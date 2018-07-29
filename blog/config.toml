@@ -1,0 +1,29 @@
+baseURL = "https://galayko.rocks/"
+theme = "temple"
+languageCode = "en-us"
+title = "Nikita Galaiko"
+copyright = "(c) 2018"
+
+[params]
+  # Enables syntax highlighting
+  highlight = true
+
+  # Supports highlighting for languages not included in the original pack
+  # See https://highlightjs.org/download/ for what's included in original pack
+  # For reference to all languages, see:
+  # https://github.com/isagalaev/highlight.js/tree/master/src/languages
+  hjslangs = ["go", "python"]
+
+  # Enables the topmenu, which pulls from categories
+  topmenu = "categories"
+
+# Builds a list page for each category given
+[taxonomies]
+  tag = "tags"
+  category = "categories"
+
+[author]
+  name = "Nikita Galaiko"
+  github = "ngalayko"
+  email = "nikita@galayko.rocks"
+  gaid = "UA-79493252-1"

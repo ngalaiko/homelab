@@ -1,0 +1,7 @@
+language: bash
+
+before_install:
+    - openssl aes-256-cbc -K $encrypted_aff93925e77f_key -iv $encrypted_aff93925e77f_iv -in .travis/id_rsa.enc -out .travis/id_rsa -d
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+
+after_success: .travis/deploy.sh
