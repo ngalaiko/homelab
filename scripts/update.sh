@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 
 git pull
+git submodule update --init --recursive
 
 files=""
 for file in $(ls *.yml); do
