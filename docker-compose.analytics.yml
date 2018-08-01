@@ -7,7 +7,7 @@ services:
     image: mysql:8.0.12
     container_name: analytics-data
     environment:
-      - MYSQL_ROOT_PASSWORD=root-password
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
     volumes:
       - "/data/matomo/data/:/var/lib/mysql/"
 
