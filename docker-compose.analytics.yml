@@ -3,7 +3,7 @@ version: "2"
 services:
   analytics:
     restart: always
-    image: matomo:3.5.1-fpm-alpine
+    build: ./analytics
     container_name: analytics
     environment:
       - VIRTUAL_HOST=analytics.${HOST}
