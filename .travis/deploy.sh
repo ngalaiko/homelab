@@ -22,4 +22,5 @@ ssh root@$IP <<EOF
     cd ${DEPLOY_DIR}
     git submodule update --init --recursive
     ./scripts/update.sh
+    ./scripts/set_dns_password.sh ${ENV_DNS_PASSWORD}
 EOF
