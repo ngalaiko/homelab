@@ -8,11 +8,11 @@ services:
     environment:
       - VIRTUAL_HOST=analytics.${HOST}
       - VIRTUAL_NETWORK=nginx-proxy
-      - VIRTUAL_PORT=9000
+      - VIRTUAL_PORT=80
       - LETSENCRYPT_HOST=analytics.${HOST}
       - LETSENCRYPT_EMAIL=ngalayko@gmail.com
     ports:
-      - "9000"
+      - "80"
     links:
       - "analytics-data:db"
 
