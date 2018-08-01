@@ -6,10 +6,7 @@ services:
     image: mysql:8.0.12
     container_name: analytics-data
     environment:
-      - MYSQL_ROOT_PASSWORD=secret
-      - MYSQL_DATABASE=matomo
-      - MYSQL_USER=matomo
-      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD
     volumes:
       - "/data/matomo/data/:/var/lib/mysql/"
 
@@ -18,7 +15,7 @@ services:
     image: matomo:3.5.1-fpm-alpine
     container_name: analytics-backend
     links:
-      - "analytics-data:db"
+      - "analytics-data"
     volumes:
       - "/data/matomo/config:/var/www/html/config"
 
