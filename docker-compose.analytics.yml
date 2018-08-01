@@ -1,0 +1,27 @@
+version: "2"
+
+services:
+  analytics:
+    restart: always
+    image: matomo:3.5.1-fpm-alpine
+    container_name: analytics
+    environment:
+      - VIRTUAL_HOST=analytics.${HOST}
+      - VIRTUAL_NETWORK=nginx-proxy
+      - VIRTUAL_PORT=9000
+      - LETSENCRYPT_HOST=analytics.${HOST}
+      - LETSENCRYPT_EMAIL=ngalayko@gmail.com
+    ports:
+      - "9000"
+    links:
+      - "analytics-data:db"
+
+  analytics-data:
+     restart: always
+     image: mysql:8.0.12
+     container_name: analytics-data
+     environment:
+       - MYSQL_ROOT_PASSWORD=pasword
+       - MYSQL_DATABASE=matomo
+     volumes:
+       - "/data/matomo/data/:/var/lib/mysql/"
