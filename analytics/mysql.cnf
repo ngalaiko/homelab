@@ -1,5 +1,22 @@
 [mysqld]
-local-infile 
+local-infile
 
 [mysql]
-local-infile 
+
+max_allowed_packet              = 16M
+key_buffer_size                 = 8M
+innodb_additional_mem_pool_size = 10M
+innodb_buffer_pool_size         = 512M
+join_buffer_size                = 40M
+table_open_cache                = 1024
+query_cache_size                = 40M
+table_definition_cache          = 256
+innodb_additional_mem_pool_size = 10M
+key_buffer_size                 = 16M
+max_allowed_packet              = 32M
+max_connections                 = 300
+query_cache_limit               = 10M
+log_slow_queries                = /var/log/mysql/mysql-slow.log
+long_query_time                 = 3
+
+local-infile
