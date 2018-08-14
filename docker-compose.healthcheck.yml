@@ -4,6 +4,7 @@ services:
   autoheal:
     restart: always
     build: ./autoheal
+    container_name: autoheal
     environment:
       - AUTOHEAL_CONTAINER_LABEL=all
       - AUTOHEAL_INTERVAL = 10
