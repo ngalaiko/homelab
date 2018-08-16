@@ -14,4 +14,4 @@ services:
             - "500:500/udp"
             - "4500:4500/udp"
         volumes:
-            - "/data/vpn/lib/modules:/lib/modules:ro"
+            - "/lib/modules:/lib/modules:ro"
