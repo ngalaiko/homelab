@@ -106,8 +106,10 @@ L2TP_LOCAL=${VPN_L2TP_LOCAL:-'192.168.42.1'}
 L2TP_POOL=${VPN_L2TP_POOL:-'192.168.42.10-192.168.42.250'}
 XAUTH_NET=${VPN_XAUTH_NET:-'192.168.43.0/24'}
 XAUTH_POOL=${VPN_XAUTH_POOL:-'192.168.43.10-192.168.43.250'}
-DNS_SRV1=${VPN_DNS_SRV1:-'8.8.8.8'}
-DNS_SRV2=${VPN_DNS_SRV2:-'8.8.4.4'}
+
+# use DNS resolver from host
+DOCKER_HOST_IP="$(/sbin/ip route|awk '/default/ { print $3 }')"
+DNS_SRV=${DOCKER_HOST_IP}
 
 # Create IPsec (Libreswan) config
 cat > /etc/ipsec.conf <<EOF
@@ -147,8 +149,7 @@ conn xauth-psk
   auto=add
   leftsubnet=0.0.0.0/0
   rightaddresspool=$XAUTH_POOL
-  modecfgdns1=$DNS_SRV1
-  modecfgdns2=$DNS_SRV2
+  modecfgdns1=$DNS_SRV
   leftxauthserver=yes
   rightxauthclient=yes
   leftmodecfgserver=yes
@@ -187,8 +188,7 @@ cat > /etc/ppp/options.xl2tpd <<EOF
 +mschap-v2
 ipcp-accept-local
 ipcp-accept-remote
-ms-dns $DNS_SRV1
-ms-dns $DNS_SRV2
+ms-dns $DNS_SRV
 noccp
 auth
 mtu 1280
