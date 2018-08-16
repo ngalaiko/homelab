@@ -7,16 +7,11 @@ services:
         container_name: vpn
         privileged: true
         environment:
-            - VIRTUAL_HOST=vpn.${HOST}
-            - VIRTUAL_NETWORK=nginx-proxy
-            - VIRTUAL_PORT=500,4500
-            - LETSENCRYPT_HOST=vpn.${HOST}
-            - LETSENCRYPT_EMAIL=ngalayko@gmail.com
             - VPN_IPSEC_PSK=${VPN_IPSEC_PSK}
             - VPN_USER=${VPN_USER}
             - VPN_PASSWORD=${VPN_PASSWORD}
         ports:
-            - "500/udp"
-            - "4500/udp"
+            - "500:500/udp"
+            - "4500:4500/udp"
         volumes:
             - "/data/vpn/lib/modules:/lib/modules:ro"
