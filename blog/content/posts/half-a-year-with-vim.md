@@ -11,6 +11,8 @@ categories: [
 menu: "main"
 ---
 
+![Vim learning curve](/media/vim.png)
+
 I started using vim because I was bored. Likely, I code in go, so it’s pretty
 easy to switch. I mean, I tried to do Java with vim for about a week -
 and it’s a hell. So if your primary language requires massive IDE support,
