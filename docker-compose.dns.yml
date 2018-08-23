@@ -3,7 +3,7 @@ version: "2"
 services:
   dns:
     restart: always
-    image: diginc/pi-hole:latest
+    image: pihole/pihole:latest
     container_name: dns
     environment:
       - ServerIP=167.99.219.223
