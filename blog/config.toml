@@ -2,7 +2,7 @@ baseURL = "https://galayko.rocks/"
 theme = "temple"
 languageCode = "en-us"
 title = "Nikita Galaiko"
-copyright = "(c) 2018"
+copyright = "(c) 2018. Powered by Hugo."
 
 [params]
   # Enables syntax highlighting
