@@ -13,6 +13,7 @@ categories: [
 menu: "main"
 ---
 
+![maze](/media/maze.png)
 
 # Problem 
 
@@ -46,12 +47,13 @@ university, but it was pretty hard to come up with the solution right away.
 I googled basic types of maze solving algorithms, and it looks like 
 [Lee algorithm](https://en.wikipedia.org/wiki/Lee_algorithm) will be a pretty
 good choice in most of the `shortest path` problems since at the end of the
-day number of different paths in a maze makes a tree.
+day a number of different paths in a maze makes a tree.
 
 The idea is deadly simple: 
-1) go to start cell, mark it `0`.
-2) mark all neighbors as `+1`. It is a distance to the starting cell
-3) make the same for each of the neighbors
+
+1. go to start cell, mark it `0`.
+2. mark all neighbors as `+1`. It is a distance to the starting cell
+3. make the same for each of the neighbors
 
 By running this algorithm for each cell, we will get the number of steps it
 takes to get to any other point from the start. Of course, we should ignore
