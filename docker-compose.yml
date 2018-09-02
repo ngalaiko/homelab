@@ -3,7 +3,7 @@ version: "2"
 services:
   nginx:
     restart: always
-    image: nginx
+    image: nginx:alpine
     container_name: nginx
     ports:
       - "80:80"
