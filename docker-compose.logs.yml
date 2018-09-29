@@ -1,6 +1,8 @@
 version: '2'
 services:
     fluentd:
+        restart: always
+        container_name: fluentd
         build:
             context: ./logs/fluentd
             dockerfile: Dockerfile
@@ -13,15 +15,19 @@ services:
             - "24224:24224/udp"
 
     elasticsearch:
+        restart: always
+        container_name: elasticsearch
         image: docker.elastic.co/elasticsearch/elasticsearch:6.4.1
         expose:
             - 9200
         ports:
             - "9200:9200"
         environment:
-            - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
+            - "ES_JAVA_OPTS=-Xms512gm -Xmx512gm"
 
     kibana:
+        restart: always
+        container_name: kibana
         image: kibana:5.6.12
         links:
             - "elasticsearch"
@@ -33,5 +39,3 @@ services:
         - VIRTUAL_PORT=5601
         - LETSENCRYPT_HOST=${HOST}
         - LETSENCRYPT_EMAIL=ngalayko@gmail.com
-
-
