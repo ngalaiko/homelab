@@ -1,0 +1,35 @@
+version: '2'
+services:
+    fluentd:
+        build:
+            context: ./logs/fluentd
+            dockerfile: Dockerfile
+        volumes:
+            - "/data/logs/fluentd:/fluentd/etc"
+        links:
+            - "elasticsearch"
+        ports:
+            - "24224:24224"
+            - "24224:24224/udp"
+
+    elasticsearch:
+        image: elasticsearch:5.6-alpine
+        expose:
+            - 9200
+        ports:
+            - "9200:9200"
+
+    kibana:
+        image: kibana:5.6.12
+        links:
+            - "elasticsearch"
+        ports:
+            - "5601:5601"
+        environment:
+        - VIRTUAL_HOST=logs.${HOST}
+        - VIRTUAL_NETWORK=nginx-proxy
+        - VIRTUAL_PORT=5601
+        - LETSENCRYPT_HOST=${HOST}
+        - LETSENCRYPT_EMAIL=ngalayko@gmail.com
+
+
