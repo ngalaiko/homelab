@@ -5,7 +5,7 @@ services:
             context: ./logs/fluentd
             dockerfile: Dockerfile
         volumes:
-            - "/data/logs/fluentd:/fluentd/etc"
+            - "./logs/fluentd/fluentd.conf:/fluentd/etc/fluentd.conf"
         links:
             - "elasticsearch"
         ports:
