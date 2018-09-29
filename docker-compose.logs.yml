@@ -23,7 +23,7 @@ services:
         ports:
             - "9200:9200"
         environment:
-            - "ES_JAVA_OPTS=-Xms512gm -Xmx512gm"
+            - "ES_JAVA_OPTS=-Xms512g -Xmx512g"
 
     kibana:
         restart: always
