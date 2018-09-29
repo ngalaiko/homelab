@@ -33,6 +33,8 @@ services:
             - "elasticsearch"
         ports:
             - "5601:5601"
+        expose:
+            - "5601"
         environment:
         - VIRTUAL_HOST=logs.${HOST}
         - VIRTUAL_NETWORK=nginx-proxy
