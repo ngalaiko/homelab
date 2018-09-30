@@ -1,0 +1,19 @@
+version: '2'
+services:
+    goaccess:
+        restart: always
+        container_name: goaccess
+        expose:
+            - "7890"
+        ports: 
+            - "7890"
+        volumes: 
+            - "./goaccess/data:/srv/data"
+            - "./goaccess/logs:/srv/logs"
+            - "./goaccess/html:/srv/report"
+        environment:
+            - VIRTUAL_HOST=ws.${HOST}
+            - VIRTUAL_NETWORK=nginx-proxy
+            - VIRTUAL_PORT=7890
+            - LETSENCRYPT_HOST=ws.${HOST}
+            - LETSENCRYPT_EMAIL=ngalayko@gmail.com
