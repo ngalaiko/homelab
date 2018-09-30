@@ -14,7 +14,7 @@ services:
 
   analytics-backend:
     restart: always
-    image: matomo:3.5.1-fpm-alpine
+    image: matomo:fpm-alpine
     container_name: analytics-backend
     links:
       - "analytics-data"
