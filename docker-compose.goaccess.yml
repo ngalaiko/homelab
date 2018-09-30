@@ -12,6 +12,8 @@ services:
             - "./goaccess/data:/srv/data"
             - "./goaccess/logs:/srv/logs"
             - "./goaccess/html:/srv/report"
+            - "/data/proxy/certs/ws.galayko.rocks.key:/srv/certs/ws.galayko.rocks.key:ro"
+            - "/data/proxy/certs/ws.galayko.rocks.crt:/srv/certs/ws.galayko.rocks.crt:ro"
         environment:
             - VIRTUAL_HOST=ws.${HOST}
             - VIRTUAL_NETWORK=nginx-proxy
