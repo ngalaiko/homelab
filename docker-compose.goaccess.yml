@@ -3,6 +3,7 @@ services:
     goaccess:
         restart: always
         container_name: goaccess
+        image: allinurl/goaccess
         expose:
             - "7890"
         ports: 
