@@ -6,7 +6,7 @@ git pull
 git submodule update --init --recursive
 
 files=""
-for file in $(ls *.yml); do
+for file in $(ls *.yaml); do
     files="${files} -f ${file} "
 done
 
