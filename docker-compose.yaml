@@ -13,6 +13,8 @@ services:
             - /usr/share/nginx/html
             - /data/proxy/certs:/etc/nginx/certs
         restart: unless-stopped
+        labels:
+            - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
 
     nginx-gen:
         image: jwilder/docker-gen
