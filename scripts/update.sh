@@ -2,6 +2,8 @@
 
 set -e
 
+git pull
+
 files=""
 for file in $(ls *.yaml); do
     files="${files} -f ${file} "
