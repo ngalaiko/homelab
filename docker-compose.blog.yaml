@@ -1,0 +1,51 @@
+version: '3'
+
+services:
+    blog:
+        image: blog
+        build: ./blog
+        container_name: blog
+        volumes:
+            - ./blog/conf.d/:/etc/nginx/conf.d
+            - /data/blog/cache/:/var/nginx/cache
+        environment:
+            - VIRTUAL_HOST=${HOST}
+            - VIRTUAL_NETWORK=nginx-proxy
+            - VIRTUAL_PORT=80
+            - LETSENCRYPT_HOST=${HOST}
+            - LETSENCRYPT_EMAIL=ngalayko@gmail.com
+        restart_policy: 
+            condition: any
+            delay: 3s
+            max_attempts: 3
+            window: 120s
+
+    comments:
+        build: ./remark
+        container_name: remark42
+        privileged: true
+        ports: 
+            - 8080
+        environment:
+            - REMARK_URL=https://remark.${HOST}
+            - SECRET=${REMARK_SECRET}
+            - ADMIN_EMAIL=ngalayko@gmail.com
+            - ADMIN=github_0ff4f879002bc6feb694a37ae894e279f0d0af4e
+            - AUTH_GITHUB_CID=${GITHUB_CID}
+            - AUTH_GITHUB_CSEC=${GITHUB_CSEC}
+            - AUTH_GOOGLE_CID=${GOOGLE_CID}
+            - AUTH_GOOGLE_CSEC=${GOOGLE_CSEC}
+            - SITE=nikitag-remark
+            - USER=0
+            - VIRTUAL_HOST=remark.${HOST}
+            - VIRTUAL_NETWORK=nginx-proxy
+            - VIRTUAL_PORT=8080
+            - LETSENCRYPT_HOST=remark.${HOST}
+            - LETSENCRYPT_EMAIL=ngalayko@gmail.com
+        volumes:
+            - /data/remark:/srv/var
+        restart_policy: 
+            condition: any
+            delay: 3s
+            max_attempts: 3
+            window: 120s

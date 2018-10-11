@@ -1,8 +1,7 @@
-version: '2'
+version: '3'
 
 services:
     vpn:
-        restart: always
         build: ./vpn
         container_name: vpn
         privileged: true
@@ -14,4 +13,9 @@ services:
             - "500:500/udp"
             - "4500:4500/udp"
         volumes:
-            - "/lib/modules:/lib/modules:ro"
+            - "/lib/modules:/lib/modules"
+        restart_policy: 
+            condition: any
+            delay: 3s
+            max_attempts: 3
+            window: 120s
