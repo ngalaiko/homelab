@@ -18,8 +18,4 @@ services:
         volumes:
             - /data/dns/pihole/:/etc/pihole/
             - /data/dns/dnsmasq.d/:/etc/dnsmasq.d/
-        restart_policy: 
-            condition: any
-            delay: 3s
-            max_attempts: 3
-            window: 120s
+        restart: unless-stopped

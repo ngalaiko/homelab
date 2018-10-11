@@ -10,8 +10,4 @@ services:
             - DOCKER_SOCK=/var/run/docker.sock
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
-        restart_policy: 
-            condition: any
-            delay: 3s
-            max_attempts: 3
-            window: 120s
+        restart: unless-stopped

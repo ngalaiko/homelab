@@ -14,8 +14,4 @@ services:
             - "4500:4500/udp"
         volumes:
             - "/lib/modules:/lib/modules"
-        restart_policy: 
-            condition: any
-            delay: 3s
-            max_attempts: 3
-            window: 120s
+        restart: unless-stopped

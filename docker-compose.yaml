@@ -12,11 +12,7 @@ services:
             - /etc/nginx/vhost.d
             - /usr/share/nginx/html
             - /data/proxy/certs:/etc/nginx/certs
-        restart_policy: 
-            condition: any
-            delay: 3s
-            max_attempts: 3
-            window: 120s
+        restart: unless-stopped
 
     nginx-gen:
         image: jwilder/docker-gen
@@ -29,11 +25,7 @@ services:
             - /etc/nginx/vhost.d
             - /etc/nginx/certs
             - /data/proxy/certs:/etc/nginx/certs
-        restart_policy: 
-            condition: any
-            delay: 3s
-            max_attempts: 3
-            window: 120s
+        restart: unless-stopped
 
     letsencrypt-nginx-proxy-companion:
         image: jrcs/letsencrypt-nginx-proxy-companion
@@ -46,8 +38,4 @@ services:
             - /etc/nginx/vhost.d
             - /usr/share/nginx/html
             - /data/proxy/certs:/etc/nginx/certs
-         restart_policy: 
-            condition: any
-            delay: 3s
-            max_attempts: 3
-            window: 120s
+        restart: unless-stopped
