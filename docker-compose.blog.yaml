@@ -2,8 +2,7 @@ version: '3'
 
 services:
     blog:
-        image: blog
-        build: ./blog
+        image: ngalayko/blog
         container_name: blog
         volumes:
             - ./blog/conf.d/:/etc/nginx/conf.d
@@ -17,7 +16,7 @@ services:
         restart: unless-stopped
 
     comments:
-        build: ./remark
+        image: ngalayko/remark
         container_name: remark42
         privileged: true
         ports: 

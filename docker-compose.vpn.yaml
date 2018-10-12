@@ -2,7 +2,7 @@ version: '3'
 
 services:
     vpn:
-        build: ./vpn
+        image: ngalayko/vpn
         container_name: vpn
         privileged: true
         environment:
