@@ -4,14 +4,13 @@ set -e
 
 echo "Building images..."
 
+# NOTE: ./server is the root
 BUILD_IMAGES=(
-    "../blog:ngalayko/blog"
-    "../remark:ngalayko/remark"
-    "../autoheal:ngalayko/autoheal"
-    "../vpn:ngalayko/vpn"
+    "./blog:ngalayko/blog"
+    "./remark:ngalayko/remark"
+    "./autoheal:ngalayko/autoheal"
+    "./vpn:ngalayko/vpn"
 )
-
-echo "${DOCKER_HUB_LOGIN}" "${DOCKER_HUB_PASSWORD}"
 
 docker login -u "${DOCKER_HUB_LOGIN}" -p "${DOCKER_HUB_PASSWORD}"
 
