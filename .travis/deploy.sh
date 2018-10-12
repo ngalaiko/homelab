@@ -18,6 +18,8 @@ ssh root@$IP <<EOF
     ${VARS}
     cd ${DEPLOY_DIR}
 
+    echo ${VARS}
+
     git pull --force
     git submodule update --init --recursive
 
