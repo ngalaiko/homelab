@@ -2,22 +2,31 @@
 
 set -e
 
+echo "Building images..."
+
 BUILD_IMAGES=(
-    "../blog:ngalaiko/blog"
-    "../remark:ngalaiko/remark"
-    "../autoheal:ngalaiko/autoheal"
-    "../vpn:ngalaiko/vpn"
+    "../blog:ngalayko/blog"
+    "../remark:ngalayko/remark"
+    "../autoheal:ngalayko/autoheal"
+    "../vpn:ngalayko/vpn"
 )
 
-docker login -u "${DOCKER_HUB_LOGIN}" -p "${DOCKER_HUB_PASSWORD}"
+docker login -u "${ENV_DOCKER_HUB_LOGIN}" -p "${ENV_DOCKER_HUB_PASSWORD}"
 
 for build_image in "${BUILD_IMAGES[@]}"; do
-    image="${build_image#*:}"
     build="${build_image%:*}" 
+    image="${build_image#*:}"
+
+    echo "Building ${image}..."
+
 
     docker build "${build}" -t "${image}"
     docker push  "${image}"
 done
 
+echo "Removing unsused images..."
+
 docker rm -v $(docker ps --filter status=exited -q 2>/dev/null)
 docker rmi $(docker images --filter dangling=true -q 2>/dev/null)
+
+echo "Done"
