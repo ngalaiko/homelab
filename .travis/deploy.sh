@@ -14,8 +14,6 @@ for v in $(env); do
     fi
 done
 
-./scripts/build.sh
-
 git config --global push.default matching
 git remote add deploy ssh://git@$IP$DEPLOY_DIR
 git push deploy master
@@ -23,7 +21,12 @@ git push deploy master
 ssh root@$IP <<EOF
     ${VARS}
     cd ${DEPLOY_DIR}
+
     git submodule update --init --recursive
+
+    ./scripts/build.sh
+
     ./scripts/deploy.sh
+
     ./scripts/set_dns_password.sh ${ENV_DNS_PASSWORD}
 EOF
