@@ -14,14 +14,11 @@ for v in $(env); do
     fi
 done
 
-git config --global push.default matching
-git remote add deploy ssh://git@$IP$DEPLOY_DIR
-git push deploy master
-
 ssh root@$IP <<EOF
     ${VARS}
     cd ${DEPLOY_DIR}
 
+    git pull --force
     git submodule update --init --recursive
 
     ./scripts/build.sh
