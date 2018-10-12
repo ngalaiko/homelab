@@ -2,20 +2,11 @@
 
 set -e
 
-BUILD_IMAGES=(
-    "../blog:ngalaiko/blog"
-    "../remark:ngalaiko/remark"
-    "../autoheal:ngalaiko/autoheal"
-    "../vpn:ngalaiko/vpn"
-)
+git pull
 
-docker login -u "${DOCKER_HUB_LOGIN}" -p "${DOCKER_HUB_PASSWORD}"
-
-for build_image in "${BUILD_IMAGES[@]}"; do
-    image="${build_image#*:}"
-    build="${build_image%:*}" 
-
-    docker build "${build}" -t "${image}"
-    docker push  "${image}"
+files=""
+for file in $(ls *.yaml); do
+    files="${files} -f ${file} "
 done
 
+docker-compose ${files} up --build -d --remove-orphans
