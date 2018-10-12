@@ -8,9 +8,9 @@ services:
             - 80:80
             - 443:443
         volumes:
-            - /etc/nginx/conf.d
-            - /etc/nginx/vhost.d
-            - /usr/share/nginx/html
+            - nginx:/etc/nginx/conf.d
+            - nginx:/etc/nginx/vhost.d
+            - nginx:/usr/share/nginx/html
             - /data/proxy/certs:/etc/nginx/certs
         restart: unless-stopped
 
@@ -21,9 +21,9 @@ services:
         volumes:
             - /var/run/docker.sock:/tmp/docker.sock
             - /data/proxy/templates/nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl
-            - /etc/nginx/conf.d
-            - /etc/nginx/vhost.d
-            - /etc/nginx/certs
+            - nginx:/etc/nginx/conf.d
+            - nginx:/etc/nginx/vhost.d
+            - nginx:/etc/nginx/certs
             - /data/proxy/certs:/etc/nginx/certs
         restart: unless-stopped
 
@@ -35,8 +35,11 @@ services:
             - NGINX_PROXY_CONTAINER=nginx
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
-            - /etc/nginx/conf.d
-            - /etc/nginx/vhost.d
-            - /usr/share/nginx/html
+            - nginx:/etc/nginx/conf.d
+            - nginx:/etc/nginx/vhost.d
+            - nginx:/usr/share/nginx/html
             - /data/proxy/certs:/etc/nginx/certs
         restart: unless-stopped
+
+volumes:
+    nginx:
