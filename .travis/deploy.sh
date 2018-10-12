@@ -7,6 +7,7 @@ chmod 600 .travis/id_rsa # Allow read access to the private key
 ssh-add .travis/id_rsa # Add the private key to SSH
 
 # move ENV_* variables to the remote server
+# NOTE: they are moved without ENV_ prefix
 VARS="echo env variables updated"
 for v in $(env); do
     if [[ "${v}" =~ ^ENV_* ]]; then

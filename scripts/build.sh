@@ -11,9 +11,9 @@ BUILD_IMAGES=(
     "../vpn:ngalayko/vpn"
 )
 
-echo "${ENV_DOCKER_HUB_LOGIN}":"${ENV_DOCKER_HUB_PASSWORD}"
+echo "${DOCKER_HUB_LOGIN}" "${DOCKER_HUB_PASSWORD}"
 
-docker login -u "${ENV_DOCKER_HUB_LOGIN}" -p "${ENV_DOCKER_HUB_PASSWORD}"
+docker login -u "${DOCKER_HUB_LOGIN}" -p "${DOCKER_HUB_PASSWORD}"
 
 for build_image in "${BUILD_IMAGES[@]}"; do
     build="${build_image%:*}" 
