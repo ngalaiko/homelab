@@ -19,3 +19,5 @@ for build_image in "${BUILD_IMAGES[@]}"; do
     docker push  "${image}"
 done
 
+docker rm -v $(docker ps --filter status=exited -q 2>/dev/null)
+docker rmi $(docker images --filter dangling=true -q 2>/dev/null)
