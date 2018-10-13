@@ -9,6 +9,6 @@ for file in $(ls *.yaml); do
     files="${files} -f ${file} "
 done
 
-docker-compose ${files} up --build -d --remove-orphans
+docker-compose --verbose ${files} up --build -d --remove-orphans
 
 echo "Done."
