@@ -26,8 +26,6 @@ for build_image in "${BUILD_IMAGES[@]}"; do
 
     docker build "${build}" -t "${image}"
     docker push  "${image}"
-
-    sleep 5
 done
 
 echo "Done"
