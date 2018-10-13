@@ -13,7 +13,6 @@ WORKDIR /app
 ADD ./ .
 RUN hugo -t temple
 
-FROM nginx:1.14.0-alpine
+FROM ngalayko/nginx
 
 COPY --from=builder /app/public/ /usr/share/nginx/html
-

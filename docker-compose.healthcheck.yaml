@@ -2,7 +2,7 @@ version: '3'
 
 services:
     autoheal:
-        build: ./autoheal
+        image: ngalayko/autoheal
         container_name: autoheal
         environment:
             - AUTOHEAL_CONTAINER_LABEL=all

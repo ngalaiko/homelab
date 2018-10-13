@@ -22,7 +22,7 @@ services:
         restart: unless-stopped
 
     analytics-frontend:
-        image: nginx:1.13.3-alpine
+        image: ngalayko/nginx
         container_name: analytics-frontend
         environment:
             - VIRTUAL_HOST=analytics.${HOST}
