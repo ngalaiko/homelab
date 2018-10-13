@@ -1,13 +1,12 @@
-FROM golang:1.10-alpine as builder
+FROM alpine as builder
 
 RUN apk add --update --no-cache \
-    git
+        wget 
 
-RUN go get -v -u  github.com/magefile/mage && \
-    go get -d -v -u github.com/gohugoio/hugo && \
-    cd ${GOPATH}/src/github.com/gohugoio/hugo && \
-    mage -v vendor && \
-    mage -v install
+RUN wget -q https://github.com/gohugoio/hugo/releases/download/v0.49.2/hugo_0.49.2_Linux-64bit.tar.gz && \
+        ls && \
+        tar xzf hugo_0.49.2_Linux-64bit.tar.gz -C /usr/bin 
+        
 
 WORKDIR /app
 ADD ./ .
