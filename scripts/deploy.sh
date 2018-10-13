@@ -9,6 +9,6 @@ for file in $(ls *.yaml); do
     files="${files} -f ${file} "
 done
 
-docker-compose --verbose ${files} up --build -d --remove-orphans
+COMPOSE_HTTP_TIMEOUT=120 docker-compose ${files} up --build -d --remove-orphans
 
 echo "Done."

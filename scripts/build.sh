@@ -24,7 +24,6 @@ for build_image in "${BUILD_IMAGES[@]}"; do
 
     echo "Building ${image}..."
 
-
     docker build "${build}" -t "${image}"
     docker push  "${image}"
 
