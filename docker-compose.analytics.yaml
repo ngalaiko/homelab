@@ -2,14 +2,14 @@ version: '3'
 
 services:
     analytics-data:
-        image: mysql:8.0.12
+        image: ngalayko/mysql
         container_name: analytics-data
         command: "--default-authentication-plugin=mysql_native_password"
         environment:
             - MYSQL_RANDOM_ROOT_PASSWORD=yes
         volumes:
             - /data/matomo/data/:/var/lib/mysql/
-            - ./analytics/mysql.cnf:/etc/mysql/conf.d/mysql.cnf
+            - ./mysql/mysql.cnf:/etc/mysql/conf.d/mysql.cnf
         restart: unless-stopped
 
     analytics-backend:
