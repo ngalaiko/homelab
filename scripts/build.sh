@@ -9,11 +9,11 @@ BUILD_IMAGES=(
     "./dns:ngalayko/pihole"
     "./mysql:ngalayko/mysql"
     "./nginx:ngalayko/nginx"
-    "./blog:ngalayko/blog"
     "./analytics:ngalayko/matomo"
     "./remark:ngalayko/remark"
     "./autoheal:ngalayko/autoheal"
     "./vpn:ngalayko/vpn"
+    "./blog:ngalayko/blog"
 )
 
 docker login -u "${DOCKER_HUB_LOGIN}" -p "${DOCKER_HUB_PASSWORD}"
