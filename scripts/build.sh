@@ -9,6 +9,7 @@ BUILD_IMAGES=(
     "./mysql:ngalayko/mysql"
     "./nginx:ngalayko/nginx"
     "./blog:ngalayko/blog"
+    "./analytics:ngalayko/matomo"
     "./remark:ngalayko/remark"
     "./autoheal:ngalayko/autoheal"
     "./vpn:ngalayko/vpn"

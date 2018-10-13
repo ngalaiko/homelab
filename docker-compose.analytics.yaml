@@ -13,7 +13,7 @@ services:
         restart: unless-stopped
 
     analytics-backend:
-        image: matomo:3.6.0-fpm-alpine
+        image: ngalayko/matomo
         container_name: analytics-backend
         links:
             - analytics-data
