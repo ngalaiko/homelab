@@ -5,7 +5,7 @@ services:
         image: ngalayko/blog
         container_name: blog
         volumes:
-            - ./blog/conf.d/:/etc/nginx/conf.d
+            - ./containers/blog/conf.d/:/etc/nginx/conf.d
             - /data/blog/cache/:/var/nginx/cache
         environment:
             - VIRTUAL_HOST=${HOST}
