@@ -1,0 +1,16 @@
+FROM armhf/alpine as builder
+
+RUN apk add --update --no-cache \
+        wget 
+
+# TODO: check why is it insecure
+RUN wget -q --no-check-certificate https://github.com/gohugoio/hugo/releases/download/v0.49.2/hugo_0.49.2_Linux-ARM.tar.gz && \
+        tar xzf hugo_0.49.2_Linux-ARM.tar.gz -C /usr/bin 
+
+WORKDIR /app
+ADD ./ .
+RUN hugo -t temple
+
+FROM ngalayko/nginx:arm32v7
+
+COPY --from=builder /app/public/ /usr/share/nginx/html

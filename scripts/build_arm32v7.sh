@@ -6,15 +6,12 @@ echo "Building images..."
 
 # NOTE: ./server is the root
 BUILD_IMAGES=(
-    "./proxy:ngalayko/proxy"
+    "./blog:ngalayko/blog"
+    "./analytics:ngalayko/matomo"
+    "./nginx:ngalayko/nginx"
     "./dns:ngalayko/pihole"
     "./mysql:ngalayko/mysql"
-    "./nginx:ngalayko/nginx"
-    "./analytics:ngalayko/matomo"
-    "./remark:ngalayko/remark"
-    "./autoheal:ngalayko/autoheal"
-    "./vpn:ngalayko/vpn"
-    "./blog:ngalayko/blog"
+    "./proxy:ngalayko/proxy"
 )
 
 docker login -u "${DOCKER_HUB_LOGIN}" -p "${DOCKER_HUB_PASSWORD}"
@@ -25,8 +22,8 @@ for build_image in "${BUILD_IMAGES[@]}"; do
 
     echo "Building ${image}..."
 
-    docker build "${build}" -t "${image}"
-    docker push  "${image}"
+    docker build -f "${build}/Dockerfile.arm32v7" "${build}" -t "${image}:arm32v7"
+    docker push "${image}:arm32v7"
 done
 
 echo "Done"
