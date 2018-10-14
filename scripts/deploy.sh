@@ -5,7 +5,7 @@ set -e
 echo "Deploying..."
 
 ARCH="$1"
-if [[ -z "${ARCH}" ]]; then
+if [ -z "${ARCH}" ]; then
     echo "specify archetecture: arm32 or amd64"
     exit 0
 fi
