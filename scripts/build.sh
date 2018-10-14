@@ -6,15 +6,15 @@ echo "Building images..."
 
 # NOTE: ./server is the root
 BUILD_IMAGES=(
-    "./proxy:ngalayko/proxy"
-    "./dns:ngalayko/pihole"
-    "./mysql:ngalayko/mysql"
-    "./nginx:ngalayko/nginx"
-    "./analytics:ngalayko/matomo"
-    "./remark:ngalayko/remark"
-    "./autoheal:ngalayko/autoheal"
-    "./vpn:ngalayko/vpn"
-    "./blog:ngalayko/blog"
+    "./containers/proxy:ngalayko/proxy"
+    "./containers/dns:ngalayko/pihole"
+    "./containers/mysql:ngalayko/mysql"
+    "./containers/nginx:ngalayko/nginx"
+    "./containers/analytics:ngalayko/matomo"
+    "./containers/remark:ngalayko/remark"
+    "./containers/autoheal:ngalayko/autoheal"
+    "./containers/vpn:ngalayko/vpn"
+    "./containers/blog:ngalayko/blog"
 )
 
 docker login -u "${DOCKER_HUB_LOGIN}" -p "${DOCKER_HUB_PASSWORD}"

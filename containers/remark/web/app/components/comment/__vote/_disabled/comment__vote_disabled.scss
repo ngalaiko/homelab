@@ -1,0 +1,7 @@
+.comment__vote_disabled {
+  &,
+  &:hover {
+    background-image: url('comment__vote_disabled.svg');
+    cursor: not-allowed;
+  }
+}

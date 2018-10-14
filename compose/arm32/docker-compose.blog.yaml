@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+    blog:
+        image: ngalayko/blog:arm32v7
+        container_name: blog
+        volumes:
+            - /etc/nginx/conf.d
+            - /var/nginx/cache
+        labels:
+            - traefik.frontend.rule=Host:blog.docker.localhost
