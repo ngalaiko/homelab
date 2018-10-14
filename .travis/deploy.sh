@@ -22,7 +22,6 @@ ssh root@$IP <<EOF
     echo ${VARS}
 
     git pull --force
-    git submodule update --init --recursive
 
     ./scripts/build.sh
 
