@@ -1,11 +1,13 @@
 version: '3'
 
 services:
-    blog:
+     blog:
         image: ngalayko/blog:arm32v7
-        container_name: blog
-        volumes:
-            - /etc/nginx/conf.d
-            - /var/nginx/cache
-        labels:
-            - traefik.frontend.rule=Host:blog.docker.localhost
+        networks:
+            - traefik
+        deploy:
+            replicas: 3
+            labels:
+                - "traefik.port=80"
+                - "traefik.docker.network=traefik"
+                - "traefik.frontend.rule=Host:blog.docker.swarm"
