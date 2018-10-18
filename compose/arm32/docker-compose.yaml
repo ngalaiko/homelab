@@ -4,9 +4,6 @@ networks:
     traefik:
         driver: overlay
 
-volumes:
-    traefik_acme_certificates:
-
 configs:
     traefik_config:
         file: ../../containers/traefik/conf/traefik.toml
@@ -25,7 +22,7 @@ services:
             - DO_AUTH_TOKEN=${DIGITAL_OCEAN_AUTH_TOKEN}
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
-            - traefik_acme_certificates:/etc/traefik/acme/acme.json
+            - /etc/traefik/acme/acme.json:/etc/traefik/acme/acme.json
         networks:
             - traefik
         deploy:
