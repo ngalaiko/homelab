@@ -1,14 +1,14 @@
-version: '3'
+version: '3.3'
 
 services:
     proxy:
         image: ngalayko/proxy:arm32v7
-        command: 
-            - --api.dashboard
-            - --docker 
-            - --docker.swarmmode 
-            - --docker.watch 
-            - --docker.domain=docker.swarm
+        command: --api.dashboard \
+            --docker \
+            --docker.swarmmode \
+            --docker.watch \
+            --docker.domain=docker.swarm
+              #- --entryPoints='Name:https Address::443 SSL Compress:true'
         ports:
             - 80:80
             - 443:443
@@ -20,31 +20,11 @@ services:
             - traefik
         deploy:
             replicas: 1
-            labels:
-                - "traefik.port=8080"
-                - "traefik.docker.network=traefik"
-                - "traefik.frontend.rule=Host:admin.docker.swarm"
             placement:
                 constraints: 
                     - "node.role==manager"
             restart_policy:
                 condition: on-failure
-
-    visualizer:
-        image: alexellis2/visualizer-arm:latest
-        networks:
-            - traefik
-        volumes: 
-            - /var/run/docker.sock:/var/run/docker.sock
-        deploy:
-            replicas: 1
-            labels:
-                - "traefik.port=8080"
-                - "traefik.docker.network=traefik"
-                - "traefik.frontend.rule=Host:swarm.docker.swarm"
-            placement:
-                constraints: 
-                    - "node.role==manager"
 
 networks:
     traefik:

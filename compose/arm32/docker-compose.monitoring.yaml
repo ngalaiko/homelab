@@ -1,0 +1,143 @@
+version: '3.3'
+
+volumes:
+    prometheus_data:
+    grafana_data:
+
+configs:
+    dockerd_config:
+        file: ../../containers/dockerd-exporter/Caddyfile
+    node_rules:
+        file: ../../containers/prometheus/rules/swarm_node.rules.yml
+    task_rules:
+        file: ../../containers/prometheus/rules/swarm_task.rules.yml
+
+services:
+    grafana:
+        image: ngalayko/grafana:arm32v7
+        volumes:
+            - grafana_data:/var/lib/grafana
+        networks:
+            - traefik
+        deploy:
+            replicas: 1
+            labels:
+                - "traefik.port=3000"
+                - "traefik.docker.network=traefik"
+                - "traefik.frontend.rule=Host:metrics.docker.swarm"
+            restart_policy:
+                condition: on-failure
+            resources:
+                limits:
+                    memory: 128M
+                reservations:
+                    memory: 64M
+
+    prometheus:
+        image: ngalayko/prometheus:arm32v7
+        volumes:
+            - prometheus_data:/prometheus
+        networks:
+            - traefik
+        configs:
+            - source: node_rules
+              target: /etc/prometheus/swarm_node.rules.yml
+            - source: task_rules
+              target: /etc/prometheus/swarm_task.rules.yml
+        deploy:
+            replicas: 1
+            restart_policy:
+                condition: on-failure
+            resources:
+                limits:
+                    memory: 512M
+                reservations:
+                    memory: 128M
+
+    dockerd-exporter:
+        image: elswork/arm-caddy:0.11.0alpine3.7
+        networks:
+            - traefik
+        environment:
+            - DOCKER_GWBRIDGE_IP=172.18.0.1
+        configs:
+            - source: dockerd_config
+              target: /etc/caddy/Caddyfile
+        deploy:
+            mode: global
+            restart_policy: 
+                condition: on-failure
+            resources:
+                limits:
+                    memory: 128M
+                reservations:
+                    memory: 64M
+
+    node-exporter:
+        image: ngalayko/node-exporter:arm32v7
+        command: 
+            - --path.sysfs=/host/sys
+            - --path.procfs=/host/proc
+            - --collector.textfile.directory=/etc/node-exporter/
+            - --collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)
+            - --no-collector.ipvs
+        networks:
+            - traefik
+        environment:
+            - NODE_ID={{.Node.ID}}
+        volumes:
+            - /proc:/host/proc:ro
+            - /sys:/host/sys:ro
+            - /:/rootfs:ro
+            - /etc/hostname:/etc/nodename
+        deploy:
+            mode: global
+            restart_policy:
+                condition: on-failure
+            resources:
+                limits:
+                    memory: 128M
+                reservations:
+                    memory: 64M
+
+    arm-exporter:
+        image: carlosedp/arm_exporter
+        command: --collector.textfile.directory=/etc/rpi_exporter/
+        environment:
+            - NODE_ID={{.Node.ID}}
+        networks:
+            - traefik
+        volumes:
+            - /etc/hostname:/etc/nodename:ro
+            - /etc/localtime:/etc/localtime:ro
+            - /etc/timezone:/etc/TZ:ro
+        deploy:
+            mode: global
+            restart_policy:
+                condition: on-failure
+            resources:
+                limits:
+                    memory: 128M
+                reservations:
+                    memory: 64M
+
+    cadvisor:
+        image: carlosedp/rpi-cadvisor
+        command:
+            - --global_housekeeping_interval=30s
+            - --housekeeping_interval=5s
+            - --storage_duration=1m0s
+        networks:
+            - traefik
+        volumes:
+            - /:/rootfs:ro
+            - /var/run:/var/run:rw
+            - /sys:/sys:ro
+            - /var/lib/docker/:/var/lib/docker:ro
+        deploy:
+            mode: global
+            resources:
+                limits:
+                    memory: 128M
+                reservations:
+                    memory: 64M

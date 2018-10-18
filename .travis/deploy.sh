@@ -25,7 +25,7 @@ ssh root@$IP <<EOF
 
     ./scripts/build.sh
 
-    ./scripts/deploy.sh amd64
+    ./scripts/deploy.sh
 
     ./scripts/set_dns_password.sh ${ENV_DNS_PASSWORD}
 EOF
