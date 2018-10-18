@@ -9,7 +9,7 @@ BUILD_IMAGES=(
     "./containers/node-exporter:ngalayko/node-exporter"
     "./containers/grafana:ngalayko/grafana"
     "./containers/prometheus:ngalayko/prometheus"
-    "./containers/proxy:ngalayko/proxy"
+    "./containers/traefik:ngalayko/proxy"
     "./containers/blog:ngalayko/blog"
     "./containers/analytics:ngalayko/matomo"
     "./containers/nginx:ngalayko/nginx"
