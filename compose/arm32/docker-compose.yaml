@@ -4,16 +4,9 @@ networks:
     traefik:
         driver: overlay
 
-configs:
-    traefik_config:
-        file: ../../containers/traefik/conf/traefik.toml
-
 services:
     proxy:
         image: ngalayko/proxy:arm32v7
-        configs:
-            - source: traefik_config
-              target: /etc/traefik/traefik.toml
         ports:
             - 80:80
             - 443:443
@@ -23,6 +16,7 @@ services:
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
             - /etc/traefik/acme/acme.json:/etc/traefik/acme/acme.json
+            - ../../containers/traefik/conf/traefik.toml:/etc/traefik/traefik.toml
         networks:
             - traefik
         deploy:
