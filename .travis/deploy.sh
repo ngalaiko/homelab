@@ -23,7 +23,5 @@ ssh $USER@$IP <<EOF
 
     git pull --force
 
-    ./scripts/build_arm32v7.sh
-
     ./scripts/deploy_arm32v7.sh
 EOF
