@@ -20,6 +20,7 @@ services:
         ports:
             - 80:80
             - 443:443
+            - 8090:8080
         environment:
             - DO_AUTH_TOKEN=${DIGITAL_OCEAN_AUTH_TOKEN}
         volumes:
