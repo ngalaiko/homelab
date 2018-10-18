@@ -15,7 +15,7 @@ for v in $(env); do
     fi
 done
 
-ssh root@$IP <<EOF
+ssh $USER@$IP <<EOF
     ${VARS}
     cd ${DEPLOY_DIR}
 
@@ -23,9 +23,7 @@ ssh root@$IP <<EOF
 
     git pull --force
 
-    ./scripts/build.sh
+    ./scripts/build_arm32v7.sh
 
-    ./scripts/deploy.sh
-
-    ./scripts/set_dns_password.sh ${ENV_DNS_PASSWORD}
+    ./scripts/deploy_arm32v7.sh
 EOF
