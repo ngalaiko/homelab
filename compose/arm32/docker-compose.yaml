@@ -1,14 +1,21 @@
 version: '3.3'
 
+networks:
+    traefik:
+        driver: overlay
+
+volumes:
+    traefik_acme_certificates:
+
 configs:
-    traefik.toml:
-        file: ../../containers/proxy/conf/traefik.toml
+    traefik_config:
+        file: ../../containers/traefik/conf/traefik.toml
 
 services:
     proxy:
         image: ngalayko/proxy:arm32v7
         configs:
-            - source: traefik.toml
+            - source: traefik_config
               target: /etc/traefik/traefik.toml
         ports:
             - 80:80
@@ -17,6 +24,7 @@ services:
             - DO_AUTH_TOKEN=${DIGITAL_OCEAN_AUTH_TOKEN}
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
+            - traefik_acme_certificates:/etc/traefik/acme/acme.json
         networks:
             - traefik
         deploy:
@@ -26,7 +34,3 @@ services:
                     - "node.role==manager"
             restart_policy:
                 condition: on-failure
-
-networks:
-    traefik:
-        driver: overlay
