@@ -2,7 +2,7 @@ version: '3.3'
 
 configs:
     traefik.toml:
-        file: ../../containers/proxy/traefik.toml
+        file: ../../containers/proxy/conf/traefik.toml
 
 services:
     proxy:
