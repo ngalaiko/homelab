@@ -9,5 +9,5 @@ services:
             replicas: 3
             labels:
                 - "traefik.port=80"
-                - "traefik.docker.network=traefik"
-                - "traefik.frontend.rule=Host:blog.docker.swarm"
+                - "traefik.docker.network=server_traefik"
+                - "traefik.frontend.rule=Host:blog.test.galayko.rocks"

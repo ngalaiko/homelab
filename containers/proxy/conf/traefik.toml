@@ -1,0 +1,28 @@
+defaultEntryPoints = ["http", "https"]
+
+[api]
+  dashboard=true
+
+[entryPoints]
+  [entryPoints.http]
+    address = ":80"
+  [entryPoints.https]
+    address = ":443"
+    compress = true
+      [entryPoints.https.tls]
+
+[acme]
+  email = "ngalayko@gmail.com"
+  storage = "acme.json"
+  entryPoint = "https"
+  OnHostRule = true
+  acmeLogging = true
+
+[acme.dnsChallenge]
+  provider = "digitalocean"
+  delayBeforeCheck = 0
+
+[docker]
+  domain = "test.galayko.rocks"
+  watch = true
+  swarmmode = true

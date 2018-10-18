@@ -1,21 +1,22 @@
 version: '3.3'
 
+configs:
+    traefik.toml:
+        file: ../../containers/proxy/traefik.toml
+
 services:
     proxy:
         image: ngalayko/proxy:arm32v7
-        command: --api.dashboard \
-            --docker \
-            --docker.swarmmode \
-            --docker.watch \
-            --docker.domain=docker.swarm
-              #- --entryPoints='Name:https Address::443 SSL Compress:true'
+        configs:
+            - source: traefik.toml
+              target: /etc/traefik/traefik.toml
         ports:
             - 80:80
             - 443:443
-            - 8080:8080
+        environment:
+            - DO_AUTH_TOKEN=${DIGITAL_OCEAN_AUTH_TOKEN}
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
-            - /dev/null:/traefik.toml
         networks:
             - traefik
         deploy:

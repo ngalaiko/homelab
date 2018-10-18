@@ -1,1 +1,3 @@
 FROM arm32v6/traefik:alpine
+
+COPY conf/traefik.toml /etc/traefik/traefik.toml

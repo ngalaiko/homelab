@@ -4,10 +4,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates \
         curl 
 
-RUN curl -sSLO https://github.com/prometheus/node_exporter/releases/download/v0.16.0-rc.0/node_exporter-0.16.0-rc.0.linux-armv7.tar.gz && \
-    tar xfvz node_exporter-0.16.0-rc.0.linux-armv7.tar.gz
+RUN curl -sSLO https://github.com/prometheus/node_exporter/releases/download/v0.15.2/node_exporter-0.15.2.linux-armv7.tar.gz && \
+    tar xfvz node_exporter-0.15.2.linux-armv7.tar.gz
 
-RUN mv ./node_exporter-0.16.0-rc.0.linux-armv7/node_exporter /bin/node_exporter
+RUN mv ./node_exporter-0.15.2.linux-armv7/node_exporter /bin/node_exporter
 
 COPY conf /etc/node-exporter/
 

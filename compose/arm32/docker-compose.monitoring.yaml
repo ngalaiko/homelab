@@ -23,8 +23,8 @@ services:
             replicas: 1
             labels:
                 - "traefik.port=3000"
-                - "traefik.docker.network=traefik"
-                - "traefik.frontend.rule=Host:metrics.docker.swarm"
+                - "traefik.docker.network=server_traefik"
+                - "traefik.frontend.rule=Host:monitor.test.galayko.rocks"
             restart_policy:
                 condition: on-failure
             resources:
@@ -58,6 +58,8 @@ services:
         image: elswork/arm-caddy:0.11.0alpine3.7
         networks:
             - traefik
+        ports:
+            - 9323:9323
         environment:
             - DOCKER_GWBRIDGE_IP=172.18.0.1
         configs:
@@ -81,6 +83,8 @@ services:
             - --collector.textfile.directory=/etc/node-exporter/
             - --collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)
             - --no-collector.ipvs
+        ports:
+            - 9100:9100
         networks:
             - traefik
         environment:
@@ -107,6 +111,8 @@ services:
             - NODE_ID={{.Node.ID}}
         networks:
             - traefik
+        ports:
+            - 9243:9243
         volumes:
             - /etc/hostname:/etc/nodename:ro
             - /etc/localtime:/etc/localtime:ro
@@ -129,6 +135,8 @@ services:
             - --storage_duration=1m0s
         networks:
             - traefik
+        ports:
+            - 8080
         volumes:
             - /:/rootfs:ro
             - /var/run:/var/run:rw
