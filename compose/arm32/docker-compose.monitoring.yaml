@@ -83,8 +83,6 @@ services:
             - --collector.textfile.directory=/etc/node-exporter/
             - --collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)
             - --no-collector.ipvs
-        ports:
-            - 9100:9100
         networks:
             - traefik
         environment:
@@ -136,7 +134,7 @@ services:
         networks:
             - traefik
         ports:
-            - 8080
+            - 8080:8080
         volumes:
             - /:/rootfs:ro
             - /var/run:/var/run:rw
