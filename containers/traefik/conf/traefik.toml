@@ -26,3 +26,8 @@ defaultEntryPoints = ["http", "https"]
   domain = "test.galayko.rocks"
   watch = true
   swarmmode = true
+
+[metrics]
+  [metrics.prometheus]
+    entryPoint = "traefik"
+    buckets = [0.1,0.3,1.2,5.0]
