@@ -49,7 +49,6 @@ scrape_configs:
       port: 9243
 
   - jon_name: "proxy"
-    metrics_path: '/traefik'
     dns_sd_configs:
     - names:
         - "tasks.proxy"
