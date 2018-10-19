@@ -48,11 +48,9 @@ scrape_configs:
       type: 'A'
       port: 9243
 
-  - jon_name: "proxy"
+  - job_name: 'proxy'
     dns_sd_configs:
     - names:
-        - "tasks.proxy"
-        type: 'A'
-        port: 8080
-
-
+      - 'tasks.proxy'
+      type: 'A'
+      port: 8080
