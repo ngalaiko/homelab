@@ -40,6 +40,13 @@ services:
             - analytics-data
         volumes:
             - matomo_html:/var/www/html
+        deploy:
+            replicas: 1
+            restart_policy:
+                condition: on-failure
+            placement:
+                constraints:
+                    - "node.label.analytics==true"
 
     analytics-frontend:
         image: ngalayko/nginx:arm32v7
@@ -57,3 +64,6 @@ services:
                 - "traefik.port=80"
                 - "traefik.docker.network=server_traefik"
                 - "traefik.frontend.rule=Host:analytics.${HOST}"
+            placement:
+                constraints:
+                    - "node.label.analytics==true"
