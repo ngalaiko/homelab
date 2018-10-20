@@ -19,6 +19,7 @@ services:
             - ../../containers/traefik/conf/traefik.toml:/etc/traefik/traefik.toml
         networks:
             - traefik
+            - monitoring
         deploy:
             replicas: 1
             placement:
