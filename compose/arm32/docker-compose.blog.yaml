@@ -41,3 +41,6 @@ services:
                 - "traefik.port=8080"
                 - "traefik.docker.network=server_traefik"
                 - "traefik.frontend.rule=Host:remark.${HOST}"
+            placement:
+                constraints:
+                    - "node.labels.remark==true"
