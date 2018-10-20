@@ -46,7 +46,7 @@ services:
                 condition: on-failure
             placement:
                 constraints:
-                    - "node.label.analytics==true"
+                    - "node.labels.analytics==true"
 
     analytics-frontend:
         image: ngalayko/nginx:arm32v7
@@ -66,4 +66,4 @@ services:
                 - "traefik.frontend.rule=Host:analytics.${HOST}"
             placement:
                 constraints:
-                    - "node.label.analytics==true"
+                    - "node.labels.analytics==true"
