@@ -16,14 +16,16 @@ services:
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
             - /etc/traefik/acme/acme.json:/etc/traefik/acme/acme.json
-            - ../../containers/traefik/conf/traefik.toml:/etc/traefik/traefik.toml
         networks:
             - traefik
             - monitoring
         deploy:
-            replicas: 1
+            mode: global
             placement:
                 constraints: 
                     - "node.role==manager"
             restart_policy:
                 condition: on-failure
+            update_config:
+                parallelism: 1
+                delay: 10s
