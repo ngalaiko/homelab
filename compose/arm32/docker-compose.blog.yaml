@@ -20,6 +20,8 @@ services:
 
     comments:
         image: ngalayko/remark:arm32v7
+        networks:
+            - traefik
         volumes:
             - remark_data:/srv/var
         environment:

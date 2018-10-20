@@ -12,6 +12,10 @@ configs:
     task_rules:
         file: ../../containers/prometheus/rules/swarm_task.rules.yml
 
+networks:
+    monitoring:
+        driver: overlay
+
 services:
     grafana:
         image: ngalayko/grafana:arm32v7
@@ -19,6 +23,7 @@ services:
             - grafana_data:/var/lib/grafana
         networks:
             - traefik
+            - monitoring
         deploy:
             replicas: 1
             labels:
@@ -38,7 +43,7 @@ services:
         volumes:
             - prometheus_data:/prometheus
         networks:
-            - traefik
+            - monitoring
         configs:
             - source: node_rules
               target: /etc/prometheus/swarm_node.rules.yml
@@ -57,7 +62,7 @@ services:
     dockerd-exporter:
         image: elswork/arm-caddy:0.11.0alpine3.7
         networks:
-            - traefik
+            - monitoring
         ports:
             - 9323:9323
         environment:
@@ -82,7 +87,7 @@ services:
             - --collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)
             - --no-collector.ipvs
         networks:
-            - traefik
+            - monitoring
         environment:
             - NODE_ID={{.Node.ID}}
         volumes:
@@ -105,6 +110,7 @@ services:
             - NODE_ID={{.Node.ID}}
         networks:
             - traefik
+            - monitoring
         ports:
             - 9243:9243
         volumes:
@@ -126,7 +132,7 @@ services:
             - --housekeeping_interval=5s
             - --storage_duration=1m0s
         networks:
-            - traefik
+            - monitoring
         ports:
             - 8080:8080
         volumes:

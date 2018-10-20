@@ -3,10 +3,15 @@ version: '3.3'
 volumes:
     matomo_data:
 
+networks:
+    analytics:
+        driver: overlay
+
 services:
     analytics-data:
         image: ngalayko/mysql:arm32v7
-        container_name: analytics-data
+        networks:
+            - analytics
         command: "--default-authentication-plugin=mysql_native_password"
         environment:
             - MYSQL_RANDOM_ROOT_PASSWORD=yes
@@ -25,13 +30,15 @@ services:
 
     analytics-backend:
         image: ngalayko/matomo:arm32v7
-        container_name: analytics-backend
+        networks:
+            - analytics
         volumes:
             - matomo_data:/var/www/html
 
     analytics-frontend:
         image: ngalayko/nginx:arm32v7
-        container_name: analytics-frontend
+        networks:
+            - analytics
         volumes:
             - matomo_data:/var/www/html
             - ../../containers/analytics/nginx.conf:/etc/nginx/nginx.conf
