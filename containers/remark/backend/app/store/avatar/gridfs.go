@@ -5,12 +5,13 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"time"
 
 	"github.com/globalsign/mgo"
+	"github.com/go-pkgz/mongo"
 	"github.com/pkg/errors"
 
 	"github.com/umputun/remark/backend/app/store"
-	"github.com/umputun/remark/backend/app/store/engine/mongo"
 )
 
 // NewGridFS makes gridfs (mongo) avatar store
@@ -26,7 +27,7 @@ type GridFS struct {
 
 // Put avatar to gridfs object, try to resize
 func (gf *GridFS) Put(userID string, reader io.Reader) (avatar string, err error) {
-	id := store.EncodeID(userID)
+	id := encodeID(userID)
 	err = gf.Connection.WithDB(func(dbase *mgo.Database) error {
 		fh, e := dbase.GridFS("fs").Create(id + imgSfx)
 		if e != nil {
@@ -40,7 +41,7 @@ func (gf *GridFS) Put(userID string, reader io.Reader) (avatar string, err error
 
 		// Trying to resize avatar.
 		if reader = resize(reader, gf.resizeLimit); reader == nil {
-			return errors.New("avatar reader is nil")
+			return errors.New("avatar resize reader is nil")
 		}
 		_, e = io.Copy(fh, reader)
 		return e
@@ -73,11 +74,52 @@ func (gf *GridFS) ID(avatar string) (id string) {
 			return errors.Wrapf(e, "can't open avatar %s", avatar)
 		}
 		id = fh.MD5()
-		return nil
+		return errors.Wrapf(fh.Close(), "can't close avatar")
 	})
 	if err != nil {
 		log.Printf("[DEBUG] can't get file info '%s', %s", avatar, err)
 		return store.EncodeID(avatar)
 	}
 	return id
+}
+
+// Remove avatar from gridfs
+func (gf *GridFS) Remove(avatar string) error {
+	return gf.Connection.WithDB(func(dbase *mgo.Database) error {
+		fh, e := dbase.GridFS("fs").Open(avatar)
+		if e != nil {
+			return errors.Wrapf(e, "can't get avatar %s", avatar)
+		}
+		if e = fh.Close(); e != nil {
+			log.Printf("[WARN] can't close avatar %s, %s", avatar, e)
+		}
+		return dbase.GridFS("fs").Remove(avatar)
+	})
+}
+
+// List all avatars (ids) on gfs
+// note: id includes .image suffix
+func (gf *GridFS) List() (ids []string, err error) {
+
+	type gfsFile struct {
+		UploadDate time.Time `bson:"uploadDate"`
+		Length     int64     `bson:",minsize"`
+		MD5        string
+		Filename   string `bson:",omitempty"`
+	}
+
+	files := []gfsFile{}
+	err = gf.Connection.WithDB(func(dbase *mgo.Database) error {
+		return dbase.GridFS("fs").Find(nil).All(&files)
+	})
+
+	for _, f := range files {
+		ids = append(ids, f.Filename)
+	}
+	return ids, errors.Wrap(err, "can't list avatars")
+}
+
+// Close gridfs does nothing but satisfies interface
+func (gf *GridFS) Close() error {
+	return nil
 }

@@ -24,7 +24,7 @@ services:
             labels:
                 - "traefik.port=3000"
                 - "traefik.docker.network=server_traefik"
-                - "traefik.frontend.rule=Host:monitor.test.galayko.rocks"
+                - "traefik.frontend.rule=Host:monitor.${HOST}"
             restart_policy:
                 condition: on-failure
             resources:

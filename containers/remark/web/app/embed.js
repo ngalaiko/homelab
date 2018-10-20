@@ -51,9 +51,8 @@ function init() {
   const iframe = node.getElementsByTagName('iframe')[0];
 
   window.addEventListener('message', receiveMessages);
-
   window.addEventListener('hashchange', postHashToIframe);
-
+  document.addEventListener('click', postClickOutsideToIframe);
   setTimeout(postHashToIframe, 1000);
 
   const remarkRootId = 'remark-km423lmfdslkm34';
@@ -61,6 +60,7 @@ function init() {
     node: null,
     back: null,
     closeEl: null,
+    iframe: null,
     style: null,
     init(user) {
       this.animationStop();
@@ -98,8 +98,6 @@ function init() {
           #${remarkRootId}-close {
             top: 0px;
             right: 400px;
-            width: 30px;
-            height: 30px;
             position: absolute;
             text-align: center;
             font-size: 25px;
@@ -108,6 +106,7 @@ function init() {
             border-color: transparent;
             border-width: 0;
             padding: 0;
+            margin-right: 4px;
             background-color: transparent;
           }
           @media all and (max-width: 430px) {
@@ -151,14 +150,16 @@ function init() {
         verticalscrolling="no"
         horizontalscrolling="no"
       />`;
+      this.iframe = this.node.querySelector('iframe');
       this.node.appendChild(this.closeEl);
       document.body.appendChild(this.style);
       document.body.appendChild(this.back);
       document.body.appendChild(this.node);
+      document.addEventListener('keydown', this.onKeyDown);
       setTimeout(() => {
         this.back.setAttribute('data-animation', '');
         this.node.setAttribute('data-animation', '');
-        this.closeEl.focus();
+        this.iframe.focus();
       }, 400);
     },
     close() {
@@ -169,6 +170,7 @@ function init() {
       if (this.back) {
         this.back.removeAttribute('data-animation');
       }
+      document.removeEventListener('keydown', this.onKeyDown);
     },
     delay: null,
     events: ['', 'webkit', 'moz', 'MS', 'o'].map(prefix => (prefix ? `${prefix}TransitionEnd` : 'transitionend')),
@@ -179,6 +181,12 @@ function init() {
       }
       this.delay = setTimeout(this.animationStop, 1000);
       this.events.forEach(event => el.addEventListener(event, this.animationStop, false));
+    },
+    onKeyDown(e) {
+      // ESCAPE key pressed
+      if (e.keyCode == 27) {
+        userInfo.close();
+      }
     },
     animationStop() {
       const t = userInfo;
@@ -228,6 +236,12 @@ function init() {
       if (e) e.preventDefault();
 
       iframe.contentWindow.postMessage(JSON.stringify({ hash }), '*');
+    }
+  }
+
+  function postClickOutsideToIframe(e) {
+    if (!iframe.contains(e.target)) {
+      iframe.contentWindow.postMessage(JSON.stringify({ clickOutside: true }), '*');
     }
   }
 }

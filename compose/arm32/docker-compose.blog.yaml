@@ -1,13 +1,41 @@
 version: '3.3'
 
+volumes:
+    blog_cache:
+    remark_data:
+
 services:
-     blog:
+    blog:
         image: ngalayko/blog:arm32v7
         networks:
             - traefik
+        volumes:
+            - blog_cache:/var/nginx/cache
         deploy:
-            replicas: 3
+            replicas: 1
             labels:
                 - "traefik.port=80"
                 - "traefik.docker.network=server_traefik"
-                - "traefik.frontend.rule=Host:blog.test.galayko.rocks"
+                - "traefik.frontend.rule=Host:${HOST}"
+
+    comments:
+        image: ngalayko/remark:arm32v7
+        volumes:
+            - remark_data:/srv/var
+        environment:
+            - REMARK_URL=https://remark.${HOST}
+            - SECRET=${REMARK_SECRET}
+            - ADMIN_EMAIL=ngalayko@gmail.com
+            - ADMIN=github_0ff4f879002bc6feb694a37ae894e279f0d0af4e
+            - AUTH_GITHUB_CID=${GITHUB_CID}
+            - AUTH_GITHUB_CSEC=${GITHUB_CSEC}
+            - AUTH_GOOGLE_CID=${GOOGLE_CID}
+            - AUTH_GOOGLE_CSEC=${GOOGLE_CSEC}
+            - SITE=nikitag-remark
+            - USER=0
+        deploy:
+            replicas: 1
+            labels:
+                - "traefik.port=8080"
+                - "traefik.docker.network=server_traefik"
+                - "traefik.frontend.rule=Host:remark.${HOST}"
