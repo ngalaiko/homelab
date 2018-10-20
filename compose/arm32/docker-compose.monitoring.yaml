@@ -71,9 +71,7 @@ services:
                 condition: on-failure
             resources:
                 limits:
-                    memory: 128M
-                reservations:
-                    memory: 64M
+                    memory: 32M
 
     node-exporter:
         image: ngalayko/node-exporter:arm32v7
@@ -98,8 +96,6 @@ services:
                 condition: on-failure
             resources:
                 limits:
-                    memory: 128M
-                reservations:
                     memory: 64M
 
     arm-exporter:
@@ -121,8 +117,6 @@ services:
                 condition: on-failure
             resources:
                 limits:
-                    memory: 128M
-                reservations:
                     memory: 64M
 
     cadvisor:
@@ -145,5 +139,3 @@ services:
             resources:
                 limits:
                     memory: 128M
-                reservations:
-                    memory: 64M
