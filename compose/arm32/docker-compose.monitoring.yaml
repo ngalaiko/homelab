@@ -2,6 +2,7 @@ version: '3.3'
 
 volumes:
     prometheus_data:
+    grafana_data:
 
 configs:
     dockerd_config:
@@ -18,6 +19,8 @@ networks:
 services:
     grafana:
         image: ngalayko/grafana:arm32v7
+        volumes:
+            - grafana_data:/var/lib/grafana
         networks:
             - traefik
             - monitoring
@@ -34,6 +37,9 @@ services:
                     memory: 128M
                 reservations:
                     memory: 64M
+            placement:
+                constraints:
+                    - "node.labels.grafana==true"
 
     prometheus:
         image: ngalayko/prometheus:arm32v7
