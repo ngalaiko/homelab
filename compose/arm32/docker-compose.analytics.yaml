@@ -2,6 +2,7 @@ version: '3.3'
 
 volumes:
     matomo_data:
+    matomo_html:
 
 networks:
     analytics:
@@ -19,7 +20,7 @@ services:
             - MYSQL_USER=matomo
             - MYSQL_PASSWORD=${MYSQL_PASSWORD}
         volumes:
-            - matomo_data:/var/lib/mysql/
+            - matomo_data:/var/lib/mysql
             - ../../containers/mysql/mysql.cnf:/etc/mysql/conf.d/mysql.cnf
         deploy:
             replicas: 1
@@ -38,7 +39,7 @@ services:
         depends_on:
             - analytics-data
         volumes:
-            - matomo_data:/var/www/html
+            - matomo_html:/var/www/html
 
     analytics-frontend:
         image: ngalayko/nginx:arm32v7
@@ -46,7 +47,7 @@ services:
             - traefik
             - analytics
         volumes:
-            - matomo_data:/var/www/html
+            - matomo_html:/var/www/html
             - ../../containers/analytics/nginx.conf:/etc/nginx/nginx.conf
         depends_on:
             - analytics-backend
