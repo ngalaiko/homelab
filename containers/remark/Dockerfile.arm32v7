@@ -53,6 +53,9 @@ FROM arm32v7/debian:7.11-slim as builder
 
 WORKDIR /srv
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        curl
+
 ADD entrypoint.sh /entrypoint.sh
 ADD backend/scripts/backup.sh /usr/local/bin/backup
 ADD backend/scripts/restore.sh /usr/local/bin/restore
