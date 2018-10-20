@@ -21,9 +21,6 @@ services:
             - monitoring
         deploy:
             mode: global
-            placement:
-                constraints: 
-                    - "node.role==manager"
             restart_policy:
                 condition: on-failure
             update_config:
