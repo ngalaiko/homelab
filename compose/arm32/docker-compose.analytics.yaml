@@ -32,6 +32,8 @@ services:
         image: ngalayko/matomo:arm32v7
         networks:
             - analytics
+        depends_on:
+            - analytics-data
         volumes:
             - matomo_data:/var/www/html
 
@@ -42,6 +44,8 @@ services:
         volumes:
             - matomo_data:/var/www/html
             - ../../containers/analytics/nginx.conf:/etc/nginx/nginx.conf
+        depends_on:
+            - analytics-backend
         deploy:
             replicas: 1
             labels:
