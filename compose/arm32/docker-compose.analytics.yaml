@@ -2,7 +2,6 @@ version: '3.3'
 
 volumes:
     matomo_data:
-    matomo_html:
 
 networks:
     analytics:
@@ -26,6 +25,9 @@ services:
             replicas: 1
             restart_policy:
                 condition: on-failure
+            placement:
+                constraints:
+                    - "node.labels.analytics==true"
             resources:
                 limits:
                     memory: 512M
@@ -39,7 +41,7 @@ services:
         depends_on:
             - analytics-data
         volumes:
-            - matomo_html:/var/www/html
+            - matomo_data:/var/www/html
         deploy:
             replicas: 1
             restart_policy:
@@ -54,7 +56,7 @@ services:
             - traefik
             - analytics
         volumes:
-            - matomo_html:/var/www/html
+            - matomo_data:/var/www/html
             - ../../containers/analytics/nginx.conf:/etc/nginx/nginx.conf
         depends_on:
             - analytics-backend
