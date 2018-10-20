@@ -23,7 +23,7 @@ defaultEntryPoints = ["http", "https"]
   delayBeforeCheck = 0
 
 [docker]
-  domain = "test.galayko.rocks"
+  domain = "galayko.rocks"
   watch = true
   swarmmode = true
 
