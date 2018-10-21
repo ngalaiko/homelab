@@ -7,8 +7,7 @@ VOLUME_PATH=${VOLUME:-"export"}
 TASKS="tasks"
 QUERY="${TASKS}.${HOST}"
 
-until nslookup "${HOST}"
-do
+until nslookup "${HOST}"; do
   echo "waiting for service discovery..."
   sleep 5
 done
@@ -16,12 +15,20 @@ done
 NO_HOSTS=0
 while [ "${NO_HOSTS}" -lt "${NO_REPLICAS}" ]; do
   echo "waiting for all replicas to come online..."
-  NO_HOSTS=$(nslookup "${QUERY}" | grep Address | wc -l)
+  nslookup "${QUERY}"
+
+  NO_HOSTS=$(nslookup "${QUERY}" 2>/dev/null | grep Address | wc -l)
   echo $NO_HOSTS
   sleep 5
 done
 
-HOSTNAMES=$(nslookup "${QUERY}" | grep "Address" | awk '{ print $3 }' | sed -e 's/^/http:\/\//' | sed -e "s/$/\/${VOLUME_PATH}/" | tr '\n' ' ' | sed -e 's/[ \t]*$//')
+HOSTNAMES=$(nslookup "${QUERY}" 2>/dev/null \
+     | grep "Address" \
+     | awk '{ print $3 }' \
+     | sed -e 's/^/http:\/\//' \
+     | sed -e "s/$/\/${VOLUME_PATH}/" \
+     | tr '\n' ' ' \
+     | sed -e 's/[ \t]*$//')
 
 echo "found hosts: $HOSTNAMES"
 
