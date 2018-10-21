@@ -12,6 +12,7 @@ services:
         environment:
             MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
             MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+            REPLICAS: 4
         deploy:
             mode: global
             restart_policy:

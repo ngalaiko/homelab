@@ -1,5 +1,7 @@
 FROM arm32v7/debian:7.11-slim
 
+ENV REPLICAS 4
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
         dnsutils \
         ca-certificates \

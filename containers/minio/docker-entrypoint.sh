@@ -18,6 +18,7 @@ do
   echo "waiting for all replicas to come online..."
   NO_HOSTS=$(nslookup "${QUERY}" | grep Address | wc -l)
   echo $NO_HOSTS
+  sleep 5
 done
 
 HOSTNAMES=$(nslookup "${QUERY}" | grep "Address" | awk '{ print $3 }' | sed -e 's/^/http:\/\//' | sed -e "s/$/\/${VOLUME_PATH}/" | tr '\n' ' ' | sed -e 's/[ \t]*$//')
