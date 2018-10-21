@@ -13,6 +13,7 @@ BUILD_IMAGES=(
     "./containers/prometheus:ngalayko/prometheus"
     "./containers/traefik:ngalayko/proxy"
     "./containers/blog:ngalayko/blog"
+    "./containers/analytics-front:ngalayko/analytiics-front"
     "./containers/analytics:ngalayko/matomo"
     "./containers/nginx:ngalayko/nginx"
     "./containers/dns:ngalayko/pihole"

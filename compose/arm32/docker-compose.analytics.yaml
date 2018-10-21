@@ -55,7 +55,7 @@ services:
                     - "node.labels.analytics==true"
 
     analytics-frontend:
-        image: ngalayko/nginx:arm32v7
+        image: ngalayko/analytiics-front:arm32v7
         networks:
             - traefik
             - analytics
