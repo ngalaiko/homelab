@@ -13,22 +13,26 @@ until nslookup "${HOST}"; do
 done
 
 NO_HOSTS=0
-while [ "${NO_HOSTS}" -lt "${NO_REPLICAS}" ]; do
+while [ "${NO_HOSTS}" -ne "${NO_REPLICAS}" ]; do
   echo "waiting for all replicas to come online..."
-  nslookup "${QUERY}"
 
-  NO_HOSTS=$(nslookup "${QUERY}" 2>/dev/null | grep Address | wc -l)
-  echo $NO_HOSTS
+  HOSTS=$(nslookup "${QUERY}" 2>/dev/null | grep Address | grep -v '#')
+  echo "Found: \n${HOSTS}"
+
+  NO_HOSTS=$(nslookup "${QUERY}" 2>/dev/null | grep Address | grep -v '#' | wc -l)
+
   sleep 5
 done
 
-HOSTNAMES=$(nslookup "${QUERY}" 2>/dev/null \
+HOSTNAMES=`nslookup "${QUERY}" 2>/dev/null \
      | grep "Address" \
-     | awk '{ print $3 }' \
+     | grep -v "#" \
+     | awk '{ print $2 }' \
      | sed -e 's/^/http:\/\//' \
      | sed -e "s/$/\/${VOLUME_PATH}/" \
      | tr '\n' ' ' \
-     | sed -e 's/[ \t]*$//')
+     | sed -e 's/[ \t]*$//'
+`
 
 echo "found hosts: $HOSTNAMES"
 
