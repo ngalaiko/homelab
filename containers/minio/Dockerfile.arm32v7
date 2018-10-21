@@ -9,6 +9,8 @@ RUN curl --silent --show-error --fail --location \
 	"https://dl.minio.io/server/minio/release/linux-arm/minio" \
 	 && chmod 0755 /usr/bin/minio
 
+ADD ./docker-entrypoint.sh ./docker-entrypoint.sh
+
 EXPOSE 9000
 VOLUME ["/export"]
 ENTRYPOINT ["./docker-entrypoint.sh"]
