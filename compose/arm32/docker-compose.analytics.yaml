@@ -1,9 +1,10 @@
-version: '3.3'
+version: '3.4'
 
 volumes:
     matomo_data:
     matomo_html:
         driver: ngalayko/rexray-s3fs
+        name: matomo-html
 
 networks:
     analytics:
