@@ -1,0 +1,50 @@
+{
+    "Args": {
+        "Description": "",
+        "Name": "",
+        "Settable": null,
+        "Value": null
+    },
+    "Description": "REX-Ray FUSE Driver for Amazon Simple Storage Service (S3FS)",
+    "DockerVersion": "18.05.0-ce",
+    "Documentation": "https://github.com/thecodeteam/rexray/.docker/plugins/s3fs",
+    "Entrypoint": [
+        "/usr/bin/rexray",
+        "start",
+        "-c",
+        "/etc/rexray/config.yaml"
+    ],
+    "Env": [],
+    "Interface": {
+        "Socket": "rexray.sock",
+        "Types": [
+            "docker.volumedriver/1.0"
+        ]
+    },
+    "Linux": {
+        "AllowAllDevices": true,
+        "Capabilities": [
+            "CAP_SYS_ADMIN"
+        ],
+        "Devices": null
+    },
+    "Mounts": [
+        {
+            "Description": "",
+            "Destination": "/dev",
+            "Name": "",
+            "Options": [
+                "rbind"
+            ],
+            "Settable": null,
+            "Source": "/dev",
+            "Type": "bind"
+        }
+    ],
+    "Network": {
+        "Type": "host"
+    },
+    "PropagatedMount": "/var/lib/rexray",
+    "User": {},
+    "WorkDir": ""
+}
