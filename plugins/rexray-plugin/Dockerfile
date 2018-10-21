@@ -8,9 +8,8 @@ RUN wget -q https://dl.bintray.com/rexray/rexray/stable/0.11.3/rexray-Linux-ARMv
         && tar -xvzf rexray.tar.gz -C /usr/bin \
         && rm rexray.tar.gz
 
-RUN mkdir -p /run/docker/plugins /var/lib/libstorage/volumes
+RUN mkdir -p /etc/rexray /run/docker/plugins /var/lib/rexray/volumes /var/lib/libstorage/volumes
 
 ADD config.yaml /etc/rexray/config.yaml
 
 ENTRYPOINT ["rexray", "-c", "/etc/rexray/config.yaml"]
-CMD ["--help"]

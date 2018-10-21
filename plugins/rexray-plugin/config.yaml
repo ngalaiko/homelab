@@ -1,3 +1,5 @@
+rexray:
+  loglevel: debug
 libstorage:
     service: s3fs
 s3fs:
