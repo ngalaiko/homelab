@@ -1,0 +1,90 @@
+version: '3'
+
+services:
+    minio1:
+        image: ngalayko/minio:arm32v7
+        command: server http://minio1/export http://minio2/export http://minio3/export http://minio4/export 
+        volumes:
+            - storage1:/export
+        ports:
+            - "9001:9000"
+        networks:
+            - minio_distributed
+        environment:
+            MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+            MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+        deploy:
+            restart_policy:
+                delay: 10s
+                max_attempts: 10
+                window: 60s
+            placement:
+                constraints:
+                    - "node.labels.minio1==true"
+
+    minio2:
+        image: ngalayko/minio:arm32v7
+        command: server http://minio1/export http://minio2/export http://minio3/export http://minio4/export 
+        volumes:
+            - storage2:/export
+        ports:
+            - "9002:9000"
+        networks:
+            - minio_distributed
+        environment:
+            MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+            MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+        deploy:
+            restart_policy:
+                delay: 10s
+                max_attempts: 10
+                window: 60s
+            placement:
+                constraints:
+                    - "node.labels.minio2==true"
+
+    minio3:
+        image: ngalayko/minio:arm32v7
+        command: server http://minio1/export http://minio2/export http://minio3/export http://minio4/export 
+        volumes:
+            - storage3:/export
+        ports:
+            - "9003:9000"
+        networks:
+            - minio_distributed
+        environment:
+            MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+            MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+        deploy:
+            restart_policy:
+                delay: 10s
+                max_attempts: 10
+                window: 60s
+            placement:
+                constraints:
+                    - "node.labels.minio3==true"
+
+    minio4:
+        image: ngalayko/minio:arm32v7
+        command: server http://minio1/export http://minio2/export http://minio3/export http://minio4/export 
+        volumes:
+            - storage4:/export
+        ports:
+            - "9004:9000"
+        networks:
+            - minio_distributed
+        environment:
+            MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+            MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+        deploy:
+            restart_policy:
+                delay: 10s
+                max_attempts: 10
+                window: 60s
+            placement:
+                constraints:
+                    - "node.labels.minio4==true"
+
+networks:
+    minio_distributed:
+        driver: overlay
