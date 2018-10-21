@@ -10,5 +10,5 @@ RUN curl --silent --show-error --fail --location \
 	 && chmod 0755 /usr/bin/minio
 
 EXPOSE 9000
-ENTRYPOINT ["minio"]
 VOLUME ["/export"]
+ENTRYPOINT ["./docker-entrypoint.sh"]
