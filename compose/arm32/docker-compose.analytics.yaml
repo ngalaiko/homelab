@@ -21,7 +21,6 @@ services:
             - MYSQL_PASSWORD=${MYSQL_PASSWORD}
         volumes:
             - matomo_data:/var/lib/mysql
-            - ../../containers/mysql/mysql.cnf:/etc/mysql/conf.d/mysql.cnf
         deploy:
             replicas: 1
             restart_policy:
@@ -34,6 +33,9 @@ services:
                     memory: 512M
                 reservations:
                     memory: 256M
+            placement:
+                constraints:
+                    - "node.labels.analytics==true"
 
     analytics-backend:
         image: ngalayko/matomo:arm32v7

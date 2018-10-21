@@ -16,7 +16,6 @@ services:
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
             - /etc/traefik/acme/acme.json:/etc/traefik/acme/acme.json
-            - ../../containers/traefik/conf/traefik.toml:/etc/traefik/traefik.toml
         networks:
             - traefik
             - monitoring

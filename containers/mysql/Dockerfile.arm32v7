@@ -1,1 +1,3 @@
 FROM  apcheamitru/arm32v7-mariadb:10.1.28
+
+ADD conf/mysql.conf /etc/mysql/conf.d/mysql.cnf
