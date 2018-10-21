@@ -59,7 +59,6 @@ services:
             - analytics
         volumes:
             - matomo_html:/var/www/html
-            - ../../containers/analytics/nginx.conf:/etc/nginx/nginx.conf
         depends_on:
             - analytics-backend
         deploy:
