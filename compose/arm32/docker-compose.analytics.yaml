@@ -3,6 +3,7 @@ version: '3.3'
 volumes:
     matomo_data:
     matomo_html:
+        driver: rexray
 
 networks:
     analytics:
@@ -51,7 +52,7 @@ services:
                 condition: on-failure
             placement:
                 constraints:
-                    - "node.labels.analytics==true"
+                    - "node.labels.analytics==false"
 
     analytics-frontend:
         image: ngalayko/nginx:arm32v7
@@ -71,4 +72,4 @@ services:
                 - "traefik.frontend.rule=Host:analytics.${HOST}"
             placement:
                 constraints:
-                    - "node.labels.analytics==true"
+                    - "node.labels.analytics==false"
