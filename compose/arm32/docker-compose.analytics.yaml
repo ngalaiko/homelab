@@ -3,6 +3,7 @@ version: '3.4'
 volumes:
     matomo_data:
     matomo_html:
+        driver: ngalayko/rexray-s3fs
         name: matomo-html
 
 networks:
@@ -50,9 +51,6 @@ services:
             replicas: 1
             restart_policy:
                 condition: on-failure
-            placement:
-                constraints:
-                    - "node.labels.analytics==true"
 
     analytics-frontend:
         image: ngalayko/analytiics-front:arm32v7
@@ -69,6 +67,3 @@ services:
                 - "traefik.port=80"
                 - "traefik.docker.network=server_traefik"
                 - "traefik.frontend.rule=Host:analytics.${HOST}"
-            placement:
-                constraints:
-                    - "node.labels.analytics==true"
