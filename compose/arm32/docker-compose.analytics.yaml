@@ -4,7 +4,7 @@ volumes:
     matomo_data:
     matomo_html:
         driver: ngalayko/rexray-s3fs
-        name: matomo-html
+        name: matomo.html
 
 networks:
     analytics:
