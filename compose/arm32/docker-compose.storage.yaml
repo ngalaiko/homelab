@@ -22,8 +22,6 @@ services:
 
 volumes:
     minio_storage:
-        driver: ngalayko/rexray-s3fs
-        name: minio-distribute-storage
 
 networks:
     minio:
