@@ -21,7 +21,7 @@ services:
                 max_attempts: 10
                 window: 60s
             labels:
-                - "traefik.port=9090"
+                - "traefik.port=9000"
                 - "traefik.docker.network=server_traefik"
                 - "traefik.frontend.rule=Host:storage.${HOST}"
 
