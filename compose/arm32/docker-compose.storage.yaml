@@ -9,6 +9,7 @@ services:
             - "9000:9000"
         networks:
             - minio
+            - traefik
         environment:
             MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
             MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
@@ -19,6 +20,10 @@ services:
                 delay: 10s
                 max_attempts: 10
                 window: 60s
+            labels:
+                - "traefik.port=9090"
+                - "traefik.docker.network=server_traefik"
+                - "traefik.frontend.rule=Host:storage.${HOST}"
 
 volumes:
     minio_storage:
