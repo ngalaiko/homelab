@@ -1,3 +1,15 @@
+FROM umputun/baseimage:buildgo-latest as build
+
+WORKDIR $GOPATH/src/github.com/minio
+
+RUN apk add --update --no-cache \
+        make
+
+RUN git clone https://github.com/minio/minio \
+        && cd minio \
+        && git reset --hard RELEASE.2018-10-18T00-28-58Z \
+        && GOOS=linux GOARCH=arm GOARM=7 go build -ldflags "$(go run buildscripts/gen-ldflags.go)" -o minio
+
 FROM arm32v7/debian:7.11-slim
 
 ENV REPLICAS 4
@@ -7,12 +19,13 @@ ENV MINIO_SECRET_KEY secret-key
 RUN apt-get update && apt-get install -y --no-install-recommends \
         dnsutils \
         ca-certificates \
-        curl
+    && rm -rf /var/lib/apt/lists/*
 
-RUN curl --silent --show-error --fail --location \
-	--header "Accept: application/tar+gzip, application/x-gzip, application/octet-stream" -o /usr/bin/minio \
-	"https://dl.minio.io/server/minio/release/linux-arm/minio" \
-	 && chmod 0755 /usr/bin/minio
+COPY --from=build /go/src/github.com/minio/minio/minio /usr/bin/minio
+
+RUN chmod 0755 /usr/bin/minio
+
+RUN /usr/bin/minio version
 
 ADD ./docker-entrypoint.sh ./docker-entrypoint.sh
 
