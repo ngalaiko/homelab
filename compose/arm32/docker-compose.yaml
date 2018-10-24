@@ -1,8 +1,5 @@
 version: '3.4'
 
-volumes:
-    traefik_logs:
-
 networks:
     traefik:
         driver: overlay
@@ -19,7 +16,7 @@ services:
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
             - /etc/traefik/acme/acme.json:/etc/traefik/acme/acme.json
-            - traefik_logs:/var/log/traefik
+            - /data/stats:/var
         networks:
             - traefik
             - monitoring
@@ -30,3 +27,39 @@ services:
                     - "node.role==manager"
             restart_policy:
                 condition: on-failure
+
+    goaccess:
+        image: ngalayko/goaccess:arm32v7
+        volumes:
+            - /data/stats:/srv
+        networks:
+            - traefik
+        deploy:
+            replicas: 1
+            placement:
+                constraints:
+                    - "node.role==manager"
+            restart_policy:
+                condition: on-failure
+            labels:
+                - "traefik.port=7890"
+                - "traefik.docker.network=server_traefik"
+                - "traefik.frontend.rule=Host:ws.stats.${HOST}"
+
+    goaccess-front:
+        image: ngalayko/nginx:arm32v7
+        volumes:
+            - /data/stats/report:/usr/share/nginx/html:ro
+        networks:
+            - traefik
+        deploy:
+            replicas: 1
+            placement:
+                constraints:
+                    - "node.role==manager"
+            restart_policy:
+                condition: on-failure
+            labels:
+                - "traefik.port=80"
+                - "traefik.docker.network=server_traefik"
+                - "traefik.frontend.rule=Host:stats.${HOST}"

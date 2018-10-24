@@ -1,0 +1,1161 @@
+.TH goaccess 1 "MARCH 2017" Linux "User Manuals"
+.SH NAME
+goaccess \- fast web log analyzer and interactive viewer.
+.SH SYNOPSIS
+.LP
+.B goaccess [filename] [options...] [-c][-M][-H][-q][-d][...]
+.SH DESCRIPTION
+.B goaccess
+GoAccess is an open source real-time web log analyzer and interactive viewer
+that runs in a
+.I terminal
+in *nix systems or through your
+.I browser.
+.P
+It provides fast and valuable HTTP statistics for system administrators that
+require a visual server report on the fly.
+.P
+GoAccess parses the specified web log file and outputs the data to the X
+terminal. Features include:
+
+.IP "General Statistics:"
+This panel gives a summary of several metrics, such as the number of valid and
+invalid requests, time taken to analyze the dataset, unique visitors, requested
+files, static files (CSS, ICO, JPG, etc) HTTP referrers, 404s, size of the
+parsed log file and bandwidth consumption.
+.IP "Unique visitors"
+This panel shows metrics such as hits, unique visitors and cumulative bandwidth
+per date. HTTP requests containing the same IP, the same date, and the same
+user agent are considered a unique visitor. By default, it includes web
+crawlers/spiders.
+.IP
+Optionally, date specificity can be set to the hour level using
+.I --date-spec=hr
+which will display dates such as 05/Jun/2016:16. This is great if you want to
+track your daily traffic at the hour level.
+.IP "Requested files"
+This panel displays the most requested files on your web server. It shows hits,
+unique visitors, and percentage, along with the cumulative bandwidth, protocol,
+and the request method used.
+.IP "Requested static files"
+Lists the most frequently static files such as: JPG, CSS, SWF, JS, GIF, and PNG
+file types, along with the same metrics as the last panel. Additional static
+files can be added to the configuration file.
+.IP "404 or Not Found"
+Displays the same metrics as the previous request panels, however, its data
+contains all pages that were not found on the server, or commonly known as 404
+status code.
+.IP "Hosts"
+This panel has detailed information on the hosts themselves. This is great for
+spotting aggressive crawlers and identifying who's eating your bandwidth.
+
+Expanding the panel can display more information such as host's reverse DNS
+lookup result, country of origin and city. If the
+.I -a
+argument is enabled, a list of user agents can be displayed by selecting the
+desired IP address, and then pressing ENTER.
+.IP "Operating Systems"
+This panel will report which operating system the host used when it hit the
+server. It attempts to provide the most specific version of each operating
+system.
+.IP "Browsers"
+This panel will report which browser the host used when it hit the server. It
+attempts to provide the most specific version of each browser.
+.IP "Visit Times"
+This panel will display an hourly report. This option displays 24 data points,
+one for each hour of the day.
+.IP
+Optionally, hour specificity can be set to the tenth of an hour level using
+.I --hour-spec=min
+which will display hours as 16:4 This is great if you want to spot peaks of
+traffic on your server.
+.IP "Virtual Hosts"
+This panel will display all the different virtual hosts parsed from the access
+log. This panel is displayed if
+.I %v
+is used within the log-format string.
+.IP "Referrers URLs"
+If the host in question accessed the site via another resource, or was
+linked/diverted to you from another host, the URL they were referred from will
+be provided in this panel. See `--ignore-panel` in your configuration file to
+enable it.
+.I disabled
+by default.
+.IP "Referring Sites"
+This panel will display only the host part but not the whole URL. The URL where
+the request came from.
+.IP "Keyphrases"
+It reports keyphrases used on Google search, Google cache, and Google translate
+that have lead to your web server. At present, it only supports Google search
+queries via HTTP. See `--ignore-panel` in your configuration file to enable it.
+.I disabled
+by default.
+.IP "Geo Location"
+Determines where an IP address is geographically located. Statistics are broken
+down by continent and country. It needs to be compiled with GeoLocation
+support.
+.IP "HTTP Status Codes"
+The values of the numeric status code to HTTP requests.
+.IP "Remote User (HTTP authentication)"
+This is the userid of the person requesting the document as determined by HTTP
+authentication. If the document is not password protected, this part will be
+"-" just like the previous one. This panel is not enabled unless
+.I %e
+is given within the log-format variable.
+
+.P
+.I NOTE:
+Optionally and if configured, all panels can display the average time taken to
+serve the request.
+
+.SH STORAGE
+.P
+There are three storage options that can be used with GoAccess. Choosing one
+will depend on your environment and needs.
+.TP
+Default Hash Tables
+In-memory storage provides better performance at the cost of limiting the
+dataset size to the amount of available physical memory. By default GoAccess
+uses in-memory hash tables. If your dataset can fit in memory, then this will
+perform fine. It has very good memory usage and pretty good performance.
+.TP
+Tokyo Cabinet On-Disk B+ Tree
+Use this storage method for large datasets where it is not possible to fit
+everything in memory. The B+ tree database is slower than any of the hash
+databases since data has to be committed to disk. However, using an SSD greatly
+increases the performance. You may also use this storage method if you need
+data persistence to quickly load statistics at a later date.
+.TP
+Tokyo Cabinet In-memory Hash Database
+An alternative to the default hash tables. It uses generic typing and thus it's
+performance in terms of memory and speed is average.
+.SH CONFIGURATION
+.P
+Multiple options can be used to configure GoAccess. For a complete up-to-date
+list of configure options, run
+.I ./configure --help
+.TP
+\fB\-\-enable-debug
+Compile with debugging symbols and turn off compiler optimizations.
+.TP
+\fB\-\-enable-utf8
+Compile with wide character support. Ncursesw is required.
+.TP
+\fB\-\-enable-geoip=<legacy|mmdb>
+Compile with GeoLocation support. MaxMind's GeoIP is required.
+.I legacy
+will utilize the original GeoIP databases.
+.I mmdb
+will utilize the enhanced GeoIP2 databases.
+.TP
+\fB\-\-enable-tcb=<memhash|btree>
+Compile with Tokyo Cabinet storage support.
+.I memhash
+will utilize Tokyo Cabinet's on-memory hash database.
+.I btree
+will utilize Tokyo Cabinet's on-disk B+ Tree database.
+.TP
+\fB\-\-disable-zlib
+Disable zlib compression on B+ Tree database.
+.TP
+\fB\-\-disable-bzip
+Disable bzip2 compression on B+ Tree database.
+.TP
+\fB\-\-with-getline
+Dynamically expands line buffer in order to parse full line requests instead of
+using a fixed size buffer of 4096.
+.TP
+\fB\-\-with-openssl
+Compile GoAccess with OpenSSL support for its WebSocket server.
+.SH OPTIONS
+.P
+The following options can be supplied to the command or specified in the
+configuration file. If specified in the configuration file, long options need
+to be used without prepending -- and without using the equal sign =.
+.SS
+LOG/DATE/TIME FORMAT
+.TP
+\fB\-\-time-format=<timeformat>
+The time-format variable followed by a space, specifies the log format time
+containing either a name of a predefined format (see options below) or any
+combination of regular characters and special format specifiers.
+.IP
+They all begin with a percentage (%) sign. See `man strftime`.
+.I %T or %H:%M:%S.
+.IP
+Note that if a timestamp is given in microseconds,
+.I %f
+must be used as time-format
+.TP
+\fB\-\-date-format=<dateformat>
+The date-format variable followed by a space, specifies the log format time
+containing either a name of a predefined format (see options below) or any
+combination of regular characters and special format specifiers.
+.IP
+They all begin with a percentage (%) sign. See `man strftime`.
+.I %Y-%m-%d.
+.IP
+Note that if a timestamp is given in microseconds,
+.I
+%f
+must be used as date-format
+.TP
+\fB\-\-log-format=<logformat>
+The log-format variable followed by a space or
+.I \\\\t
+for tab-delimited, specifies the log format string.
+
+Note that if there are spaces within the format, the string needs to be
+enclosed in single/double quotes. Inner quotes need to be escaped.
+.IP
+In addition to specifying the raw log/date/time formats, for simplicity, any of
+the following predefined log format names can be supplied to the
+log/date/time-format variables. GoAccess can also handle one predefined name in
+one variable and another predefined name in another variable.
+.IP
+  COMBINED     - Combined Log Format,
+  VCOMBINED    - Combined Log Format with Virtual Host,
+  COMMON       - Common Log Format,
+  VCOMMON      - Common Log Format with Virtual Host,
+  W3C          - W3C Extended Log File Format,
+  SQUID        - Native Squid Log Format,
+  CLOUDFRONT   - Amazon CloudFront Web Distribution,
+  CLOUDSTORAGE - Google Cloud Storage,
+  AWSELB       - Amazon Elastic Load Balancing,
+  AWSS3        - Amazon Simple Storage Service (S3)
+.IP
+.I Note:
+Piping data into GoAccess won't prompt a log/date/time configuration dialog,
+you will need to previously define it in your configuration file or in the
+command line.
+.SS
+USER INTERFACE OPTIONS
+.TP
+\fB\-c \-\-config-dialog
+Prompt log/time/date configuration window on program start. Only when curses is
+initialized.
+.TP
+\fB\-i \-\-hl-header
+Color highlight active terminal panel.
+.TP
+\fB\-m \-\-with-mouse
+Enable mouse support on main terminal dashboard.
+.TP
+\fB\-\-\-color=<fg:bg[attrs, PANEL]>
+Specify custom colors for the terminal output.
+
+.I Color Syntax
+  DEFINITION space/tab colorFG#:colorBG# [attributes,PANEL]
+
+ FG# = foreground color [-1...255] (-1 = default term color)
+ BG# = background color [-1...255] (-1 = default term color)
+
+Optionally, it is possible to apply color attributes (multiple attributes are
+comma separated), such as:
+.I bold,
+.I underline,
+.I normal,
+.I reverse,
+.I blink
+
+If desired, it is possible to apply custom colors per panel, that is, a metric
+in the REQUESTS panel can be of color A, while the same metric in the BROWSERS
+panel can be of color B.
+
+.I Available color definitions:
+  COLOR_MTRC_HITS
+  COLOR_MTRC_VISITORS
+  COLOR_MTRC_DATA
+  COLOR_MTRC_BW
+  COLOR_MTRC_AVGTS
+  COLOR_MTRC_CUMTS
+  COLOR_MTRC_MAXTS
+  COLOR_MTRC_PROT
+  COLOR_MTRC_MTHD
+  COLOR_MTRC_HITS_PERC
+  COLOR_MTRC_HITS_PERC_MAX
+  COLOR_MTRC_VISITORS_PERC
+  COLOR_MTRC_VISITORS_PERC_MAX
+  COLOR_PANEL_COLS
+  COLOR_BARS
+  COLOR_ERROR
+  COLOR_SELECTED
+  COLOR_PANEL_ACTIVE
+  COLOR_PANEL_HEADER
+  COLOR_PANEL_DESC
+  COLOR_OVERALL_LBLS
+  COLOR_OVERALL_VALS
+  COLOR_OVERALL_PATH
+  COLOR_ACTIVE_LABEL
+  COLOR_BG
+  COLOR_DEFAULT
+  COLOR_PROGRESS
+
+See configuration file for a sample color scheme.
+.TP
+\fB\-\-color-scheme=<1|2|3>
+Choose among color schemes.
+.I 1
+for the default grey scheme.
+.I 2
+for the green scheme.
+.I 3
+for the Monokai scheme (shown only if terminal supports 256 colors).
+.TP
+\fB\-\-crawlers-only
+Parse and display only crawlers (bots).
+.TP
+\fB\-\-html-custom-css=<path/custom.css>
+Specifies a custom CSS file path to load in the HTML report.
+.TP
+\fB\-\-html-custom-js=<path/custom.js>
+Specifies a custom JS file path to load in the HTML report.
+.TP
+\fB\-\-html-report-title=<title>
+Set HTML report page title and header.
+.TP
+\fB\-\-html-prefs=<JSON>
+Set HTML report default preferences. Supply a valid JSON object containing the
+HTML preferences.  It allows the ability to customize each panel plot. See
+example below.
+.IP
+.I Note:
+The JSON object passed needs to be a one line JSON string. For instance,
+.IP
+\-\-html-prefs='{"theme":"bright","perPage":5,"layout":"horizontal","showTables":true,"visitors":{"plot":{"chartType":"bar"}}}'
+.TP
+\fB\-\-json-pretty-print
+Format JSON output using tabs and newlines.
+.IP
+.I Note:
+This is not recommended when outputting a real-time HTML report since the
+WebSocket payload will much much larger.
+.TP
+\fB\-\-max-items=<number>
+The maximum number of items to display per panel. The maximum can be a number
+between 1 and n.
+.IP
+.I Note:
+Only the CSV and JSON output allow a maximum number greater than the default
+value of 366 (or 50 in the real-time HTML output) items per panel.
+.TP
+\fB\-\-no-color
+Turn off colored output. This is the  default output on terminals that do not
+support colors.
+.TP
+\fB\-\-no-column-names
+Don't write column names in the terminal output. By default, it displays column
+names for each available metric in every panel.
+.TP
+\fB\-\-no-csv-summary
+Disable summary metrics on the CSV output.
+.TP
+\fB\-\-no-progress
+Disable progress metrics [total requests/requests per second].
+.TP
+\fB\-\-no-tab-scroll
+Disable scrolling through panels when TAB is pressed or when a panel is
+selected using a numeric key.
+.TP
+\fB\-\-no-html-last-updated
+Do not show the last updated field displayed in the HTML generated report.
+.TP
+\fB\-\-no-parsing-spinner
+Do now show the progress metrics and parsing spinner.
+.SS
+SERVER OPTIONS
+.TP
+\fB\-\-addr
+Specify IP address to bind the server to. Otherwise it binds to 0.0.0.0.
+.IP
+Usually there is no need to specify the address, unless you intentionally would
+like to bind the server to a different address within your server.
+.TP
+\fB\-\-daemonize
+Run GoAccess as daemon (only if \fB\-\-real-time-html enabled).
+.IP
+Note: It's important to make use of absolute paths across GoAccess'
+configuration.
+.TP
+\fB\-\-origin=<url>
+Ensure clients send the specified origin header upon the WebSocket handshake.
+.TP
+\fB\-\-pid-file=<path/goaccess.pid>
+Write the daemon PID to a file when used along the --daemonize option.
+.TP
+\fB\-\-port=<port>
+Specify the port to use. By default GoAccess' WebSocket server listens on port
+7890.
+.TP
+\fB\-\-real-time-html
+Enable real-time HTML output.
+.IP
+GoAccess uses its own WebSocket server to push the data from the server to the
+client. See http://gwsocket.io for more details how the WebSocket server works.
+.TP
+\fB\-\-ws-url=<[scheme://]url[:port]>
+URL to which the WebSocket server responds. This is the URL supplied to the
+WebSocket constructor on the client side.
+.IP
+Optionally, it is possible to specify the WebSocket URI scheme, such as
+.I ws://
+or
+.I wss://
+for unencrypted and encrypted connections. e.g.,
+.I
+wss://goaccess.io
+.IP
+If GoAccess is running behind a proxy, you could set the client side to connect
+to a different port by specifying the host followed by a colon and the port.
+e.g.,
+.I goaccess.io:9999
+. e.g.,
+.IP
+By default, it will attempt to connect to the generated report's hostname. If
+GoAccess is running on a remote server, the host of the remote server should be
+specified here. Also, make sure it is a valid host and NOT an http address.
+.TP
+\fB\-\-fifo-in=<path/file>
+Creates a named pipe (FIFO) that reads from on the given path/file.
+.TP
+\fB\-\-fifo-out=<path/file>
+Creates a named pipe (FIFO) that writes to the given path/file.
+.TP
+\fB\-\-ssl-cert=<cert.crt>
+Path to TLS/SSL certificate. In order to enable TLS/SSL support, GoAccess
+requires that \-\-ssl-cert and \-\-ssl-key are used.
+
+Only if configured using --with-openssl
+.TP
+\fB\-\-ssl-key=<priv.key>
+Path to TLS/SSL private key. In order to enable TLS/SSL support, GoAccess
+requires that \-\-ssl-cert and \-\-ssl-key are used.
+
+Only if configured using --with-openssl
+.SS
+FILE OPTIONS
+.TP
+\fB\-f \-\-log-file=<logfile>
+Specify the path to the input log file. If set in the config file, it will take
+priority over -f from the command line.
+.TP
+\fB\-S \-\-log-size=<bytes>
+Specify the log size in bytes. This is useful when piping in logs for
+processing in which the log size can be explicitly set.
+.TP
+\fB\-l \-\-debug-file=<debugfile>
+Send all debug messages to the specified file.
+.TP
+\fB\-p \-\-config-file=<configfile>
+Specify a custom configuration file to use. If set, it will take priority over
+the global configuration file (if any).
+.TP
+\fB\-\-invalid-requests=<filename>
+Log invalid requests to the specified file.
+.TP
+\fB\-\-no-global-config
+Do not load the global configuration file. This directory should normally be
+/usr/local/etc, unless specified with
+.I --sysconfdir=/dir.
+See --dcf option for finding the default configuration file.
+.SS
+PARSE OPTIONS
+.TP
+\fB\-a \-\-agent-list
+Enable a list of user-agents by host. For faster parsing, do not enable this
+flag.
+.TP
+\fB\-d \-\-with-output-resolver
+Enable IP resolver on HTML|JSON output.
+.TP
+\fB\-e \-\-exclude-ip=<IP|IP-range>
+Exclude an IPv4 or IPv6 from being counted.
+Ranges can be included as well using a dash in between the IPs (start-end).
+.IP
+.I Examples:
+  exclude-ip 127.0.0.1
+  exclude-ip 192.168.0.1-192.168.0.100
+  exclude-ip ::1
+  exclude-ip 0:0:0:0:0:ffff:808:804-0:0:0:0:0:ffff:808:808
+.TP
+\fB\-H \-\-http-protocol=<yes|no>
+Set/unset HTTP request protocol. This will create a request key containing the
+request protocol + the actual request.
+.TP
+\fB\-M \-\-http-method=<yes|no>
+Set/unset HTTP request method. This will create a request key containing the
+request method + the actual request.
+.TP
+\fB\-o \-\-output=<path/file.[json|csv|html]>
+Write output to stdout given one of the following files and the corresponding
+extension for the output format:
+.IP
+  /path/file.csv  - Comma-separated values (CSV)
+  /path/file.json - JSON (JavaScript Object Notation)
+  /path/file.html - HTML
+.TP
+\fB\-q \-\-no-query-string
+Ignore request's query string. i.e.,  www.google.com/page.htm?query =>
+www.google.com/page.htm.
+.IP
+.I Note:
+Removing the query string can greatly decrease memory consumption, especially
+on timestamped requests.
+.TP
+\fB\-r \-\-no-term-resolver
+Disable IP resolver on terminal output.
+.TP
+\fB\-\-444-as-404
+Treat non-standard status code 444 as 404.
+.TP
+\fB\-\-4xx-to-unique-count
+Add 4xx client errors to the unique visitors count.
+.TP
+\fB\-\-accumulated-time
+Store accumulated processing time from parsing day-by-day logs.
+
+Only if configured with --enable-tcb=btree
+.TP
+\fB\-\-anonymize-ip
+Anonymize the client IP address. The IP anonymization option sets the last
+octet of IPv4 user IP addresses and the last 80 bits of IPv6 addresses to
+zeros.
+e.g., 192.168.20.100 => 192.168.20.0
+e.g., 2a03:2880:2110:df07:face:b00c::1 => 2a03:2880:2110:df07::
+.TP
+\fB\-\-all-static-files
+Include static files that contain a query string. e.g.,
+/fonts/fontawesome-webfont.woff?v=4.0.3
+.TP
+\fB\-\-date-spec=<date|hr>
+Set the date specificity to either date (default) or hr to display hours
+appended to the date.
+.IP
+This is used in the visitors panel. It's useful for tracking visitors at the
+hour level. For instance, an hour specificity would yield to display traffic as
+18/Dec/2010:19
+.TP
+\fB\-\-double-decode
+Decode double-encoded values. This includes, user-agent, request, and referer.
+.TP
+\fB\-\-enable-panel=<PANEL>
+Enable parsing and displaying the given panel.
+.IP
+.I Available panels:
+  VISITORS
+  REQUESTS
+  REQUESTS_STATIC
+  NOT_FOUND
+  HOSTS
+  OS
+  BROWSERS
+  VISIT_TIMES
+  VIRTUAL_HOSTS
+  REFERRERS
+  REFERRING_SITES
+  KEYPHRASES
+  STATUS_CODES
+  REMOTE_USER
+  GEO_LOCATION
+.TP
+\fB\-\-hide-referer=<NEEDLE>
+Hide a referer but still count it. Wild cards are allowed in the needle. i.e.,
+*.bing.com.
+.TP
+\fB\-\-hour-spec=<hr|min>
+Set the time specificity to either hour (default) or min to display the tenth
+of an hour appended to the hour.
+.IP
+This is used in the time distribution panel. It's useful for tracking peaks of
+traffic on your server at specific times.
+.TP
+\fB\-\-ignore-crawlers
+Ignore crawlers from being counted.
+.TP
+\fB\-\-ignore-panel=<PANEL>
+Ignore parsing and displaying the given panel.
+.IP
+.I Available panels:
+  VISITORS
+  REQUESTS
+  REQUESTS_STATIC
+  NOT_FOUND
+  HOSTS
+  OS
+  BROWSERS
+  VISIT_TIMES
+  VIRTUAL_HOSTS
+  REFERRERS
+  REFERRING_SITES
+  KEYPHRASES
+  STATUS_CODES
+  REMOTE_USER
+.TP
+\fB\-\-ignore-referer=<referer>
+Ignore referers from being counted. Wildcards allowed. e.g.,
+.I
+*.domain.com
+.I
+ww?.domain.*
+.TP
+\fB\-\-ignore-status=<CODE>
+Ignore parsing and displaying one or multiple status code(s). For multiple
+status codes, use this option multiple times.
+.TP
+\fB\-\-num-tests=<number>
+Number of lines from the access log to test against the provided log/date/time
+format. By default, the parser is set to test 10 lines.  If set to 0, the parser
+won't test any lines and will parse the whole access log. If a line matches the
+given log/date/time format before it reaches
+.I <number>,
+the parser will consider the log to be valid, otherwise GoAccess will return
+EXIT_FAILURE and display the relevant error messages.
+.TP
+\fB\-\-process-and-exit
+Parse log and exit without outputting data. Useful if we are looking to only
+add new data to the on-disk database without outputting to a file or a
+terminal.
+.TP
+\fB\-\-real-os
+Display real OS names. e.g, Windows XP, Snow Leopard.
+.TP
+\fB\-\-sort-panel=<PANEL,FIELD,ORDER>
+Sort panel on initial load. Sort options are separated by comma. Options are in
+the form: PANEL,METRIC,ORDER
+.IP
+.I Available metrics:
+  BY_HITS     - Sort by hits
+  BY_VISITORS - Sort by unique visitors
+  BY_DATA     - Sort by data
+  BY_BW       - Sort by bandwidth
+  BY_AVGTS    - Sort by average time served
+  BY_CUMTS    - Sort by cumulative time served
+  BY_MAXTS    - Sort by maximum time served
+  BY_PROT     - Sort by http protocol
+  BY_MTHD     - Sort by http method
+.IP
+.I Available orders:
+  ASC
+  DESC
+.TP
+\fB\-\-static-file=<extension>
+Add static file extension. e.g.:
+.I .mp3
+Extensions are case sensitive.
+.SS
+GEOLOCATION OPTIONS
+.TP
+\fB\-g \-\-std-geoip
+Standard GeoIP database for less memory usage.
+.TP
+\fB\-\-geoip-database=<geofile>
+Specify path to GeoIP database file. i.e., GeoLiteCity.dat.
+
+If using GeoIP2, you will need to download the GeoLite2 City or Country
+database from MaxMind.com and use the option --geoip-database to specify the
+database. You can also get updated database files for GeoIP legacy, you can
+find these as GeoLite Legacy Databases from MaxMind.com. IPv4 and IPv6 files
+are supported as well. For updated DB URLs, please see the default GoAccess
+configuration file.
+
+.I Note:
+--geoip-city-data is an alias of --geoip-database.
+.SS
+OTHER OPTIONS
+.TP
+\fB\-h \-\-help
+The help.
+.TP
+\fB\-s \-\-storage
+Display current storage method. i.e., B+ Tree, Hash.
+.TP
+\fB\-V \-\-version
+Display version information and exit.
+.TP
+\fB\-\-dcf
+Display the path of the default config file when `-p` is not used.
+.SS
+ON-DISK STORAGE OPTIONS
+.TP
+\fB\-\-keep-db-files
+Persist parsed data into disk. If database files exist, files will be
+overwritten. This should be set to the first dataset. Setting it to false will
+delete all database files when exiting the program. See examples below.
+
+Only if configured with --enable-tcb=btree
+.TP
+\fB\-\-load-from-disk
+Load previously stored data from disk. If reading persisted data only, the
+database files need to exist. See
+.I keep-db-files
+and examples below.
+
+Only if configured with --enable-tcb=btree
+.TP
+\fB\-\-db-path=<dir>
+Path where the on-disk database files are stored. The default value is the
+.I /tmp/goaccess<PID>
+directory (created on-demand).
+
+Only if configured with --enable-tcb=btree
+.TP
+\fB\-\-xmmap=<num>
+Set the size in bytes of the extra mapped memory. The default value is 0.
+
+Only if configured with --enable-tcb=btree
+.TP
+\fB\-\-cache-lcnum=<num>
+Specifies the maximum number of leaf nodes to be cached. If it is not more than
+0, the default value is specified. The default value is 1024. Setting a larger
+value will increase speed performance, however, memory consumption will
+increase. Lower value will decrease memory consumption.
+
+Only if configured with --enable-tcb=btree
+.TP
+\fB\-\-cache-ncnum=<num>
+Specifies the maximum number of non-leaf nodes to be cached. If it is not more
+than 0, the default value is specified. The default value is 512.
+
+Only if configured with --enable-tcb=btree
+.TP
+\fB\-\-tune-lmemb=<num>
+Specifies the number of members in each leaf page. If it is not more than 0,
+the default value is specified. The default value is 128.
+
+Only if configured with --enable-tcb=btree
+.TP
+\fB\-\-tune-nmemb=<num>
+Specifies the number of members in each non-leaf page. If it is not more than
+0, the default value is specified. The default value is 256.
+
+Only if configured with --enable-tcb=btree
+.TP
+\fB\-\-tune-bnum=<num>
+Specifies the number of elements of the bucket array. If it is not more than 0,
+the default value is specified. The default value is 32749. Suggested size of
+the bucket array is about from 1 to 4 times of the number of all pages to be
+stored.
+
+Only if configured with --enable-tcb=btree
+.TP
+\fB\-\-compression=<zlib|bz2>
+Specifies that each page is compressed with ZLIB|BZ2 encoding.
+
+Only if configured with --enable-tcb=btree
+
+.SH CUSTOM LOG/DATE FORMAT
+GoAccess can parse virtually any web log format.
+.P
+Predefined options include, Common Log Format (CLF), Combined Log Format
+(XLF/ELF), including virtual host, Amazon CloudFront (Download Distribution),
+Google Cloud Storage and W3C format (IIS).
+.P
+GoAccess allows any custom format string as well.
+.P
+There are two ways to configure the log format.
+The easiest is to run GoAccess with
+.I -c
+to prompt a configuration window. Otherwise, it can be configured under
+~/.goaccessrc or the %sysconfdir%.
+.IP "time-format"
+The
+.I time-format
+variable followed by a space, specifies the log format time
+containing any combination of regular characters and special format specifiers.
+They all begin with a percentage (%) sign. See `man strftime`.
+.I %T or %H:%M:%S.
+.IP
+.I Note:
+If a timestamp is given in microseconds,
+.I
+%f
+must be used as
+.I
+time-format
+.IP "date-format"
+The
+.I date-format
+variable followed by a space, specifies the log format date containing any
+combination of regular characters and special format specifiers. They all begin
+with a percentage (%) sign. See `man strftime`. e.g.,
+.I %Y-%m-%d.
+.IP
+.I Note:
+If a timestamp is given in microseconds,
+.I
+%f
+must be used as
+.I
+date-format
+.IP "log-format"
+The
+.I log-format
+variable followed by a space or
+.I \\\\t
+, specifies the log format string.
+.IP %x
+A date and time field matching the
+.I time-format
+and
+.I date-format
+variables. This is used when given a timestamp or the date & time are
+concatenated as a single string (e.g., 1501647332 or 20170801235000) instead of
+the date and time being in two separated variables.
+.IP %t
+time field matching the
+.I time-format
+variable.
+.IP %d
+date field matching the
+.I date-format
+variable.
+.IP %v
+The canonical Server Name of the server serving the request (Virtual Host).
+.IP %e
+This is the userid of the person requesting the document as determined by HTTP
+authentication.
+.IP %h
+host (the client IP address, either IPv4 or IPv6)
+.IP %r
+The request line from the client. This requires specific delimiters around the
+request (as single quotes, double quotes, or anything else) to be parsable. If
+not, we have to use a combination of special format specifiers as %m %U %H.
+.IP %q
+The query string.
+.IP %m
+The request method.
+.IP %U
+The URL path requested.
+
+.I Note:
+If the query string is in %U, there is no need to use
+.I %q.
+However, if the URL path, does not include any query string, you may use
+.I %q
+and the query string will be appended to the request.
+.IP %H
+The request protocol.
+.IP %s
+The status code that the server sends back to the client.
+.IP %b
+The size of the object returned to the client.
+.IP %R
+The "Referrer" HTTP request header.
+.IP %u
+The user-agent HTTP request header.
+.IP %D
+The time taken to serve the request, in microseconds as a decimal number.
+.IP %T
+The time taken to serve the request, in seconds with milliseconds resolution.
+.IP %L
+The time taken to serve the request, in milliseconds as a decimal number.
+.IP %^
+Ignore this field.
+.IP %~
+Move forward through the log string until a non-space (!isspace) char is found.
+.IP ~h
+The host (the client IP address, either IPv4 or IPv6) in a X-Forwarded-For (XFF) field.
+
+It uses a special specifier which consists of a tilde before the host
+specifier, followed by the character(s) that delimit the XFF field, which are
+enclosed by curly braces (i.e., ~h{," })
+
+For example, ~h{," } is used in order to parse "11.25.11.53, 17.68.33.17" field
+which is delimited by a double quote, a comma, and a space.
+.P
+.I Note:
+In order to get the average, cumulative and maximum time served in GoAccess,
+you will need to start logging response times in your web server. In Nginx you
+can add
+.I $request_time
+to your log format, or
+.I %D
+in Apache.
+.P
+.I Important:
+If multiple time served specifiers are used at the same time, the first option
+specified in the format string will take priority over the other specifiers.
+.P
+GoAccess
+.I requires
+the following fields:
+.IP
+.I %h
+a valid IPv4/6
+.IP
+.I %d
+a valid date
+.IP
+.I %r
+the request
+.SH INTERACTIVE MENU
+.IP "F1 or h"
+Main help.
+.IP "F5"
+Redraw main window.
+.IP "q"
+Quit the program, current window or collapse active module
+.IP "o or  ENTER"
+Expand selected module or open window
+.IP "0-9 and Shift + 0"
+Set selected module to active
+.IP "j"
+Scroll down within expanded module
+.IP "k"
+Scroll up within expanded module
+.IP "c"
+Set or change scheme color.
+.IP "TAB"
+Forward iteration of modules. Starts from current active module.
+.IP "SHIFT + TAB"
+Backward iteration of modules. Starts from current active module.
+.IP "^f"
+Scroll forward one screen within an active module.
+.IP "^b"
+Scroll backward one screen within an active module.
+.IP "s"
+Sort options for active module
+.IP "/"
+Search across all modules (regex allowed)
+.IP "n"
+Find the position of the next occurrence across all modules.
+.IP "g"
+Move to the first item or top of screen.
+.IP "G"
+Move to the last item or bottom of screen.
+.SH EXAMPLES
+.I Note:
+Piping data into GoAccess won't prompt a log/date/time configuration dialog,
+you will need to previously define it in your configuration file or in the
+command line.
+
+.SS
+DIFFERENT OUTPUTS
+.P
+To output to a terminal and generate an interactive report:
+.IP
+# goaccess access.log
+.P
+To generate an HTML report:
+.IP
+# goaccess access.log -a -o report.html
+.P
+To generate a JSON report:
+.IP
+# goaccess access.log -a -d -o report.json
+.P
+To generate a CSV file:
+.IP
+# goaccess access.log --no-csv-summary -o report.csv
+.P
+GoAccess also allows great flexibility for real-time filtering and parsing. For
+instance, to quickly diagnose issues by monitoring logs since goaccess was
+started:
+.IP
+# tail -f access.log | goaccess -
+.P
+And even better, to filter while maintaining opened a pipe to preserve
+real-time analysis, we can make use of
+.I tail -f
+and
+a matching pattern tool such as
+.I grep, awk, sed,
+etc:
+.IP
+# tail -f access.log | grep -i --line-buffered 'firefox' | goaccess --log-format=COMBINED -
+.P
+or to parse from the beginning of the file while maintaining the pipe opened
+and applying a filter
+.IP
+# tail -f -n +0 access.log | grep -i --line-buffered 'firefox' | goaccess --log-format=COMBINED -o report.html --real-time-html -
+.SS
+MULTIPLE LOG FILES
+.P
+There are several ways to parse multiple logs with GoAccess. The simplest is to
+pass multiple log files to the command line:
+.IP
+# goaccess access.log access.log.1
+.P
+It's even possible to parse files from a pipe while reading regular files:
+.IP
+# cat access.log.2 | goaccess access.log access.log.1 -
+.P
+.I Note
+that the single dash is appended to the command line to let GoAccess know that
+it should read from the pipe.
+.P
+Now if we want to add more flexibility to GoAccess, we can do a series of
+pipes. For instance, if we would like to process all compressed log files
+.I access.log.*.gz
+in addition to the current log file, we can do:
+.IP
+# zcat access.log.*.gz | goaccess access.log -
+.P
+.I Note:
+On Mac OS X, use gunzip -c instead of zcat.
+.SS
+REAL TIME HTML OUTPUT
+.P
+GoAccess has the ability to output real-time data in the HTML report. You can
+even email the HTML file since it is composed of a single file with no external
+file dependencies, how neat is that!
+.P
+The process of generating a real-time HTML report is very similar to the
+process of creating a static report. Only --real-time-html is needed to make it
+real-time.
+.IP
+# goaccess access.log -o /usr/share/nginx/html/site/report.html --real-time-html
+.P
+By default, GoAccess will use the host name of the generated report.
+Optionally, you can specify the URL to which the client's browser will connect
+to. See https://goaccess.io/faq for a more detailed example.
+.IP
+# goaccess access.log -o report.html --real-time-html --ws-url=goaccess.io
+.P
+By default, GoAccess listens on port 7890, to use a different port other than
+7890, you can specify it as (make sure the port is opened):
+.IP
+# goaccess access.log -o report.html --real-time-html --port=9870
+.P
+And to bind the WebSocket server to a different address other than 0.0.0.0, you
+can specify it as:
+.IP
+# goaccess access.log -o report.html --real-time-html --addr=127.0.0.1
+.P
+.I Note:
+To output real time data over a TLS/SSL connection, you need to use
+.I --ssl-cert=<cert.crt>
+and
+.I --ssl-key=<priv.key>.
+.SS
+WORKING WITH DATES
+.P
+Another useful pipe would be filtering dates out of the web log
+.P
+The following will get all HTTP requests starting on 05/Dec/2010 until the end
+of the file.
+.IP
+# sed -n '/05\/Dec\/2010/,$ p' access.log | goaccess -a -
+.P
+or using relative dates such as yesterdays or tomorrows day:
+.IP
+# sed -n '/'$(date '+%d\/%b\/%Y' -d '1 week ago')'/,$ p' access.log | goaccess -a -
+.P
+If we want to parse only a certain time-frame from DATE a to DATE b, we can do:
+.IP
+# sed -n '/5\/Nov\/2010/,/5\/Dec\/2010/ p' access.log | goaccess -a -
+.SS
+VIRTUAL HOSTS
+.P
+Assuming your log contains the virtual host (server blocks) field. For
+instance:
+.IP
+vhost.com:80 10.131.40.139 - - [02/Mar/2016:08:14:04 -0600] "GET /shop/bag-p-20
+HTTP/1.1" 200 6715 "-" "Apache (internal dummy connection)"
+.P
+And you would like to append the virtual host to the request in order to see
+which virtual host the top urls belong to
+.IP
+awk '$8=$1$8' access.log | goaccess -a -
+.P
+To exclude a list of virtual hosts you can do the following:
+.IP
+# grep -v "`cat exclude_vhost_list_file`" vhost_access.log | goaccess -
+.SS
+FILES & STATUS CODES
+.P
+To parse specific pages, e.g., page views, html, htm, php, etc. within a
+request:
+.IP
+# awk '$7~/\.html|\.htm|\.php/' access.log | goaccess -
+.P
+Note,
+.I $7
+is the request field for the common and combined log format, (without Virtual
+Host), if your log includes Virtual Host, then you probably want to use
+.I $8
+instead. It's best to check which field you are shooting for, e.g.:
+.IP
+# tail -10 access.log | awk '{print $8}'
+.P
+Or to parse a specific status code, e.g., 500 (Internal Server Error):
+.IP
+# awk '$9~/500/' access.log | goaccess -
+.SS
+SERVER
+.P
+Also, it is worth pointing out that if we want to run GoAccess at lower
+priority, we can run it as:
+.IP
+# nice -n 19 goaccess -f access.log -a
+.P
+and if you don't want to install it on your server, you can still run it from
+your local machine:
+.IP
+# ssh root@server 'cat /var/log/apache2/access.log' | goaccess -a -
+.SS
+INCREMENTAL LOG PROCESSING
+.P
+GoAccess has the ability to process logs incrementally through the on-disk
+B+Tree database. It works in the following way:
+
+.nr step 1 1
+.IP \n[step] 3
+A dataset must be persisted first with
+.I --keep-db-files,
+then the same dataset can be loaded with
+.I --load-from-disk.
+.IP \n+[step]
+If new data is passed (piped or through a log file), it will append it to the
+original dataset.
+.IP \n+[step]
+To preserve the data at all times,
+.I --keep-db-files
+must be used.
+.IP \n+[step]
+If
+.I --load-from-disk
+is used without
+.I --keep-db-files,
+database files will be deleted upon closing the program.
+.P
+For instance:
+.IP
+// last month access log
+.br
+goaccess access.log.1 --keep-db-files
+.P
+then, load it with
+.IP
+// append this month access log, and preserve new data
+.br
+goaccess access.log --load-from-disk --keep-db-files
+.P
+To read persisted data only (without parsing new data)
+.IP
+goaccess --load-from-disk --keep-db-files
+.P
+.SH NOTES
+Each active panel has a total of 366 items or 50 in the real-time HTML report.
+The number of items is customizable using
+.I max-items
+However, only the CSV and JSON output allow a maximum number greater than the
+default value of 366 items per panel.
+.P
+When analyzing the same log file twice using the on-disk B+Tree and using
+.I --keep-db-files
+and
+.I --load-from-disk
+on each run, GoAccess will count each entry twice. Issue #334 will address this
+issue.
+.P
+A hit is a request (line in the access log), e.g., 10 requests = 10 hits. HTTP
+requests with the same IP, date, and user agent are considered a unique visit.
+.SH BUGS
+If you think you have found a bug, please send me an email to
+.I goaccess@prosoftcorp.com
+or use the issue tracker in https://github.com/allinurl/goaccess/issues
+.SH AUTHOR
+Gerardo Orellana <goaccess@prosoftcorp.com>
+For more details about it, or new releases, please visit
+https://goaccess.io
