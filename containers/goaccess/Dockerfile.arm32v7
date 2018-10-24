@@ -18,6 +18,8 @@ RUN apk update && \
     apk del $build_deps && \
     rm -rf /var/cache/apk/* /tmp/goaccess/* /goaccess
 
+ADD ./config/goaccess.conf /srv/data/goaccess.conf
+
 VOLUME /srv/data
 VOLUME /srv/log
 VOLUME /srv/report
