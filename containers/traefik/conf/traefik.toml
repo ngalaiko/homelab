@@ -31,3 +31,6 @@ defaultEntryPoints = ["http", "https"]
   [metrics.prometheus]
     entryPoint = "traefik"
     buckets = [0.1,0.3,1.2,5.0]
+
+[accessLog]
+  filePath = "/var/log/traefik/access.log"

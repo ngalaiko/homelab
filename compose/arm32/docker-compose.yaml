@@ -1,5 +1,8 @@
 version: '3.4'
 
+volumes:
+    traefik_logs:
+
 networks:
     traefik:
         driver: overlay
@@ -16,6 +19,7 @@ services:
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
             - /etc/traefik/acme/acme.json:/etc/traefik/acme/acme.json
+            - traefik_logs:/var/log/traefik
         networks:
             - traefik
             - monitoring
