@@ -33,7 +33,8 @@ services:
         volumes:
             - /data/stats/log/traefik/access.log:/srv/log/traefik/access.log
             - /data/stats/report:/srv/report
-            - /data/stats/data:/srv/data
+            - /data/stats/data/certs:/srv/data/certs
+            - /data/stats/data/goaccess.conf:/srv/data/goaccess.conf
         networks:
             - traefik
         deploy:
