@@ -7,18 +7,14 @@ echo "Building images..."
 # NOTE: ./server is the root
 BUILD_IMAGES=(
     "./containers/goaccess:ngalayko/goaccess"
-    "./containers/minio:ngalayko/minio"
     "./containers/remark:ngalayko/remark"
     "./containers/node-exporter:ngalayko/node-exporter"
     "./containers/grafana:ngalayko/grafana"
     "./containers/prometheus:ngalayko/prometheus"
     "./containers/traefik:ngalayko/proxy"
     "./containers/blog:ngalayko/blog"
-    "./containers/analytics-front:ngalayko/analytiics-front"
-    "./containers/analytics:ngalayko/matomo"
     "./containers/nginx:ngalayko/nginx"
     "./containers/dns:ngalayko/pihole"
-    "./containers/mysql:ngalayko/mysql"
 )
 
 docker login -u "${DOCKER_HUB_LOGIN}" -p "${DOCKER_HUB_PASSWORD}"
