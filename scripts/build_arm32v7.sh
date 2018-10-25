@@ -6,12 +6,12 @@ echo "Building images..."
 
 # NOTE: ./server is the root
 BUILD_IMAGES=(
+    "./containers/traefik:ngalayko/proxy"
     "./containers/goaccess:ngalayko/goaccess"
     "./containers/remark:ngalayko/remark"
     "./containers/node-exporter:ngalayko/node-exporter"
     "./containers/grafana:ngalayko/grafana"
     "./containers/prometheus:ngalayko/prometheus"
-    "./containers/traefik:ngalayko/proxy"
     "./containers/blog:ngalayko/blog"
     "./containers/nginx:ngalayko/nginx"
     "./containers/dns:ngalayko/pihole"
