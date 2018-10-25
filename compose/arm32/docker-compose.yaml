@@ -44,7 +44,7 @@ services:
             restart_policy:
                 condition: on-failure
             labels:
-                - "traefik.port=7890"
+                - "traefik.port=443"
                 - "traefik.docker.network=server_traefik"
                 - "traefik.frontend.rule=Host:ws.stats.${HOST}"
 
