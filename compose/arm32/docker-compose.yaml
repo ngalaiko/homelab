@@ -31,10 +31,7 @@ services:
     goaccess:
         image: ngalayko/goaccess:arm32v7
         volumes:
-            - /data/stats/log/traefik/access.log:/srv/log/traefik/access.log
-            - /data/stats/report:/srv/report
-            - /data/stats/data/certs:/srv/data/certs
-            - /data/stats/data/goaccess.conf:/srv/data/goaccess.conf
+            - /data/stats:/srv
         networks:
             - traefik
         deploy:
