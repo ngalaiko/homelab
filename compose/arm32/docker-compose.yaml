@@ -34,7 +34,7 @@ services:
             - /data/stats/log/traefik/access.log:/srv/log/traefik/access.log
             - /data/stats/report:/srv/report
             - /data/stats/data:/srv/data
-        reportnetworks:
+        networks:
             - traefik
         deploy:
             replicas: 1
