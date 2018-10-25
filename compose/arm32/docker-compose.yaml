@@ -36,6 +36,8 @@ services:
             - /data/stats/certs:/srv/data/certs
         networks:
             - traefik
+        ports:
+            - 8443:443
         deploy:
             replicas: 1
             placement:
