@@ -6,6 +6,7 @@ echo "Building images..."
 
 # NOTE: ./server is the root
 BUILD_IMAGES=(
+    "./containers/dns:ngalayko/pihole"
     "./containers/traefik:ngalayko/proxy"
     "./containers/goaccess:ngalayko/goaccess"
     "./containers/remark:ngalayko/remark"
@@ -14,7 +15,6 @@ BUILD_IMAGES=(
     "./containers/prometheus:ngalayko/prometheus"
     "./containers/blog:ngalayko/blog"
     "./containers/nginx:ngalayko/nginx"
-    "./containers/dns:ngalayko/pihole"
 )
 
 docker login -u "${DOCKER_HUB_LOGIN}" -p "${DOCKER_HUB_PASSWORD}"
