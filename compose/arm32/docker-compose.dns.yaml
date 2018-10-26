@@ -1,0 +1,22 @@
+version: '3.4'
+
+services:
+    pihole:
+        image: ngalayko/pihole:arm32v7
+        volumes:
+            - /data/dns/pihole/:/etc/pihole/
+            - /data/dns/dnsmasq.d/:/etc/dnsmasq.d/
+        networks:
+            - traefik
+        deploy:
+            replicas: 1
+            placement:
+                    - "node.labels.dns==true"
+            restart_policy:
+                condition: on-failure
+            labels:
+                - "traefik.docker.network=server_traefik"
+                - "traefik.web.port=80"
+                - "traefik.web.frontend.rule=Host:dns.${HOST}"
+                - "traefik.dns.port=53"
+                - "traefik.dns.frontend.rule=Host:connect.dns.${HOST}"
