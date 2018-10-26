@@ -5,6 +5,7 @@ services:
         image: ngalayko/pihole:arm32v7
         environment:
             - ServerIP=${SERVER_IP}
+            - VIRTUAL_HOST=dns.${HOST}
             - TZ=Europe/Stockholm
             - WEBPASSWORD=${DNS_PASSWORD}
         volumes:
