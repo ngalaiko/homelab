@@ -6,7 +6,7 @@ services:
         environment:
             - ServerIP=${SERVER_IP}
             - TZ=Europe/Stockholm
-            - WEBPASSWORD=${ENV_DNS_PASSWORD}
+            - WEBPASSWORD=${DNS_PASSWORD}
         volumes:
             - /data/dns/pihole/:/etc/pihole/
             - /data/dns/dnsmasq.d/:/etc/dnsmasq.d/
