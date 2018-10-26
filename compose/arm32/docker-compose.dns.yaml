@@ -5,6 +5,8 @@ services:
         image: ngalayko/pihole:arm32v7
         environment:
             - ServerIP=${SERVER_IP}
+            - TZ=Europe/Stockholm
+            - WEBPASSWORD=${ENV_DNS_PASSWORD}
         volumes:
             - /data/dns/pihole/:/etc/pihole/
             - /data/dns/dnsmasq.d/:/etc/dnsmasq.d/
