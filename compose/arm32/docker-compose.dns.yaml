@@ -24,5 +24,17 @@ services:
                 - "traefik.docker.network=server_traefik"
                 - "traefik.web.port=80"
                 - "traefik.web.frontend.rule=Host:dns.${HOST}"
-                - "traefik.dns.port=53"
+
+    dnscrypt:
+        image: jedisct1/dnscrypt-server
+        command: init -N connect.dns.${HOST} -E ${SERVER_IP}
+        networks:
+            - traefik
+        deploy:
+            replicas: 1
+            restart_policy:
+                condition: on-failure
+            labels:
+                - "traefik.docker.network=server_traefik"
+                - "traefik.dns.port=443"
                 - "traefik.dns.frontend.rule=Host:connect.dns.${HOST}"
