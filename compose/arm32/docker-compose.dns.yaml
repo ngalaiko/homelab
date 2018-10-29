@@ -26,7 +26,7 @@ services:
                 - "traefik.web.frontend.rule=Host:dns.${HOST}"
 
     dnscrypt:
-        image: jedisct1/dnscrypt-server
+        image: ngalayko/dnscrypt:arm32v7
         command: init -N connect.dns.${HOST} -E ${SERVER_IP}
         networks:
             - traefik
