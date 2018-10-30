@@ -30,13 +30,14 @@ services:
 
     dnscrypt:
         image: ngalayko/dnscrypt:arm32v7
-        command: init
         environment: 
-            - PROVIDER_BASENAME=connect.dns.${HOST}
+            - PROVIDER_NAME=2.dnscrypt-cert.connect.dns.${HOST}
+            - RESOLVER_ADDR=8.8.8.8:53
+            - LISTEN_ADDR=0.0.0.0:443
         networks:
             - traefik
-        volumes:
-            - dnscrypt:/usr/local/etc/dnscrypt-wrapper
+        volumes: 
+            - dnscrypt:/var/lib/dnscrypt-wrapper
         deploy:
             replicas: 1
             restart_policy:
