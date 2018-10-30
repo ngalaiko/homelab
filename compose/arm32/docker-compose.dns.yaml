@@ -35,7 +35,7 @@ services:
             - traefik
         volumes:
             - dnscrypt:/opt/dnscrypt-wrapper/etc/keys
-            - dnscrypt:/opt/unbound/etc/unbound/unbound.conf
+              #- dnscrypt:/opt/unbound/etc/unbound/unbound.conf
         deploy:
             replicas: 1
             restart_policy:
