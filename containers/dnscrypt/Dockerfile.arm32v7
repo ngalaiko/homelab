@@ -1,100 +1,67 @@
 FROM apcheamitru/arm32v7-alpine:3.7
 
-ADD start_runit /sbin/
-RUN 	mkdir /etc/container_environment &&\
-        chmod a+x /sbin/start_runit && mkdir /etc/service && mkdir /etc/runit_init.d && \
-        apk --update upgrade && apk add bash util-linux coreutils findutils grep runit && rm -rf /var/cache/apk/*
+LABEL maintainer='Chao QU <mail@quchao.com>'
 
-ENV SERIAL 1
+ARG DNSCRYPT_SHA256='6bd025d17411c2e220c3a70f8bcb3188f08a79b40020e51b1749b791269c7d77'
+ARG DNSCRYPT_VERSION='0.3'
 
-ENV BUILD_DEPS   make gcc musl-dev git libevent-dev expat-dev shadow autoconf file libressl-dev
-ENV RUNTIME_DEPS bash util-linux coreutils findutils grep libressl ldns ldns-tools libevent expat libexecinfo coreutils drill
+WORKDIR /usr/local/src/
 
-RUN set -x && \
-    apk --update upgrade && apk add $RUNTIME_DEPS $BUILD_DEPS
+RUN set -ex; \
+    # build deps
+    apk add --no-cache --virtual .build-deps \
+        #shadow \
+        curl \
+        build-base \
+        linux-headers \
+        autoconf \
+        bsd-compat-headers \
+        libsodium-dev \
+        libevent-dev \
+    ; \
+    # runtime deps
+    apk add --no-cache --virtual .runtime-deps \
+        libsodium \
+        libevent \
+    ; \
+    curl -sSLO "https://github.com/cofyc/dnscrypt-wrapper/archive/v${DNSCRYPT_VERSION}.tar.gz"; \
+    echo "${DNSCRYPT_SHA256}  v${DNSCRYPT_VERSION}.tar.gz" | sha256sum -c -; \
+    tar xfz "v${DNSCRYPT_VERSION}.tar.gz"; \
+    cd "dnscrypt-wrapper-${DNSCRYPT_VERSION}"; \
+    # disable backtrace
+    sed -i 's|HAVE_BACKTRACE|NO_BACKTRACE|' compat.h; \
+    make configure; \
+    env CFLAGS=-Ofast ./configure; \
+    make install; \
+    cd ..; \
+    rm -f "v${DNSCRYPT_VERSION}.tar.gz"; \
+    rm -rf "dnscrypt-wrapper-${DNSCRYPT_VERSION}"; \
+    # for chroot
+    #usermod -d '/usr/local/var/dnscrypt-wrapper' "${RUN_AS_USER}"; \
+    #chown "${RUN_AS_USER}":"${RUN_AS_USER}" /usr/local/var/dnscrypt-wrapper; \
+    # do some cleanup
+    apk del --purge .build-deps; \
+    rm -rf /tmp/* /var/tmp/* /var/cache/apk/* /usr/local/src/*;
 
-ENV UNBOUND_VERSION 1.8.0
-ENV UNBOUND_SHA256 78f79d6d3b643fdcd74a14fc76542250da886c82f82bc55b51e189663d61b83f
-ENV UNBOUND_DOWNLOAD_URL https://www.unbound.net/downloads/unbound-${UNBOUND_VERSION}.tar.gz
+COPY docker-entrypoint.sh /usr/local/bin/
 
-RUN set -x && \
-    mkdir -p /tmp/src && \
-    cd /tmp/src && \
-    wget -O unbound.tar.gz $UNBOUND_DOWNLOAD_URL && \
-    echo "${UNBOUND_SHA256} *unbound.tar.gz" | sha256sum -c - && \
-    tar xzf unbound.tar.gz && \
-    rm -f unbound.tar.gz && \
-    cd unbound-${UNBOUND_VERSION} && \
-    groupadd _unbound && \
-    useradd -g _unbound -s /etc -d /dev/null _unbound && \
-    ./configure --prefix=/opt/unbound --with-pthreads \
-    --with-username=_unbound --with-libevent --enable-event-api && \
-    make install && \
-    mv /opt/unbound/etc/unbound/unbound.conf /opt/unbound/etc/unbound/unbound.conf.example && \
-    rm -fr /opt/unbound/share/man && \
-    rm -fr /tmp/* /var/tmp/*
+RUN set -ex; \
+    chmod +x /usr/local/bin/docker-entrypoint.sh; 
 
-ENV LIBSODIUM_VERSION 1.0.16
-ENV LIBSODIUM_SHA256 eeadc7e1e1bcef09680fb4837d448fbdf57224978f865ac1c16745868fbd0533
-ENV LIBSODIUM_DOWNLOAD_URL https://download.libsodium.org/libsodium/releases/libsodium-${LIBSODIUM_VERSION}.tar.gz
+ENV LISTEN_PORT='12345' \
+    RESOLVER_IP='8.8.8.8' \
+    RESOLVER_PORT='53' \
+    PROVIDER_BASENAME='example.com' \
+    CRYPT_KEYS_LIFESPAN='365' \
+    KEYS_DIR='/usr/local/etc/dnscrypt-wrapper'
+ENV CRYPT_KEYS_DIR="${KEYS_DIR}/crypt"
 
-RUN set -x && \
-    mkdir -p /tmp/src && \
-    cd /tmp/src && \
-    wget -O libsodium.tar.gz $LIBSODIUM_DOWNLOAD_URL && \
-    echo "${LIBSODIUM_SHA256} *libsodium.tar.gz" | sha256sum -c - && \
-    tar xzf libsodium.tar.gz && \
-    rm -f libsodium.tar.gz && \
-    cd libsodium-${LIBSODIUM_VERSION} && \
-    env CFLAGS=-Ofast ./configure --disable-dependency-tracking && \
-    make check && make install && \
-    ldconfig /usr/local/lib && \
-    rm -fr /tmp/* /var/tmp/*
+HEALTHCHECK --interval=1m --timeout=3s \
+    CMD [[ "$(/usr/bin/find "${CRYPT_KEYS_DIR}" -maxdepth 1 -type f -name '*.key' -mmin -"$((CRYPT_KEYS_LIFESPAN * 1440 * 7 / 10))" -print | wc -l | sed 's|[^0-9]||g')" -ne 0 ]] || exit 1
+STOPSIGNAL SIGKILL
 
-ENV DNSCRYPT_WRAPPER_GIT_URL https://github.com/jedisct1/dnscrypt-wrapper.git
-ENV DNSCRYPT_WRAPPER_GIT_BRANCH xchacha-stamps
+EXPOSE ${LISTEN_PORT}/tcp ${LISTEN_PORT}/udp
 
-COPY queue.h /tmp
-
-RUN set -x && \
-    mkdir -p /tmp/src && \
-    cd /tmp/src && \
-    git clone --branch=${DNSCRYPT_WRAPPER_GIT_BRANCH} ${DNSCRYPT_WRAPPER_GIT_URL} && \
-    cd dnscrypt-wrapper && \
-    sed -i 's#<sys/queue.h>#"/tmp/queue.h"#' compat.h && \
-    sed -i 's#HAVE_BACKTRACE#NO_BACKTRACE#' compat.h && \
-    mkdir -p /opt/dnscrypt-wrapper/empty && \
-    groupadd _dnscrypt-wrapper && \
-    useradd -g _dnscrypt-wrapper -s /etc -d /opt/dnscrypt-wrapper/empty _dnscrypt-wrapper && \
-    groupadd _dnscrypt-signer && \
-    useradd -g _dnscrypt-signer -G _dnscrypt-wrapper -s /etc -d /dev/null _dnscrypt-signer && \
-    make configure && \
-    env CFLAGS=-Ofast ./configure --prefix=/opt/dnscrypt-wrapper && \
-    make install && \
-    rm -fr /tmp/* /var/tmp/*
-
-RUN set -x && \
-    echo apk del --purge $BUILD_DEPS && \
-    echo rm -rf /tmp/* /var/tmp/* /usr/local/include
-
-RUN mkdir -p \
-    /etc/service/unbound \
-    /etc/service/watchdog
-
-COPY entrypoint.sh /
-
-COPY unbound.sh /etc/service/unbound/run
-COPY unbound-check.sh /etc/service/unbound/check
-
-COPY dnscrypt-wrapper.sh /etc/service/dnscrypt-wrapper/run
-
-COPY key-rotation.sh /etc/service/key-rotation/run
-COPY watchdog.sh /etc/service/watchdog/run
-
-VOLUME ["/opt/dnscrypt-wrapper/etc/keys"]
-
-EXPOSE 443/udp 443/tcp
-
-CMD ["/sbin/start_runit"]
-
-ENTRYPOINT ["/entrypoint.sh"]
+VOLUME [ "${KEYS_DIR}" ]
+WORKDIR ${KEYS_DIR}
+ENTRYPOINT [ "docker-entrypoint.sh" ]

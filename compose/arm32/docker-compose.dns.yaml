@@ -30,12 +30,13 @@ services:
 
     dnscrypt:
         image: ngalayko/dnscrypt:arm32v7
-        command: init -N connect.dns.${HOST} -E ${SERVER_IP}
+        command: init
+        environment: 
+            - PROVIDER_BASENAME=connect.dns.${HOST}
         networks:
             - traefik
         volumes:
-            - dnscrypt:/opt/dnscrypt-wrapper/etc/keys
-            - dnscrypt:/opt/unbound/etc/unbound
+            - dnscrypt:/usr/local/etc/dnscrypt-wrapper
         deploy:
             replicas: 1
             restart_policy:
@@ -45,4 +46,4 @@ services:
             labels:
                 - "traefik.docker.network=server_traefik"
                 - "traefik.dns.port=443"
-                - "traefik.dns.frontend.rule=Host:connect.dns.${HOST}"
+                - "traefik.dns.frontend.rule=Host:2.dnscrypt-cert.connect.dns.${HOST}"
