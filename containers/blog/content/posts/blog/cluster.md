@@ -33,7 +33,7 @@ Hardware Used:
 * 5 x [Gigabit Ethernet patch cable](https://www.amazon.de/gp/product/B0046ZAK0K/ref=oh_aui_detailpage_o00_s01?ie=UTF8&psc=1)
 * 1 x [USB Charger for 6 ports](https://www.amazon.de/gp/product/B00PTLSH9G/ref=oh_aui_detailpage_o00_s02?ie=UTF8&psc=1)
 * 4 x [Raspberry PI 3 Model B+](https://www.amazon.de/gp/product/B07BFH96M3/ref=oh_aui_detailpage_o00_s02?ie=UTF8&psc=1)
-* 1 x [8-Port Gigabit Switch]https://www.amazon.de/gp/product/B000BCC0LO/ref=oh_aui_detailpage_o00_s02?ie=UTF8&psc=1
+* 1 x [8-Port Gigabit Switch](https://www.amazon.de/gp/product/B000BCC0LO/ref=oh_aui_detailpage_o00_s02?ie=UTF8&psc=1)
 
 ![Cluster](/media/cluster.jpg)
 
