@@ -1,5 +1,19 @@
-FROM matomo:3.6.0-fpm-alpine
+FROM golang:1.11-alpine3.7 as builder
 
-COPY --from=ngalayko/dyn-dns:latest /dyn-dns /dyn-dns
+ARG GOOS=linux
+ARG GOARCH=arm
+
+WORKDIR $GOPATH/src/github.com/ngalayko/dyn-dns
+
+COPY . .
+
+RUN GOOS=$GOOS GOARCH=$GOARCH go build -o /dyn-dns ./cmd/dyn-dns
+
+FROM apcheamitru/arm32v7-alpine:3.7
+
+RUN apk add --no-cache --update \
+        ca-certificates
+
+COPY --from=builder /dyn-dns /dyn-dns
 
 ENTRYPOINT [ "/dyn-dns" ]
