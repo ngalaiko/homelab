@@ -1,0 +1,5 @@
+FROM matomo:3.6.0-fpm-alpine
+
+COPY --from=ngalayko/dyn-dns:latest /dyn-dns /dyn-dns
+
+ENTRYPOINT [ "/dyn-dns" ]

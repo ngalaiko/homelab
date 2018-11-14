@@ -6,7 +6,9 @@ echo "Building images..."
 
 # NOTE: ./server is the root
 BUILD_IMAGES=(
-    "./containers/dnscrypt:ngalayko/dnscrypt"
+    "./containers/dyn-dns:ngalayko/dyn-dns"
+    "./containers/blog:ngalayko/blog"
+    "./containers/dns-wrapper:ngalayko/dnscrypt"
     "./containers/goaccess:ngalayko/goaccess"
     "./containers/dns:ngalayko/pihole"
     "./containers/traefik:ngalayko/proxy"
@@ -14,7 +16,6 @@ BUILD_IMAGES=(
     "./containers/node-exporter:ngalayko/node-exporter"
     "./containers/grafana:ngalayko/grafana"
     "./containers/prometheus:ngalayko/prometheus"
-    "./containers/blog:ngalayko/blog"
     "./containers/nginx:ngalayko/nginx"
 )
 

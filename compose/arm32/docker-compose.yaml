@@ -28,6 +28,14 @@ services:
             restart_policy:
                 condition: on-failure
 
+    dyn-dns:
+        image: ngalayko/dyn-dns:arm32v7
+        command: --apiToken=${DYN_DNS_TOKEN} --domain="${HOST}" --interval=10s
+        deploy:
+            replicas: 1
+            restart_policy:
+                condition: on-failure
+
     goaccess:
         image: ngalayko/goaccess:arm32v7
         volumes:
