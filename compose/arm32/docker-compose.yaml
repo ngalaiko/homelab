@@ -30,7 +30,7 @@ services:
 
     dyn-dns:
         image: ngalayko/dyn-dns:arm32v7
-        command: --apiToken=${DYN_DNS_TOKEN} --domain="${HOST}" --interval=10s
+        command: --apiToken=${DYN_DNS_TOKEN} --domain="${HOST}" --interval=10m
         deploy:
             replicas: 1
             restart_policy:
