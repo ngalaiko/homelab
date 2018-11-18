@@ -54,7 +54,7 @@ services:
             - traefik
             - monitoring
         deploy:
-            replicas: 1
+            mode: global
             placement:
                 constraints: 
                     - "node.role==manager" 
