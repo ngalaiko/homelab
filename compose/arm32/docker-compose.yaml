@@ -38,8 +38,8 @@ services:
             - "--consul"
             - "--consul.endpoint=consul:8500"
             - "--consul.prefix=traefik"
-		depends_on:
-			- consul
+        depends_on:
+            - consul
         ports:
             - 80:80
             - 443:443
