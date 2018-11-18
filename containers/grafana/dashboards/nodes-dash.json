@@ -1181,7 +1181,7 @@
   "schemaVersion": 16,
   "style": "dark",
   "tags": [
-    "swarmprom"
+    "metrics"
   ],
   "templating": {
     "list": [
