@@ -17,7 +17,7 @@
   "editable": true,
   "gnetId": 4475,
   "graphTooltip": 1,
-  "iteration": 1542565313898,
+  "iteration": 1542565629139,
   "links": [],
   "panels": [
     {
@@ -169,7 +169,7 @@
           "expr": "histogram_quantile(\n  0.$percentiles,\n    rate(\n      traefik_backend_request_duration_seconds_bucket{code=\"200\",method=\"GET\"}[5m]\n    ) \n)",
           "format": "time_series",
           "intervalFactor": 1,
-          "legendFormat": "{{ instance }}",
+          "legendFormat": "{{ backend }}",
           "refId": "A"
         }
       ],
@@ -1023,5 +1023,5 @@
   "timezone": "",
   "title": "Traefik",
   "uid": "traefik",
-  "version": 4
+  "version": 5
 }
