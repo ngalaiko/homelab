@@ -2,6 +2,7 @@
   "annotations": {
     "list": [
       {
+        "$$hashKey": "object:82",
         "builtIn": 1,
         "datasource": "-- Grafana --",
         "enable": true,
@@ -16,8 +17,7 @@
   "editable": true,
   "gnetId": 4475,
   "graphTooltip": 1,
-  "id": null,
-  "iteration": 1527284418552,
+  "iteration": 1542565313898,
   "links": [],
   "panels": [
     {
@@ -154,7 +154,7 @@
       "lines": true,
       "linewidth": 1,
       "links": [],
-      "nullPointMode": "null",
+      "nullPointMode": "null as zero",
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -165,7 +165,8 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "histogram_quantile(0.$percentiles, rate(traefik_entrypoint_request_duration_seconds_bucket{code=\"200\",method=\"GET\"}[5m]))",
+          "$$hashKey": "object:131",
+          "expr": "histogram_quantile(\n  0.$percentiles,\n    rate(\n      traefik_backend_request_duration_seconds_bucket{code=\"200\",method=\"GET\"}[5m]\n    ) \n)",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{ instance }}",
@@ -175,7 +176,7 @@
       "thresholds": [],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Per node latency $percentiles th perc over 5 min",
+      "title": "Per backend latency $percentiles th perc over 5 min",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -1022,5 +1023,5 @@
   "timezone": "",
   "title": "Traefik",
   "uid": "traefik",
-  "version": 1
+  "version": 4
 }
