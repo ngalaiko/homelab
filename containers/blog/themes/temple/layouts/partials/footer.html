@@ -58,7 +58,7 @@
     (d.head || d.body).appendChild(s);
 
 	var d = document, s = d.createElement('script');
-    s.src = '/web/counter.js'; // prepends this address with domain where remark42 is placed
+    s.src = baseURL + '/web/counter.js';
     (d.head || d.body).appendChild(s);
   })();
 </script>
