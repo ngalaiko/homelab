@@ -36,6 +36,7 @@ services:
             - "--accessLog"
             - "--accessLog.filePath=/var/log/traefik/access.log"
             - "--consul"
+            - "--consul.watch=true"
             - "--consul.endpoint=consul:8500"
             - "--consul.prefix=traefik"
         depends_on:
@@ -53,7 +54,10 @@ services:
             - traefik
             - monitoring
         deploy:
-            mode: global
+            replicas: 1
+            placement:
+                constraints: 
+                    - "node.role==manager" 
             restart_policy:
                 condition: on-failure
             update_config:
