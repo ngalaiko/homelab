@@ -13,7 +13,6 @@ services:
         command:
             - "--api"
             - "--api.dashboard=true"
-            - "--api.debug=true"
             - "--entrypoints=Name:http Address::80"
             - "--entrypoints=Name:https Address::443 TLS"
             - "--defaultentrypoints=http,https"
