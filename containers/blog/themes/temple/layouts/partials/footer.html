@@ -56,6 +56,10 @@
     s.src = baseURL + '/web/embed.js';
     s.type = 'text/javascript';
     (d.head || d.body).appendChild(s);
+
+	var d = document, s = d.createElement('script');
+    s.src = '/web/counter.js'; // prepends this address with domain where remark42 is placed
+    (d.head || d.body).appendChild(s);
   })();
 </script>
 

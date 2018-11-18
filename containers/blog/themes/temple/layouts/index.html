@@ -37,7 +37,9 @@
 			series: [ {{ range $page.Params.series }}<a href="{{ $baseurl }}series/{{ . | urlize }}">{{ . }}</a> {{ end }}]
 			{{ end }}
 
+			comments: <span class="remark42__counter" data-url="{{ .Permalink }}"></span>
 		  </p>
+
 		</li>
 		{{ end }}
 		{{ end }}
