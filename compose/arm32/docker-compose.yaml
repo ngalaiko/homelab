@@ -11,6 +11,7 @@ services:
     proxy:
         image: ngalayko/proxy:arm32v7
         command:
+            - "--logLevel=DEBUG"
             - "--api"
             - "--api.dashboard=true"
             - "--entrypoints=Name:http Address::80"
@@ -47,7 +48,6 @@ services:
             - DO_AUTH_TOKEN=${DIGITAL_OCEAN_AUTH_TOKEN}
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
-            - /etc/traefik/acme/acme.json:/etc/traefik/acme/acme.json
             - /data/stats:/var
         networks:
             - traefik
