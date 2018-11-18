@@ -31,7 +31,7 @@ services:
             - "--metrics"
             - "--metrics.prometheus"
             - "--metrics.prometheus.entrypoint=traefik"
-            - "--metrics.prometheus.buckets=[0.1,0.3,1.2,5.0]"
+            - "--metrics.prometheus.buckets=0.1,0.3,1.2,5.0"
             - "--accessLog"
             - "--accessLog.filePath=/var/log/traefik/access.log"
             - "--consul"
