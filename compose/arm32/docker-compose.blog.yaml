@@ -17,6 +17,9 @@ services:
                 - "traefik.port=80"
                 - "traefik.docker.network=server_traefik"
                 - "traefik.frontend.rule=Host:${HOST}"
+            placement:
+                constraints:
+                    - "node.labels.blog==true"
 
     comments:
         image: ngalayko/remark:arm32v7

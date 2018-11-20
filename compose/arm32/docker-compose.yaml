@@ -106,6 +106,7 @@ services:
             placement:
                 constraints:
                     - "node.role==manager"
+                    - "node.labels.blog==true"
             restart_policy:
                 condition: on-failure
             labels:
