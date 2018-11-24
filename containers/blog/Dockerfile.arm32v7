@@ -9,7 +9,7 @@ RUN wget -q --no-check-certificate https://github.com/gohugoio/hugo/releases/dow
 
 WORKDIR /app
 ADD ./ .
-RUN hugo -t temple
+RUN hugo -t hermit
 
 FROM ngalayko/nginx:arm32v7
 
