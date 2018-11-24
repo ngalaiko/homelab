@@ -1,6 +1,7 @@
 FROM armhf/alpine as builder
 
 RUN apk add --update --no-cache \
+        imagemagick \
         wget 
 
 # TODO: check why is it insecure
@@ -9,6 +10,7 @@ RUN wget -q --no-check-certificate https://github.com/gohugoio/hugo/releases/dow
 
 WORKDIR /app
 ADD ./ .
+RUN mogrify -resize "600>" -quality 50 ./content/media/*
 RUN hugo -t hermit
 
 FROM ngalayko/nginx:arm32v7
