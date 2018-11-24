@@ -8,7 +8,6 @@ date: "2018-07-21"
 categories: [
     "Blog",
 ]
-menu: "main"
 ---
 
 ![Vim learning curve](/media/vim.png)

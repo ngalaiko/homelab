@@ -7,7 +7,6 @@ date: "2018-07-31"
 categories: [
     "Blog",
 ]
-menu: "main"
 ---
 
 For a long time, I tried to find the most comfortable way to manage a server where I host 

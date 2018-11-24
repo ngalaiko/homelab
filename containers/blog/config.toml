@@ -1,28 +1,55 @@
-baseURL = "https://galayko.rocks/"
-theme = "temple"
+baseURL = "https://galayko.rocks"
 languageCode = "en-us"
 title = "Nikita Galaiko"
+theme = "hermit"
+#enableGitInfo = true
+pygmentsCodefences  = true
+pygmentsUseClasses  = true
+#hasCJKLanguage = true  # If there're Chinese/Japanese/Korean Languages in the content, enable this.
+rssLimit = 10  # Maximum number of items in the RSS feed.
 copyright = "(c) 2018. Powered by Hugo, Docker Swarm and Raspberry Pi (for some reason)"
-
-[params]
-  # Enables syntax highlighting
-  highlight = true
-
-  # Supports highlighting for languages not included in the original pack
-  # See https://highlightjs.org/download/ for what's included in original pack
-  # For reference to all languages, see:
-  # https://github.com/isagalaev/highlight.js/tree/master/src/languages
-  hjslangs = ["go", "python"]
-
-  # Enables the topmenu, which pulls from categories
-  topmenu = "categories"
-
-# Builds a list page for each category given
-[taxonomies]
-  tag = "tags"
-  category = "categories"
+# googleAnalytics = "UA-123-45"
+# disqusShortname = "yourdiscussshortname"
 
 [author]
   name = "Nikita Galaiko"
-  github = "ngalayko"
-  email = "nikita@galayko.rocks"
+
+[blackfriday]
+  hrefTargetBlank = true
+
+[taxonomies]
+  tag = "tags"
+  category = ""  # Categories are disabled by default.
+
+[params]
+  dateform        = "Jan 2, 2006"
+  dateformShort   = "Jan 2"
+  dateformNum     = "2006-01-02"
+  dateformNumTime = "2006-01-02 15:04 -0700"
+
+  # themeColor = "#494f5c"  # Theme color in meta tags.
+  #homeSubtitle = "A minimal and fast theme for Hugo."
+  footerCopyright = ' &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a>'
+  #gitUrl = "https://github.com/Someone/SomeRepo/commit/" # Prefix of link to you git commit detail page. GitInfo must be enabled. 
+  justifyContent = false  # Set "text-align: justify" to .content
+  # bgImg = ""  #  Homepage background-image URL
+
+  [[params.social]]
+    name = "github"
+    url = "https://github.com/ngalayko"
+
+  [[params.social]]
+    name = "email"
+    url = "ngalayko@gmail.com"
+
+[menu]
+
+  [[menu.main]]
+    name = "Posts"
+    url = "/posts/"
+    weight = 10
+
+  [[menu.main]]
+    name = "About"
+    url = "/about"
+    weight = 20

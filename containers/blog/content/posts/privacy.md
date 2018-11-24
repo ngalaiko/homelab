@@ -7,7 +7,6 @@ date: "2018-08-20"
 categories: [
     "Blog",
 ]
-menu: "main"
 ---
 
 About a month ago I began using some systems to protect my security on the internet a bit more than nothing.

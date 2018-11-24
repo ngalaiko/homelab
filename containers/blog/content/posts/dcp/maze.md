@@ -10,7 +10,6 @@ date: "2018-09-01"
 categories: [
     "Daily Coding Problem",
 ]
-menu: "main"
 ---
 
 ![maze](/media/maze.png)

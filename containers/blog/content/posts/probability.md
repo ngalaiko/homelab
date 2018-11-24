@@ -9,7 +9,6 @@ date: "2018-07-16"
 categories: [
     "Daily Coding Problem",
 ]
-menu: "main"
 ---
 
 Today problem is a `probability` problem.

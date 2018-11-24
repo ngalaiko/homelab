@@ -8,7 +8,6 @@ date: "2018-11-02"
 categories: [
     "Blog",
 ]
-menu: "main"
 ---
 
 ## Introduction
