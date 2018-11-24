@@ -16,3 +16,4 @@ RUN hugo -t hermit
 FROM ngalayko/nginx:arm32v7
 
 COPY --from=builder /app/public/ /usr/share/nginx/html
+COPY conf.d /etc/nginx
