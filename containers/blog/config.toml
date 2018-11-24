@@ -40,7 +40,7 @@ copyright = "(c) 2018. Powered by Hugo, Docker Swarm and Raspberry Pi (for some 
 
   [[params.social]]
     name = "email"
-    url = "ngalayko@gmail.com"
+    url = "mailto:ngalayko@gmail.com"
 
 [menu]
 
@@ -51,5 +51,5 @@ copyright = "(c) 2018. Powered by Hugo, Docker Swarm and Raspberry Pi (for some 
 
   [[menu.main]]
     name = "About"
-    url = "/about"
+    url = "/about/"
     weight = 20
