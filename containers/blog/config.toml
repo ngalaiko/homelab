@@ -9,7 +9,6 @@ pygmentsUseClasses  = true
 rssLimit = 10  # Maximum number of items in the RSS feed.
 copyright = "(c) 2018. Powered by Hugo, Docker Swarm and Raspberry Pi (for some reason)"
 # googleAnalytics = "UA-123-45"
-# disqusShortname = "yourdiscussshortname"
 
 [author]
   name = "Nikita Galaiko"
@@ -33,6 +32,7 @@ copyright = "(c) 2018. Powered by Hugo, Docker Swarm and Raspberry Pi (for some 
   #gitUrl = "https://github.com/Someone/SomeRepo/commit/" # Prefix of link to you git commit detail page. GitInfo must be enabled. 
   justifyContent = false  # Set "text-align: justify" to .content
   # bgImg = ""  #  Homepage background-image URL
+  comments = true
 
   [[params.social]]
     name = "github"
