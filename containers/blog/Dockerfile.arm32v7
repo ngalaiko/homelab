@@ -10,7 +10,7 @@ RUN wget -q --no-check-certificate https://github.com/gohugoio/hugo/releases/dow
 
 WORKDIR /app
 ADD ./ .
-RUN mogrify -resize "620>" -quality 82 ./content/media/*
+RUN mogrify -resize "800>x" -quality 82 ./content/media/*
 RUN hugo -t hermit
 
 FROM ngalayko/nginx:arm32v7
