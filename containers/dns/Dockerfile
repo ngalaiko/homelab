@@ -1,1 +1,0 @@
-FROM pihole/pihole:latest

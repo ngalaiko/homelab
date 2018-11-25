@@ -6,6 +6,7 @@ echo "Building images..."
 
 # NOTE: ./server is the root
 BUILD_IMAGES=(
+    "./containers/doh-proxy:ngalayko/doh-proxy"
     "./containers/blog:ngalayko/blog"
     "./containers/traefik:ngalayko/proxy"
     "./containers/grafana:ngalayko/grafana"
