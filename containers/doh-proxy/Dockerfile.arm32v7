@@ -1,0 +1,11 @@
+FROM arm32v7/python:3.7-slim
+
+RUN apt-get update \
+	&& apt-get -y --no-install-recommends install \
+        dnsutils \
+	&& pip3 install doh-proxy
+
+COPY entrypoint.sh .
+RUN chmod +x entrypoint.sh
+
+ENTRYPOINT [ "./entrypoint.sh" ]
