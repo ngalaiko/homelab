@@ -47,3 +47,44 @@ services:
             placement:
                 constraints:
                     - "node.labels.remark==true"
+
+    goaccess:
+        image: ngalayko/goaccess:arm32v7
+        volumes:
+            - /data/stats:/srv
+            - /data/stats/log:/srv/log
+            - /data/stats/certs:/srv/data/certs
+        networks:
+            - traefik
+        ports:
+            - 8443:443
+        deploy:
+            replicas: 1
+            placement:
+                constraints:
+                    - "node.role==manager"
+                    - "node.labels.blog==true"
+            restart_policy:
+                condition: on-failure
+            labels:
+                - "traefik.port=443"
+                - "traefik.docker.network=server_traefik"
+                - "traefik.frontend.rule=Host:ws.stats.${HOST}"
+
+    goaccess-front:
+        image: ngalayko/nginx:arm32v7
+        volumes:
+            - /data/stats/report:/usr/share/nginx/html:ro
+        networks:
+            - traefik
+        deploy:
+            replicas: 1
+            placement:
+                constraints:
+                    - "node.role==manager"
+            restart_policy:
+                condition: on-failure
+            labels:
+                - "traefik.port=80"
+                - "traefik.docker.network=server_traefik"
+                - "traefik.frontend.rule=Host:stats.${HOST}"
