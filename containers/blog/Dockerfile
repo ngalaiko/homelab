@@ -1,6 +1,7 @@
 FROM alpine as builder
 
 RUN apk add --update --no-cache \
+        imagemagick \
         wget 
 
 RUN wget -q https://github.com/gohugoio/hugo/releases/download/v0.49.2/hugo_0.49.2_Linux-64bit.tar.gz && \
@@ -8,8 +9,10 @@ RUN wget -q https://github.com/gohugoio/hugo/releases/download/v0.49.2/hugo_0.49
 
 WORKDIR /app
 ADD ./ .
-RUN hugo -t temple
+RUN mogrify -resize "800>x" -quality 82 -format jpg ./content/media/*
+RUN hugo -t hermit
 
 FROM ngalayko/nginx
 
 COPY --from=builder /app/public/ /usr/share/nginx/html
+COPY conf.d /etc/nginx
