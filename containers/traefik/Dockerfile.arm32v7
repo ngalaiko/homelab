@@ -1,1 +1,1 @@
-FROM arm32v6/traefik:alpine
+FROM arm32v6/traefik:1.7.4-alpine

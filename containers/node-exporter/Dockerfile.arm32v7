@@ -1,4 +1,4 @@
-FROM arm32v7/debian as builder
+FROM arm32v7/debian:7.11-slim as builder
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates \

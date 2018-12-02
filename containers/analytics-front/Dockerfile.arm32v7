@@ -1,3 +1,0 @@
-FROM ngalayko/nginx:arm32v7
-
-ADD nginx.conf /etc/nginx/nginx.conf

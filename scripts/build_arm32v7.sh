@@ -14,9 +14,9 @@ BUILD_IMAGES=(
     "./containers/dyn-dns:ngalayko/dyn-dns"
     "./containers/goaccess:ngalayko/goaccess"
     "./containers/remark:ngalayko/remark"
-    "./containers/dns:ngalayko/pihole"
     "./containers/node-exporter:ngalayko/node-exporter"
     "./containers/nginx:ngalayko/nginx"
+    "./containers/pihole:ngalayko/pihole"
 )
 
 docker login -u "${DOCKER_HUB_LOGIN}" -p "${DOCKER_HUB_PASSWORD}"
