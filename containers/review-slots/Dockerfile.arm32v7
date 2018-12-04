@@ -1,0 +1,15 @@
+FROM node:11.3.0-slim as builder
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        git \
+    && git clone https://github.com/ngalayko/html5-slot-machine /app
+
+WORKDIR /app
+
+RUN npm install \
+        && npm run-script build
+
+FROM ngalayko/nginx:arm32v7
+
+COPY --from=builder /app/dist/ /usr/share/nginx/html

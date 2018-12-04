@@ -1,0 +1,13 @@
+version: '3.4'
+
+services:
+    review-slots:
+        image: ngalayko/review-slots:arm32v7
+        networks:
+            - traefik
+        deploy:
+            replicas: 1
+            labels:
+                - "traefik.port=80"
+                - "traefik.docker.network=server_traefik"
+                - "traefik.frontend.rule=Host:review-slots.${HOST}"
