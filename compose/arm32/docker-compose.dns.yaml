@@ -11,10 +11,6 @@ services:
             - VIRTUAL_HOST=dns.${HOST}
             - TZ=Europe/Stockholm
             - WEBPASSWORD=${DNS_PASSWORD}
-        ports:
-            - 53:53/tcp
-            - 53:53/udp
-            - 67:67/udp
         volumes:
             - /data/dns/pihole/:/etc/pihole/
             - /data/dns/dnsmasq.d/:/etc/dnsmasq.d/
