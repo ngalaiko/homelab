@@ -9,7 +9,7 @@ volumes:
 
 services:
     test:
-        image: ngalayko/blog:arm32v7
+        image: arm32v7/busybox
         volumes:
             - test_volume:/mounted
         deploy:
