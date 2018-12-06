@@ -10,6 +10,7 @@ volumes:
 services:
     test:
         image: arm32v7/busybox
+        command: "sh"
         volumes:
             - test_volume:/mounted
         deploy:
