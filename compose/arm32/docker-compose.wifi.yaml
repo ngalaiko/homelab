@@ -1,14 +1,15 @@
 version: '3.4'
 
 networks:
-    hostnet:
-        external: true
+    outside:
+        external:
+            name: "host"
 
 services:
     wifi-ap:
         image: ngalayko/wifi-ap:arm32v7
         networks:
-            hostnet: {}
+            - outside
         volumes:
             - "/dev/urandom:/dev/random"
         deploy:
