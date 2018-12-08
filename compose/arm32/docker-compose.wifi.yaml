@@ -1,0 +1,11 @@
+version: '3.4'
+
+services:
+    wifi-ap:
+        image: ngalayko/wifi-ap:arm32v7
+        volumes:
+            - "/dev/urandom:/dev/random"
+        deploy:
+            replicas: 1
+            restart_policy:
+                condition: on-failure
