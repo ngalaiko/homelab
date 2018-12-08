@@ -3,6 +3,7 @@ version: '3.4'
 services:
     wifi-ap:
         image: ngalayko/wifi-ap:arm32v7
+        privileged: true
         volumes:
             - "/dev/urandom:/dev/random"
         deploy:
