@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM arm32v7/debian:7.11-slim as builder
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -20,4 +20,3 @@ COPY replace_wifi_pw.sh /opt/replace_wifi_pw.sh
 COPY start_services.sh /opt/start_services.sh
 
 CMD /opt/start_services.sh
-
