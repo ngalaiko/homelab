@@ -3,7 +3,6 @@ version: '3.4'
 networks:
     hostnet:
         external: true
-        name: host
 
 services:
     wifi-ap:
