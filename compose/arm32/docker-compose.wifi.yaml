@@ -9,7 +9,7 @@ services:
     wifi-ap:
         image: ngalayko/wifi-ap:arm32v7
         networks:
-            - hostnet
+            hostnet: {}
         volumes:
             - "/dev/urandom:/dev/random"
         deploy:
