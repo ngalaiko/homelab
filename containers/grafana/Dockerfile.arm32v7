@@ -5,3 +5,5 @@ COPY dashboards.yml /etc/grafana/provisioning/dashboards/
 COPY dashboards /etc/grafana/dashboards/
 
 ENV GF_PATHS_PROVISIONING=/etc/grafana/provisioning/
+
+USER root
