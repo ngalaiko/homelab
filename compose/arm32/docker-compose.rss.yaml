@@ -1,11 +1,19 @@
 version: '3.4'
 
+volumes:
+    driver: "ngalayko/sshfs:arm32v7"
+    driver_opts:
+        allow_other: ""
+        sshcmd: "pirate@node-white:/home/pirate/data/postgres"
+
 services:
     postgres:
         image: ngalayko/postgres:arm32v7
         user: root
         environment:
             - POSTGRES_PASSWORD=${POSTGRES_PASS}
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
         deploy:
             replicas: 1
             restart_policy:
