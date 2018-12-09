@@ -7,11 +7,11 @@ networks:
 
 services:
     wifi-ap:
-        image: ngalayko/wifi-ap:arm32v7
+        image: forcedinductionz/docker-ap:latest-armhf
         networks:
             - outside
-        volumes:
-            - "/dev/urandom:/dev/random"
+        environment:
+            - INTERFACE=wlan0
         deploy:
             replicas: 1
             restart_policy:
