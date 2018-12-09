@@ -8,10 +8,16 @@ services:
         image: ngalayko/postgres:arm32v7
         environment:
             - POSTGRES_PASSWORD=${POSTGRES_PASS}
+			- POSTGRES_USER=postgres
+			- POSTGRES_DB=miniflux2
         volumes:
             - postgres_data:/var/lib/postgresql/data
         deploy:
             replicas: 1
+            labels:
+                - "traefik.port="
+                - "traefik.docker.network=server_traefik"
+                - "traefik.frontend.rule=Host:${HOST}"
             restart_policy:
                 condition: on-failure
             resources:
@@ -22,3 +28,23 @@ services:
             placement:
                 constraints:
                     - "node.labels.postgres==true"
+
+    miniflux:
+        image: miniflux/miniflux:arm32v6-2.0.13
+        networks:
+            - traefik
+        environment:
+            - PORT=8080
+            - BASE_URL=https://${HOST}
+            - CREATE_ADMIN=1
+            - ADMIN_USERNAME=ngalayko
+            - ADMIN_PASSWORD=password
+            - DATABASE_URL=postgres://postgres:${POSTGRES_PASS}@postgres/miniflux2?sslmode=disable
+        deploy:
+            replicas: 1
+            labels:
+                - "traefik.port=8080"
+                - "traefik.docker.network=server_traefik"
+                - "traefik.frontend.rule=Host:rss.${HOST}"
+            restart_policy:
+                condition: on-failure
