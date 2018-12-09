@@ -39,7 +39,7 @@ services:
             - CREATE_ADMIN=1
             - ADMIN_USERNAME=ngalayko
             - ADMIN_PASSWORD=password
-            - DATABASE_URL=postgres://postgres:${POSTGRES_PASS}@postgres/miniflux2?sslmode=disable
+            - DATABASE_URL=postgres://server_postgres:${POSTGRES_PASS}@postgres/miniflux2?sslmode=disable
         deploy:
             replicas: 1
             labels:
