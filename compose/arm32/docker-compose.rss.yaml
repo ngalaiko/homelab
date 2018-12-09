@@ -8,8 +8,8 @@ services:
         image: ngalayko/postgres:arm32v7
         environment:
             - POSTGRES_PASSWORD=${POSTGRES_PASS}
-			- POSTGRES_USER=postgres
-			- POSTGRES_DB=miniflux2
+            - POSTGRES_USER=postgres
+            - POSTGRES_DB=miniflux2
         volumes:
             - postgres_data:/var/lib/postgresql/data
         deploy:
