@@ -3,6 +3,7 @@ version: '3.4'
 services:
     postgres:
         image: ngalayko/postgres:arm32v7
+        user: root
         environment:
             - POSTGRES_PASSWORD=${POSTGRES_PASS}
         deploy:
