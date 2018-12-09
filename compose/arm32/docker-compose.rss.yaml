@@ -1,0 +1,11 @@
+version: '3.4'
+
+services:
+    postgres:
+        image: arm32v7/postgres:11.1
+        environment:
+            - POSTGRES_PASSWORD=${POSTGRES_PASS}
+        deploy:
+            replicas: 1
+            restart_policy:
+                condition: on-failure
