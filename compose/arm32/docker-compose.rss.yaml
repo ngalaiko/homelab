@@ -42,7 +42,7 @@ services:
             - traefik
         environment:
             - PORT=8080
-            - BASE_URL=https://${HOST}
+            - BASE_URL=https://rss.${HOST}
             - RUN_MIGRATIONS=1
             - CREATE_ADMIN=1
             - ADMIN_USERNAME=ngalayko
