@@ -43,9 +43,10 @@ services:
         environment:
             - PORT=8080
             - BASE_URL=https://${HOST}
+            - RUN_MIGRATIONS=1
             - CREATE_ADMIN=1
             - ADMIN_USERNAME=ngalayko
-            - ADMIN_PASSWORD=password
+            - ADMIN_PASSWORD=${RSS_PASSWORD}
             - DATABASE_URL=postgres://postgres:${POSTGRES_PASS}@postgres/miniflux2?sslmode=disable
         deploy:
             replicas: 1
