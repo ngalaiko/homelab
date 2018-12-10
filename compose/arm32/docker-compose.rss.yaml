@@ -3,9 +3,15 @@ version: '3.4'
 volumes:
     postgres_data:
 
+networks:
+    rss:
+        driver: overlay
+
 services:
     postgres:
         image: ngalayko/postgres:arm32v7
+        networks:
+            - rss
         environment:
             - POSTGRES_PASSWORD=${POSTGRES_PASS}
             - POSTGRES_USER=postgres
@@ -32,6 +38,7 @@ services:
     miniflux:
         image: miniflux/miniflux:arm32v6-2.0.13
         networks:
+            - rss
             - traefik
         environment:
             - PORT=8080
@@ -39,7 +46,7 @@ services:
             - CREATE_ADMIN=1
             - ADMIN_USERNAME=ngalayko
             - ADMIN_PASSWORD=password
-            - DATABASE_URL=postgres://server_postgres:${POSTGRES_PASS}@postgres/miniflux2?sslmode=disable
+            - DATABASE_URL=postgres://postgres:${POSTGRES_PASS}@postgres/miniflux2?sslmode=disable
         deploy:
             replicas: 1
             labels:
