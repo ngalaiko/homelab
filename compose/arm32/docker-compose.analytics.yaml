@@ -62,4 +62,4 @@ services:
             labels:
                 - "traefik.port=80"
                 - "traefik.docker.network=server_traefik"
-                -
+                - "traefik.frontend.rule=Host:stats.${HOST}"
