@@ -30,7 +30,22 @@
 	{{ block "footer" . -}}{{ end }}
 	{{ $script := resources.Get "js/main.js" | minify | fingerprint -}}
 	<script src="{{ $script.RelPermalink }}" {{ printf "integrity=%q" $script.Data.Integrity | safeHTMLAttr }}></script>
-	{{ template "_internal/google_analytics_async.html" . }}
+
+    <!-- Fathom - simple website analytics - https://github.com/usefathom/fathom -->
+    <script>
+    (function(f, a, t, h, o, m){
+        a[h]=a[h]||function(){
+            (a[h].q=a[h].q||[]).push(arguments)
+        };
+        o=f.createElement('script'),
+        m=f.getElementsByTagName('script')[0];
+        o.async=1; o.src=t; o.id='fathom-script';
+        m.parentNode.insertBefore(o,m)
+    })(document, window, '//analytics.galayko.rocks/tracker.js', 'fathom');
+    fathom('set', 'siteId', 'GOBFT');
+    fathom('trackPageview');
+    </script>
+    <!-- / Fathom -->
 </body>
 
 </html>
