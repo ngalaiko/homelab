@@ -1,0 +1,34 @@
+version: '3.4'
+
+volumes:
+    postgres_data:
+
+services:
+    postgres:
+        image: ngalayko/postgres:arm32v7
+        networks:
+            - rss
+            - fathom
+        environment:
+            - POSTGRES_MULTIPLE_DATABASES=miniflux2,fathom
+            - POSTGRES_PASSWORD=${POSTGRES_PASS}
+            - POSTGRES_USER=postgres
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        deploy:
+            replicas: 1
+            labels:
+                - "traefik.port="
+                - "traefik.docker.network=server_traefik"
+                - "traefik.frontend.rule=Host:${HOST}"
+            restart_policy:
+                condition: on-failure
+            resources:
+                limits:
+                    memory: 128M
+                reservations:
+                    memory: 64M
+            placement:
+                constraints:
+                    - "node.labels.postgres==true"
+

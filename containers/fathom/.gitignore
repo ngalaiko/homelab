@@ -1,0 +1,12 @@
+node_modules
+.env*
+!.env.example
+coverage.out
+build
+dist
+*.db
+fathom
+!cmd/fathom
+
+assets/build
+assets/dist
