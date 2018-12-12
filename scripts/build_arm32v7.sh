@@ -15,7 +15,6 @@ BUILD_IMAGES=(
     "./containers/grafana:ngalayko/grafana"
     "./containers/prometheus:ngalayko/prometheus"
     "./containers/dyn-dns:ngalayko/dyn-dns"
-    "./containers/goaccess:ngalayko/goaccess"
     "./containers/remark:ngalayko/remark"
     "./containers/node-exporter:ngalayko/node-exporter"
     "./containers/nginx:ngalayko/nginx"
