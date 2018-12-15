@@ -4,9 +4,6 @@ networks:
     traefik:
         driver: overlay
 
-volumes:
-  consul-data:
-
 services:
     proxy:
         image: ngalayko/proxy:arm32v7
@@ -63,25 +60,6 @@ services:
             update_config:
                 parallelism: 1
                 delay: 10s
-
-    consul:
-        image: arm32v6/consul:1.3.0
-        command: agent -server -bootstrap-expect=1
-        volumes:
-            - consul-data:/consul/data
-        environment:
-            - CONSUL_LOCAL_CONFIG={"server":true}
-            - CONSUL_BIND_INTERFACE=eth0
-            - CONSUL_CLIENT_INTERFACE=eth0
-        networks:
-            - traefik
-        deploy:
-            replicas: 1
-            placement:
-                constraints:
-                    - node.role == manager
-            restart_policy:
-                condition: on-failure
 
     dyn-dns:
         image: ngalayko/dyn-dns:arm32v7
