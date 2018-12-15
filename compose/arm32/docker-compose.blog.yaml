@@ -1,7 +1,6 @@
 version: '3.4'
 
 volumes:
-    blog_cache:
     remark_data:
 
 services:
@@ -9,17 +8,12 @@ services:
         image: ngalayko/blog:arm32v7
         networks:
             - traefik
-        volumes:
-            - blog_cache:/var/nginx/cache
         deploy:
             replicas: 1
             labels:
                 - "traefik.port=80"
                 - "traefik.docker.network=server_traefik"
                 - "traefik.frontend.rule=Host:${HOST}"
-            placement:
-                constraints:
-                    - "node.labels.blog==true"
 
     comments:
         image: ngalayko/remark:arm32v7
