@@ -46,7 +46,6 @@ services:
             - DO_AUTH_TOKEN=${DIGITAL_OCEAN_AUTH_TOKEN}
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
-            - /data/stats:/var
         networks:
             - traefik
             - monitoring
