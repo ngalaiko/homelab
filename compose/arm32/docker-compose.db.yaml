@@ -9,6 +9,7 @@ services:
         networks:
             - rss
             - fathom
+            - default
         environment:
             - POSTGRES_MULTIPLE_DATABASES=miniflux2,fathom
             - POSTGRES_PASSWORD=${POSTGRES_PASS}

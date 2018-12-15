@@ -10,6 +10,7 @@ services:
         networks:
             - rss
             - traefik
+            - default
         environment:
             - PORT=8080
             - BASE_URL=https://rss.${HOST}
