@@ -30,6 +30,7 @@ services:
 
     doh-proxy:
         image: ngalayko/doh-proxy:arm32v7
+        hostname: dns-over-https-proxy
         command:
             - "--upstream-resolver=pihole"
             - "--port=3000"
