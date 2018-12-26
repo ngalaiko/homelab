@@ -8,7 +8,7 @@ networks:
 services:
     wifi-ap-supervisor:
         image: arm32v6/docker
-        command: docker run -it \
+        command: docker run \
             -e INTERFACE=wlan0 \
             -e SSID=${WIFI_SSID} \
             -e WPA_PASSPHRASE=${WIFI_PASSWORD} \
