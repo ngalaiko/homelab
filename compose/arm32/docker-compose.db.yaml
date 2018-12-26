@@ -7,11 +7,12 @@ services:
     postgres:
         image: ngalayko/postgres:arm32v7
         networks:
+            - home_assistant
             - rss
             - fathom
             - default
         environment:
-            - POSTGRES_MULTIPLE_DATABASES=miniflux2,fathom
+            - POSTGRES_MULTIPLE_DATABASES=miniflux2,fathom,home_assistant
             - POSTGRES_PASSWORD=${POSTGRES_PASS}
             - POSTGRES_USER=postgres
         volumes:

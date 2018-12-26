@@ -13,6 +13,10 @@ homeassistant:
   # Customization file
   customize: !include customize.yaml
 
+# Database setup
+recorder:
+    db_url: postgresql://postgres:${POSTGRES_PASS}@postgres/home_assistant?sslmode=disable
+
 # Enables the frontend
 frontend:
 
