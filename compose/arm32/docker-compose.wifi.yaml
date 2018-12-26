@@ -10,8 +10,6 @@ services:
         image: arm32v6/docker
         command: docker run --privileged \
             -e INTERFACE=wlan0 \
-            -e SSID=${WIFI_SSID} \
-            -e WPA_PASSPHRASE=${WIFI_PASSWORD} \
             -v "/var/run/docker.sock:/var/run/docker.sock" \
             ngalayko/docker-ap:arm32v7
         volumes:
