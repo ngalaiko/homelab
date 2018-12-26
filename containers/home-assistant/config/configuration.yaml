@@ -23,8 +23,8 @@ frontend:
 # Enables configuration UI
 config:
 
-# Enables ios app support
-ios:
+# Enables discovery.
+discovery:
 
 http:
    base_url: ${HOST}
