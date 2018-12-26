@@ -1,0 +1,5 @@
+#!/bin/bash
+
+set -x
+
+create_ap $AP_WIFI_IFACE $AP_INTERNET_IFACE $AP_SSID $AP_PASSPHRASE
