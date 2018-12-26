@@ -5,11 +5,15 @@ volumes:
 
 networks:
     home_assistant:
+    outside:
+        external:
+            name: "host"
 
 services:
     home-assistant:
         image: ngalayko/home-assistant:arm32v7
         networks:
+            - outside
             - traefik
             - home_assistant
         environment:
