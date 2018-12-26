@@ -29,4 +29,4 @@ for file in ${CONFIG_FILES[@]}; do
     fill_from_env "${file}"
 done
 
-#python -m homeassistant --config /config
+python -m homeassistant --config /config
