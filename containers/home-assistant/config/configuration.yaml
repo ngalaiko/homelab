@@ -23,6 +23,9 @@ frontend:
 # Enables configuration UI
 config:
 
+# Enables ios app support
+ios:
+
 http:
    base_url: ${HOST}
 
