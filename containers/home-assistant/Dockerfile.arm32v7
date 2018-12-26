@@ -1,3 +1,6 @@
 FROM homeassistant/raspberrypi3-homeassistant:0.84.6
 
-CMD [ "python", "-m", "homeassistant", "--config", "/config" ]
+COPY ./config/* /config/
+COPY ./docker-entrypoint.sh /config/docker-entrypoint.sh
+
+CMD [ "/config/docker-entrypoint.sh" ]

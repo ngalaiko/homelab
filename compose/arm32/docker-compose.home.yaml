@@ -9,9 +9,9 @@ services:
         networks:
             - traefik
         environment:
+			- LONGITUDE=${LONGITUDE}
+            - LATITUDE=${LATITUDE}
             - TZ=Europe/Stockholm
-        volumes:
-            - home_assistant_config:/config
         deploy:
             replicas: 1
             restart_policy:
