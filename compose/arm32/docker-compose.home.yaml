@@ -13,6 +13,7 @@ services:
             - LATITUDE=${LATITUDE}
             - HOST=home.{HOST}
             - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
+            - DARKSKY_TOKEN=${DARKSKY_TOKEN}
         deploy:
             replicas: 1
             restart_policy:
