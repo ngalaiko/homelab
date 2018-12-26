@@ -27,3 +27,6 @@ services:
                 - "traefik.port=8123"
                 - "traefik.docker.network=server_traefik"
                 - "traefik.frontend.rule=Host:home.${HOST}"
+            placement:
+                constraints:
+                    - "node.labels.home==true"
