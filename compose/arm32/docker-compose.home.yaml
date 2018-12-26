@@ -11,7 +11,7 @@ services:
         environment:
             - LONGITUDE=${LONGITUDE}
             - LATITUDE=${LATITUDE}
-            - TZ=Europe/Stockholm
+            - TZ=Europe\\/Stockholm
         deploy:
             replicas: 1
             restart_policy:
