@@ -5,16 +5,13 @@ homeassistant:
   latitude: ${LONGITUDE}
   longitude: ${LATITUDE}
   # Impacts weather/sunrise data (altitude above sea level in meters)
-  elevation: 0
+  elevation: 30
   # metric for Metric, imperial for Imperial
   unit_system: metric
   # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-  time_zone: ${TZ}
+  time_zone: Europe/Stockholm
   # Customization file
   customize: !include customize.yaml
-
-# Show links to resources in log and frontend
-introduction:
 
 # Enables the frontend
 frontend:
@@ -22,9 +19,8 @@ frontend:
 # Enables configuration UI
 config:
 
-# Uncomment this if you are using SSL/TLS, running in Docker container, etc.
-# http:
-#   base_url: example.duckdns.org:8123
+http:
+   base_url: ${HOST}
 
 # Checks for available updates
 # Note: This component will send some information about your system to
@@ -57,6 +53,25 @@ sun:
 sensor:
   # Weather prediction
   - platform: yr
+
+# Weather
+weather:
+  - platform: darksky
+    api_key: ${DARKSKY_TOKEN}
+	name: Dark Sky
+
+# Telegram
+telegram_bot:
+  - platform: polling
+    api_key: ${TELEGRAM_TOKEN}
+    allowed_chat_ids:
+      - 109935692
+
+# Notifications
+notify:
+  - name: Home Assistant
+    platform: telegram
+    chat_id: 109935692
 
 # Text to speech
 tts:
