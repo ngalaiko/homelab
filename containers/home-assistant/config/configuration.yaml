@@ -58,7 +58,7 @@ sensor:
 weather:
   - platform: darksky
     api_key: ${DARKSKY_TOKEN}
-	name: Dark Sky
+    name: Dark Sky
 
 # Telegram
 telegram_bot:
