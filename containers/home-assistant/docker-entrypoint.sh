@@ -21,7 +21,7 @@ function fill_from_env() {
         name="${name_value%=*}"
         value="${name_value#*=}"
 
-        sed -i -e "s/\${${name}}/${value}/g" ${file_name}
+        sed -i -e "s#\${${name}}#${value}#g" ${file_name}
     done
 }
 
