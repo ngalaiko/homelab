@@ -19,6 +19,8 @@ services:
             - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
             - DARKSKY_TOKEN=${DARKSKY_TOKEN}
             - POSTGRES_PASS=${POSTGRES_PASS}
+        volumes:
+            - home_assistant_config:/config
         deploy:
             replicas: 1
             restart_policy:
