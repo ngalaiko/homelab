@@ -20,7 +20,7 @@ services:
             - DARKSKY_TOKEN=${DARKSKY_TOKEN}
             - POSTGRES_PASS=${POSTGRES_PASS}
         volumes:
-            - home_assistant_config:/config
+            - home_assistant_config:/config/.storage
         deploy:
             replicas: 1
             restart_policy:
