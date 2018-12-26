@@ -9,7 +9,7 @@ services:
         networks:
             - traefik
         environment:
-			- LONGITUDE=${LONGITUDE}
+            - LONGITUDE=${LONGITUDE}
             - LATITUDE=${LATITUDE}
             - TZ=Europe/Stockholm
         deploy:
