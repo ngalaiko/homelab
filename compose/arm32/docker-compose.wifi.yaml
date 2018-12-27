@@ -10,3 +10,6 @@ services:
             replicas: 1
             restart_policy:
                 condition: on-failure
+            placement:
+                constraints:
+                    - "node.labels.wifi==true"
