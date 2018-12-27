@@ -2,4 +2,12 @@
 
 set -x
 
-create_ap $AP_WIFI_IFACE $AP_INTERNET_IFACE $AP_SSID $AP_PASSPHRASE
+/usr/local/dnscrypt-proxy/dnscrypt-proxy &
+
+create_ap \
+    --country=SE \
+    --dhcp-dns 127.0.0.1,1.1.1.1 \
+    $AP_WIFI_IFACE \
+    $AP_INTERNET_IFACE \
+    $AP_SSID \
+    $AP_PASSPHRASE

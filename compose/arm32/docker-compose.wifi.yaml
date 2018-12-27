@@ -3,7 +3,7 @@ version: '3.4'
 services:
     wifi-ap-supervisor:
         image: arm32v6/docker
-        command: docker run --rm -i -e AP_SSID=${WIFI_SSID} -e AP_PASSPHRASE=${WIFI_PASSWORD} --privileged --net host ngalayko/docker-ap:arm32v7
+        command: docker run --name=wifi-ap --rm -i -e AP_SSID=${WIFI_SSID} -e AP_PASSPHRASE=${WIFI_PASSWORD} --privileged --net host ngalayko/docker-ap:arm32v7
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
         deploy:
