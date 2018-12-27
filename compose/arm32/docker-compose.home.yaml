@@ -2,6 +2,8 @@ version: '3.4'
 
 networks:
     home_assistant:
+    home_assistant_bridge:
+        driver: bridge
 
 volumes:
     home_assistant_config:
@@ -12,6 +14,7 @@ services:
         networks:
             - traefik
             - home_assistant
+            - home_assistant_bridge
         environment:
             - LONGITUDE=${LONGITUDE}
             - LATITUDE=${LATITUDE}

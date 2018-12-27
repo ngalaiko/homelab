@@ -25,6 +25,8 @@ config:
 
 # Enables discovery.
 discovery:
+    enable:
+        - homekit
 
 http:
    base_url: ${HOST}
