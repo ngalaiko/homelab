@@ -12,7 +12,7 @@ services:
     home-assistant:
         image: ngalayko/home-assistant:arm32v7
         networks:
-            - home_assistant_bridge
+            - home_assistant_host
         environment:
             - LONGITUDE=${LONGITUDE}
             - LATITUDE=${LATITUDE}
