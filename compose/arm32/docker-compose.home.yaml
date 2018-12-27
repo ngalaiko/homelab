@@ -3,7 +3,8 @@ version: '3.4'
 networks:
     home_assistant:
     home_assistant_bridge:
-        driver: bridge
+        external:
+             name: "bridge"
 
 volumes:
     home_assistant_config:
