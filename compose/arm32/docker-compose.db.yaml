@@ -7,7 +7,6 @@ services:
     postgres:
         image: ngalayko/postgres:arm32v7
         networks:
-            - home_assistant
             - rss
             - fathom
             - default
