@@ -5,6 +5,7 @@ set -x
 /usr/local/dnscrypt-proxy/dnscrypt-proxy &
 
 create_ap \
+    -m bridge \
     --country=SE \
     --dhcp-dns 127.0.0.1,1.1.1.1 \
     $AP_WIFI_IFACE \
