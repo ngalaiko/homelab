@@ -1,5 +1,8 @@
 version: '3.4'
 
+networks:
+    home_assistant:
+
 volumes:
     home_assistant_config:
 
