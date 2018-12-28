@@ -16,7 +16,6 @@ CONFIG_FILES=(
 
 function fill_from_env() {
     file_name="$1"
-    file_distination="$2"
 
     if [ ! -f ${file_name} ]; then
     	echo "File ${file_name} not found!"
@@ -27,17 +26,14 @@ function fill_from_env() {
         name="${name_value%=*}"
         value="${name_value#*=}"
 
-        sed "s#\${${name}}#${value}#g" ${file_name} > ${file_distination}
+        sed -i -e "s#\${${name}}#${value}#g" ${file_name}
     done
 }
 
 for file in ${CONFIG_FILES[@]}; do
-    if [ -f "${CONFIG_PATH}/${file}" ]; then
-        echo "skipping ${CONFIG_PATH}/${file}, already exists"
-        continue
-    fi
-
-    fill_from_env "${CONFIG_TEMPLATE_PATH}/${file}" "${CONFIG_PATH}/${file}"
+    fill_from_env "${CONFIG_TEMPLATE_PATH}/${file}"
 done
+
+mv ${CONFIG_TEMPLATE_PATH}/* ${CONFIG_PATH}/
 
 python -m homeassistant --config "${CONFIG_PATH}"
