@@ -27,6 +27,10 @@ services:
             - APPLE_TV_SECRET=${APPLE_TV_SECRET}
             - APPLE_TV_IP=${APPLE_TV_IP}
             - APPLE_TV_ID=${APPLE_TV_ID}
+            - HOME_LATITUDE=${HOME_LATITUDE}
+            - HOME_LONGTITUDE=${HOME_LONGTITUDE}
+            - WORK_LATITUDE=${WORK_LATITUDE}
+            - WORK_LONGTITUDE=${WORK_LONGTITUDE}
         volumes:
             - home_assistant_config:/config/config
         deploy:
