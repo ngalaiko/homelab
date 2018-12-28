@@ -24,20 +24,14 @@ homekit:
 
 # Enables discovery.
 discovery:
+    ignore:
+        - google_cast
+        - plex_mediaserver
     enable:
         - homekit
 
 http:
    base_url: ${HOST}
-
-# Checks for available updates
-# Note: This component will send some information about your system to
-# the developers to assist with development of Home Assistant.
-# For more information, please see:
-# https://home-assistant.io/blog/2016/10/25/explaining-the-updater/
-updater:
-  # Optional, allows Home Assistant developers to focus on popular components.
-  # include_used_components: true
 
 # Allows you to issue voice commands from the frontend in enabled browsers
 conversation:
@@ -51,13 +45,12 @@ logbook:
 # Enables a map showing the location of tracked devices
 map:
 
+tradfri:
+  host: ${IKEA_TRADFRI_IP}
+  allow_tradfri_groups: true
+
 # Track the sun
 sun:
-
-# Sensors
-sensor:
-  # Weather prediction
-  - platform: yr
 
 # Weather
 weather:
@@ -77,13 +70,6 @@ notify:
   - name: Home Assistant
     platform: telegram
     chat_id: 109935692
-
-# Text to speech
-tts:
-  - platform: google
-
-# Cloud
-cloud:
 
 group: !include groups.yaml
 automation: !include automations.yaml
