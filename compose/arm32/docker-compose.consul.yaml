@@ -6,7 +6,9 @@ volumes:
 services:
     consul:
         image: arm32v6/consul:1.3.0
-        command: agent -server -bootstrap-expect=1
+        command: agent -server -bootstrap-expect=1 -ui
+        ports:
+            - 8500:8500
         volumes:
             - consul-data:/consul/data
         environment:
