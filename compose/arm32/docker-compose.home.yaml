@@ -7,6 +7,10 @@ networks:
 
 volumes:
     home_assistant_config:
+        driver: "ngalayko/sshfs:arm32v7"
+        driver_opts:
+            allow_other: ""
+            sshcmd: "pirate@node-white:/home/pirate/data/home-assistant"
 
 services:
     home-assistant:
