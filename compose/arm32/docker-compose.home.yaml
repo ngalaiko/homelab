@@ -31,6 +31,8 @@ services:
             - HOME_LONGTITUDE=${HOME_LONGTITUDE}
             - WORK_LATITUDE=${WORK_LATITUDE}
             - WORK_LONGTITUDE=${WORK_LONGTITUDE}
+            - ICLOUD_USERNAME=${ICLOUD_USERNAME}
+            - ICLOUD_PASSWORD=${ICLOUD_PASSWORD}
         volumes:
             - home_assistant_config:/config/config
         deploy:

@@ -83,3 +83,4 @@ automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
 zone: !include zones.yaml
+device_tracker: !include trackers.yaml
