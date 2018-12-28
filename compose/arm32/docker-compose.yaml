@@ -8,7 +8,6 @@ services:
     proxy:
         image: ngalayko/proxy:arm32v7
         command:
-            - "--logLevel=DEBUG"
             - "--api"
             - "--api.dashboard=true"
             - "--entrypoints=Name:http Address::80"
