@@ -30,10 +30,6 @@ services:
             replicas: 1
             restart_policy:
                 condition: on-failure
-            labels:
-                - "traefik.port=8123"
-                - "traefik.docker.network=home"
-                - "traefik.frontend.rule=Host:home.${HOST}"
             placement:
                 constraints:
                     - "node.labels.home==true"

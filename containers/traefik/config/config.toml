@@ -1,0 +1,10 @@
+[backends]
+  [backends.home-assistant]
+    [backends.home-assistant.server]
+    url = "http://192.168.86.39:8123"
+    weight = 1
+
+[frontends.home-assistant]
+  backend = "home-assistant"
+    [frontends.home-assistant.routes.main]
+    rule = "Host:home.galayko.rocks"
