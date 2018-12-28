@@ -45,10 +45,6 @@ logbook:
 # Enables a map showing the location of tracked devices
 map:
 
-tradfri:
-  host: ${IKEA_TRADFRI_IP}
-  allow_tradfri_groups: true
-
 # Track the sun
 sun:
 
