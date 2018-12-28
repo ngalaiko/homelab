@@ -1,1 +1,85 @@
-[]
+- name: Morning
+  entities:
+      light.bedroom__ceiling_lamp__1:
+          state: true
+          brightness: 255
+          rgb_color: [255, 210, 159]
+      light.bedroom__ceiling_lamp__2:
+          state: true
+          brightness: 255
+          rgb_color: [255, 210, 159]
+
+- name: Movie
+  entities:
+      remote.living_room:
+          state: true
+      light.living_room__ceiling_lamp__1:
+          state: true
+          brightness: 64
+          rgb_color: [0, 0, 255]
+      light.living_room__ceiling_lamp__2:
+          state: true
+          brightness: 64
+          rgb_color: [255, 127, 0]
+      light.living_room__corner_lamp:
+          state: true
+          brightness: 64
+          rgb_color: [255, 0, 0]
+      light.kitchen__ceiling_led__1:
+          state: true
+          brightness: 64
+          color_temp: 454
+      light.kitchen__ceiling_led__2:
+          state: true
+          brightness: 64
+          color_temp: 454
+      light.kitchen__ceiling_led__3:
+          state: true
+          brightness: 64
+          color_temp: 454
+
+- name: Evening
+  entities:
+      light.living_room__ceiling_lamp__1:
+          state: true
+          brightness: 180
+          rgb_color: [255, 171, 88]
+      light.living_room__ceiling_lamp__2:
+          state: true
+          brightness: 180
+          rgb_color: [255, 171, 88]
+      light.living_room__corner_lamp:
+          state: true
+          brightness: 180
+          rgb_color: [255, 171, 88]
+      light.kitchen__ceiling_led__1:
+          state: true
+          brightness: 180
+          color_temp: 367
+      light.kitchen__ceiling_led__2:
+          state: true
+          brightness: 180
+          color_temp: 367
+      light.kitchen__ceiling_led__3:
+          state: true
+          brightness: 180
+          color_temp: 367
+      light.entrance__ceiling_led__1:
+          state: true
+          brightness: 180
+          color_temp: 367
+      light.entrance__ceiling_led__2:
+          state: true
+          brightness: 180
+          color_temp: 367
+      light.entrance__ceiling_led__3:
+          state: true
+          brightness: 180
+          color_temp: 367
+
+- name: Night
+  entities:
+      remote.living_room:
+          state: false
+      group.all_lights:
+          state: false

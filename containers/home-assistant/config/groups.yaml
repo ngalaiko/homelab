@@ -6,6 +6,7 @@ living_room:
         - light.living_room__ceiling_lamp__2
         - light.living_room__corner_lamp
         - media_player.living_room
+        - remote.living_room
 
 kitchen:
     name: Kitchen
