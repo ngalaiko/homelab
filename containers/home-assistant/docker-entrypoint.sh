@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
-CONFIG_PATH="/config"
-CONFIG_TEMPLATE_PATH="/config-template"
+CONFIG_PATH="/config/config"
+CONFIG_TEMPLATE_PATH="/config/template"
+
+mkdir -p "${CONFIG_PATH}"
 
 CONFIG_FILES=(
     "automations.yaml"
@@ -38,4 +40,4 @@ for file in ${CONFIG_FILES[@]}; do
     fill_from_env "${CONFIG_TEMPLATE_PATH}/${file}" "${CONFIG_PATH}/${file}"
 done
 
-python -m homeassistant --config /config
+python -m homeassistant --config "${CONFIG_PATH}"
