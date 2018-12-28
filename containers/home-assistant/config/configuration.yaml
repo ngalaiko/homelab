@@ -22,6 +22,8 @@ config:
 # Enabled homekit integration
 homekit:
 
+ios:
+
 # Use Apple TV as a media player.
 apple_tv:
     - host: ${APPLE_TV_IP}

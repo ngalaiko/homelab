@@ -20,7 +20,7 @@ services:
         environment:
             - LONGITUDE=${LONGITUDE}
             - LATITUDE=${LATITUDE}
-            - HOST=home.{HOST}
+            - HOST=home.${HOST}
             - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
             - DARKSKY_TOKEN=${DARKSKY_TOKEN}
             - IKEA_TRADFRI_IP=${IKEA_TRADFRI_IP}
