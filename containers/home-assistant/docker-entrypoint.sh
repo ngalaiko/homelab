@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+CONFIG_PATH="/config"
+CONFIG_TEMPLATE_PATH="/config-template"
+
 CONFIG_FILES=(
     "automations.yaml"
     "configuration.yaml"
@@ -11,6 +14,7 @@ CONFIG_FILES=(
 
 function fill_from_env() {
     file_name="$1"
+    file_distination="$2"
 
     if [ ! -f ${file_name} ]; then
     	echo "File ${file_name} not found!"
@@ -21,12 +25,17 @@ function fill_from_env() {
         name="${name_value%=*}"
         value="${name_value#*=}"
 
-        sed -i -e "s#\${${name}}#${value}#g" ${file_name}
+        sed "s#\${${name}}#${value}#g" ${file_name} > ${file_distination}
     done
 }
 
 for file in ${CONFIG_FILES[@]}; do
-    fill_from_env "${file}"
+    if [ -f "${CONFIG_PATH}/${file}" ]; then
+        echo "skipping ${CONFIG_PATH}/${file}, already exists"
+        continue
+    fi
+
+    fill_from_env "${CONFIG_TEMPLATE_PATH}/${file}" "${CONFIG_PATH}/${file}"
 done
 
 python -m homeassistant --config /config

@@ -1,6 +1,6 @@
 FROM homeassistant/raspberrypi3-homeassistant:0.84.6
 
-COPY ./config/* /config/
-COPY ./docker-entrypoint.sh /config/docker-entrypoint.sh
+COPY ./config /config-template
+COPY ./docker-entrypoint.sh /docker-entrypoint.sh
 
 CMD [ "/config/docker-entrypoint.sh" ]
