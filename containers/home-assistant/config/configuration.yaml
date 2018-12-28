@@ -22,11 +22,14 @@ config:
 # Enabled homekit integration
 homekit:
 
+apple_tv:
+
 # Enables discovery.
 discovery:
     ignore:
         - google_cast
         - plex_mediaserver
+        - samsung_tv
     enable:
         - homekit
 
