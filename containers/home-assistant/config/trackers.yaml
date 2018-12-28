@@ -1,7 +1,7 @@
 - platform: icloud
-    username: ${ICLOUD_USERNAME}
-    password: ${ICLOUD_PASSWORD}
-    gps_accuracy_threshold: 10
-    consider_home: 180
-    new_device_defaults:
-      track_new_devices: true
+  username: ${ICLOUD_USERNAME}
+  password: ${ICLOUD_PASSWORD}
+  gps_accuracy_threshold: 10
+  consider_home: 180
+  new_device_defaults:
+    track_new_devices: true
