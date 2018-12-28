@@ -1,3 +1,1 @@
 FROM arm32v6/traefik:1.7.4-alpine
-
-COPY ./config/config.toml /etc/traefik/config.toml

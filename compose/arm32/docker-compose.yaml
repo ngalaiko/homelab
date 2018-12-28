@@ -8,7 +8,6 @@ services:
     proxy:
         image: ngalayko/proxy:arm32v7
         command:
-            - "--configFile=/etc/traefik/config.toml"
             - "--api"
             - "--api.dashboard=true"
             - "--entrypoints=Name:http Address::80"
