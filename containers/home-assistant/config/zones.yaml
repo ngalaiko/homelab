@@ -1,11 +1,11 @@
 - name: Home
   latitude: ${HOME_LATITUDE}
   longitude: ${HOME_LONGTITUDE}
-  radius: 250
+  radius: 150
   icon: mdi:home
 
 - name: WORK
   latitude: ${WORK_LATITUDE}
   longitude: ${WORK_LONGTITUDE}
-  radius: 250
+  radius: 100
   icon: mdi:briefcase
