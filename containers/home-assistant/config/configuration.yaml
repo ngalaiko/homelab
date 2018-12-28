@@ -22,7 +22,13 @@ config:
 # Enabled homekit integration
 homekit:
 
+# Use Apple TV as a media player.
 apple_tv:
+    - host: ${APPLE_TV_IP}
+      name: Living Room Apple TV
+      login_id: ${APPLE_TV_ID}
+      start_off: true
+      credentials: ${APPLE_TV_SECRET}
 
 # Enables discovery.
 discovery:
@@ -73,3 +79,4 @@ notify:
 group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
+scene: !include  scenes.yaml

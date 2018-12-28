@@ -24,6 +24,9 @@ services:
             - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
             - DARKSKY_TOKEN=${DARKSKY_TOKEN}
             - IKEA_TRADFRI_IP=${IKEA_TRADFRI_IP}
+            - APPLE_TV_SECRET=${APPLE_TV_SECRET}
+            - APPLE_TV_IP=${APPLE_TV_IP}
+            - APPLE_TV_ID=${APPLE_TV_ID}
         volumes:
             - home_assistant_config:/config/config
         deploy:
