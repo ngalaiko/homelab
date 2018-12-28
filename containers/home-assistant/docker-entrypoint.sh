@@ -12,6 +12,7 @@ CONFIG_FILES=(
     "groups.yaml"
     "scripts.yaml"
     "secrets.yaml"
+    "zones.yaml"
 )
 
 function fill_from_env() {
