@@ -26,5 +26,6 @@ services:
                 - "traefik.port=8080"
                 - "traefik.docker.network=server_traefik"
                 - "traefik.frontend.rule=Host:rss.${HOST}"
+                - "traefik.backend.loadbalancer.sticky=true"
             restart_policy:
                 condition: on-failure
