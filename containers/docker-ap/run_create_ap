@@ -7,7 +7,7 @@ set -x
 create_ap \
     -m bridge \
     --country=SE \
-    --dhcp-dns 127.0.0.1,1.1.1.1 \
+    --dhcp-dns 127.0.0.1 \
     $AP_WIFI_IFACE \
     $AP_INTERNET_IFACE \
     $AP_SSID \
