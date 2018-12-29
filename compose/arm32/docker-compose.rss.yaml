@@ -6,7 +6,7 @@ networks:
 
 services:
     miniflux:
-        image: miniflux/miniflux:arm32v6-2.0.13
+        image: ngalayko/miniflux:arm32v7
         networks:
             - rss
             - traefik
@@ -21,7 +21,7 @@ services:
             - POLLING_FREQUENCY=5
             - DATABASE_URL=postgres://postgres:${POSTGRES_PASS}@postgres/miniflux2?sslmode=disable
         deploy:
-            replicas: 1
+            replicas: 2
             labels:
                 - "traefik.port=8080"
                 - "traefik.docker.network=server_traefik"
