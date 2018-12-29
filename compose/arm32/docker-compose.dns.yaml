@@ -18,6 +18,9 @@ services:
             - traefik
         deploy:
             replicas: 1
+            placement:
+                constraints:
+                    - "node.labels.dns==true"
             restart_policy:
                 condition: on-failure
             labels:
