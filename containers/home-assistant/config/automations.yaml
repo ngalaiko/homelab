@@ -1,1 +1,14 @@
-[]
+- id: '1546192302395'
+  alias: Alarm
+  trigger:
+  - at: 05:45:00
+    platform: time
+  condition:
+  - condition: state
+    entity_id: device_tracker.nikitasiphone
+    state: home
+  action:
+  - alias: ''
+    data:
+      entity_id: scene.morning
+    service: scene.turn_on
