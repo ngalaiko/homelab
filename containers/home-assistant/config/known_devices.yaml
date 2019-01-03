@@ -9,7 +9,7 @@ nikitasapple_watch:
 nikitasiphone:
   hide_if_away: false
   icon:
-  mac:
+  mac: ${IPHONE_MAC}
   name: Nikita
   gravatar: ngalayko@gmail.com
   track: true

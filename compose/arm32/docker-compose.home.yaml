@@ -33,6 +33,7 @@ services:
             - WORK_LONGTITUDE=${WORK_LONGTITUDE}
             - ICLOUD_USERNAME=${ICLOUD_USERNAME}
             - ICLOUD_PASSWORD=${ICLOUD_PASSWORD}
+            - IPHONE_MAC=${IPHONE_MAC}
         volumes:
             - home_assistant_config:/config/config
         deploy:
