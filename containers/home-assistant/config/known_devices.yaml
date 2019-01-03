@@ -1,7 +1,6 @@
 nikitasapple_watch:
   hide_if_away: false
   icon:
-  mac:
   name: Nikita’s Apple Watch
   picture:
   track: false
