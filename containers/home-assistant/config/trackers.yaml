@@ -6,8 +6,3 @@
   consider_home: 180
   new_device_defaults:
     track_new_devices: true
-
-- platform: nmap_tracker
-  hosts: 192.168.86.0/24
-  home_interval: 5
-  scan_options: -F –host-timeout 5s
