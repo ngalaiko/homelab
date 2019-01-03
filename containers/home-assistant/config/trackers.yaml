@@ -7,8 +7,7 @@
   new_device_defaults:
     track_new_devices: true
 
-device_tracker:
-  - platform: nmap_tracker
-    hosts: 192.168.86.0/24
-    home_interval: 5
-    scan_options: -F –host-timeout 5s
+- platform: nmap_tracker
+  hosts: 192.168.86.0/24
+  home_interval: 5
+  scan_options: -F –host-timeout 5s
