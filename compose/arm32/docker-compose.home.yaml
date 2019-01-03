@@ -34,6 +34,7 @@ services:
             - ICLOUD_USERNAME=${ICLOUD_USERNAME}
             - ICLOUD_PASSWORD=${ICLOUD_PASSWORD}
             - IPHONE_MAC=${IPHONE_MAC}
+            - HOME_ASSISTANT_PASSWORD=${HOME_ASSISTANT_PASSWORD}
         volumes:
             - home_assistant_config:/config/config
         deploy:
