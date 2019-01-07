@@ -7,6 +7,7 @@ echo "Building images..."
 # NOTE: ./server is the root
 BUILD_IMAGES=(
     "./containers/home-assistant:ngalayko/home-assistant"
+    "./containers/pihole:ngalayko/pihole"
     "./containers/docker-ap:ngalayko/docker-ap"
     "./containers/miniflux:ngalayko/miniflux"
     "./containers/traefik:ngalayko/proxy"
@@ -21,7 +22,6 @@ BUILD_IMAGES=(
     "./containers/remark:ngalayko/remark"
     "./containers/node-exporter:ngalayko/node-exporter"
     "./containers/nginx:ngalayko/nginx"
-    "./containers/pihole:ngalayko/pihole"
 )
 
 docker login -u "${DOCKER_HUB_LOGIN}" -p "${DOCKER_HUB_PASSWORD}"

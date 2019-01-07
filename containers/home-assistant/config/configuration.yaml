@@ -85,3 +85,4 @@ script: !include scripts.yaml
 scene: !include scenes.yaml
 zone: !include zones.yaml
 device_tracker: !include trackers.yaml
+sensor: !include sensors.yaml

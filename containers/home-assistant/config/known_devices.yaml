@@ -1,14 +1,6 @@
-nikitasapple_watch:
+nikitas_iphone:
   hide_if_away: false
-  icon:
-  name: Nikita’s Apple Watch
-  picture:
-  track: false
-
-nikitasiphone:
-  hide_if_away: false
-  icon:
-  mac: ${IPHONE_MAC}
+  mac: 34:08:BC:E2:92:52
   name: Nikita
   gravatar: ngalayko@gmail.com
   track: true

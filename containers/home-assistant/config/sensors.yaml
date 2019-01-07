@@ -1,0 +1,22 @@
+- platform: vasttrafik
+  key: ${VASTTRAFIK_KEY}
+  secret: ${VASTTRAFIK_SECRET}
+  departures:
+    departures:
+    - name: Home -> Work
+      from: "${VASTTRAFIK_HOME}"
+      heading: "${VASTTRAFIK_WORK}"
+      lines:
+        - 11
+
+- platform: vasttrafik
+  key: ${VASTTRAFIK_KEY}
+  secret: ${VASTTRAFIK_SECRET}
+  departures:
+    departures:
+    - name: Work -> Home
+      from: "${VASTTRAFIK_WORK}"
+      heading: "${VASTTRAFIK_HOME}"
+      lines:
+        - 11
+        - 9

@@ -1,1 +1,1 @@
-FROM pihole/pihole:4.1_armhf
+FROM pihole/pihole:4.1.1_armhf

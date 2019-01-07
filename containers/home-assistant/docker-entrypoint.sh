@@ -15,6 +15,7 @@ CONFIG_FILES=(
     "zones.yaml"
     "trackers.yaml"
     "known_devices.yaml"
+    "sensors.yaml"
 )
 
 function fill_from_env() {
