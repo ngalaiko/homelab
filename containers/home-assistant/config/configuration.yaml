@@ -43,7 +43,7 @@ discovery:
 
 http:
    base_url: ${HOST}
-   api_password: ${HOME_ASSISTANT_PASSWORD}
+   api_password: "${HOME_ASSISTANT_API_PASSWORD}"
 
 # Allows you to issue voice commands from the frontend in enabled browsers
 conversation:
