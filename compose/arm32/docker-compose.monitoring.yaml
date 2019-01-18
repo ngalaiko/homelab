@@ -7,10 +7,6 @@ volumes:
 configs:
     dockerd_config:
         file: ../../containers/dockerd-exporter/Caddyfile
-    node_rules:
-        file: ../../containers/prometheus/rules/swarm_node.rules.yml
-    task_rules:
-        file: ../../containers/prometheus/rules/swarm_task.rules.yml
 
 networks:
     monitoring:
