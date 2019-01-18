@@ -1,11 +1,9 @@
-FROM xjjo/armv7-prometheus:v2.4.3
-
-ENV WEAVE_TOKEN=none
+FROM xjjo/armv7-prometheus:v2.6.0
 
 COPY conf /etc/prometheus/
 
-ENTRYPOINT [ "/etc/prometheus/docker-entrypoint.sh" ]
-CMD        [ "--config.file=/etc/prometheus/prometheus.yml", \
-             "--storage.tsdb.path=/prometheus", \
-             "--web.console.libraries=/etc/prometheus/console_libraries", \
-             "--web.console.templates=/etc/prometheus/consoles" ]
+CMD [ "--config.file=/etc/prometheus/prometheus.yml", \
+      "--storage.tsdb.path=/prometheus", \
+      "--storage.tsdb.retention=7d", \
+      "--web.console.libraries=/etc/prometheus/console_libraries", \
+      "--web.console.templates=/etc/prometheus/consoles" ]

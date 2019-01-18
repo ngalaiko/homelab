@@ -47,11 +47,6 @@ services:
             - prometheus_data:/prometheus
         networks:
             - monitoring
-        configs:
-            - source: node_rules
-              target: /etc/prometheus/swarm_node.rules.yml
-            - source: task_rules
-              target: /etc/prometheus/swarm_task.rules.yml
         deploy:
             replicas: 1
             restart_policy:

@@ -3,17 +3,7 @@ global:
   evaluation_interval: 15s
 
   external_labels:
-    monitor: 'promswarm'
-
-rule_files:
-  - "swarm_node.rules.yml"
-  - "swarm_task.rules.yml"
-
-alerting:
-  alertmanagers:
-  - static_configs:
-    - targets:
-      - alertmanager:9093
+    monitor: 'prometheus'
 
 scrape_configs:
   - job_name: 'prometheus'
@@ -48,7 +38,7 @@ scrape_configs:
       type: 'A'
       port: 9243
 
-  - job_name: 'proxy'
+  - job_name: 'traefik'
     dns_sd_configs:
     - names:
       - 'tasks.proxy'
