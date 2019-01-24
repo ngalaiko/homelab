@@ -61,7 +61,7 @@ services:
 
     dyn-dns:
         image: ngalayko/dyn-dns:arm32v7
-        command: --provider=cloudflare \
+        command: --dnsProvider=cloudflare \
             --apiToken=${CLOUDFLARE_TOKEN} \
             --email=${CLOUDFLARE_EMAIL} \
             --zoneIdentifier=${CLOUDFLARE_ZONE} \
