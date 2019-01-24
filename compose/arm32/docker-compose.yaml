@@ -61,13 +61,7 @@ services:
 
     dyn-dns:
         image: ngalayko/dyn-dns:arm32v7
-        command: --dnsProvider=cloudflare \
-            --apiToken=${CLOUDFLARE_TOKEN} \
-            --email=${CLOUDFLARE_EMAIL} \
-            --zoneIdentifier=${CLOUDFLARE_ZONE} \
-            --record=@ \
-            --domain="${HOST}" \
-            --interval=10m
+        command: --dnsProvider=cloudflare --apiToken=${CLOUDFLARE_TOKEN} --email=${CLOUDFLARE_EMAIL} --zoneIdentifier=${CLOUDFLARE_ZONE} --record=@ --domain="${HOST}" --interval=10m
         deploy:
             replicas: 1
             restart_policy:
