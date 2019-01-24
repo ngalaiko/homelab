@@ -111,7 +111,6 @@ func (p *Provider) Get(domain string) ([]*provider.Record, error) {
 
 	result := make([]*provider.Record, 0, len(resp.Records))
 	for _, d := range resp.Records {
-
 		result = append(result, &provider.Record{
 			ID:     fmt.Sprint(d.ID),
 			Type:   provider.ParseRecordType(d.Type),

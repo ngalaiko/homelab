@@ -92,7 +92,9 @@ func (u *App) update() error {
 	}
 
 	for _, r := range records {
-		if r.Name != u.record {
+		fn := fullName(u.record, u.domain)
+
+		if r.Name != u.record && r.Name != fn {
 			continue
 		}
 
@@ -135,4 +137,13 @@ func (u *App) update() error {
 
 	u.log("INFO", "record created")
 	return nil
+}
+
+func fullName(record string, domain string) string {
+	switch record {
+	case "@":
+		return domain
+	default:
+		return fmt.Sprintf("%s.%s", record, domain)
+	}
 }
