@@ -22,7 +22,7 @@ services:
             - "--acme.acmeLogging=true"
             - "--acme.email=ngalayko@gmail.com"
             - "--docker"
-            - "--docker.domain=galayko.rocks"
+            - "--docker.domain=${HOST}"
             - "--docker.watch=true"
             - "--docker.swarmmode=true"
             - "--metrics"

@@ -10,7 +10,7 @@
 ## Online documentation is available here: https://dnscrypt.info/doc
 
 
-server_names = [ 'connect.dns.galayko.rocks' ]
+server_names = [ 'connect.dns.galaiko.rocks' ]
 
 listen_addresses = ['127.0.0.1:53', '[::1]:53']
 
@@ -419,6 +419,6 @@ cache_neg_max_ttl = 600
 ## Mostly useful for testing your own servers.
 
 [static]
-  [static.'connect.dns.galayko.rocks']
+  [static.'connect.dns.galaiko.rocks']
   stamp = 'sdns://AgAAAAAAAAAADTgzLjIyNi4xMDguMTIAGWNvbm5lY3QuZG5zLmdhbGF5a28ucm9ja3MKL2Rucy1xdWVyeQ'
 

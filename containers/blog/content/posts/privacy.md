@@ -40,7 +40,7 @@ After enabling PiHole, Google Analytics stopped working, so I found a self-hoste
 You can check if it tracks you (this is an `iframe`): 
 
 <iframe
-	src="https://analytics.galayko.rocks/index.php?module=CoreAdminHome&action=optOut&language=en&backgroundColor=d3dcda&fontColor=&fontSize=&fontFamily=Helvetica%20Neue"
+	src="https://analytics.galaiko.rocks/index.php?module=CoreAdminHome&action=optOut&language=en&backgroundColor=d3dcda&fontColor=&fontSize=&fontFamily=Helvetica%20Neue"
 ></iframe>
 
 If you don't want it, you can [configure a browser](https://support.apple.com/kb/PH21416?locale=en_US)

@@ -118,7 +118,7 @@ that write speed is extremely slow and the solution for persistence is to bind
 a service to a node using placement constraints. 
 
 ## Migration 
-I used to deploy all services using docker compose. You can read about it [here](https://galayko.rocks/posts/docker-compose-server-manegement/). 
+I used to deploy all services using docker compose. You can read about it [here](https://galaiko.rocks/posts/docker-compose-server-manegement/). 
 The first step was to rewrite all compose files to version 3, so I can reuse
 them for Swarm deployment. 
 The second step is to set up a cluster and expose it to the Internet. 
