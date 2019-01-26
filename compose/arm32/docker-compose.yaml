@@ -15,7 +15,7 @@ services:
             - "--defaultentrypoints=http,https"
             - "--acme"
             - "--acme.storage=traefik/acme/account"
-            - "--acme.dnsChallenge.provider=digitalocean"
+            - "--acme.dnsChallenge.provider=cloudflare"
             - "--acme.dnsChallenge.delayBeforeCheck=0"
             - "--acme.entryPoint=https"
             - "--acme.OnHostRule=true"
@@ -42,7 +42,8 @@ services:
             - 443:443
             - 8090:8080
         environment:
-            - DO_AUTH_TOKEN=${DIGITAL_OCEAN_AUTH_TOKEN}
+            - CF_API_EMAIL=${CLOUDFLARE_EMAIL}
+            - CF_API_KEY=${CLOUDFLARE_TOKEN}
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
         networks:
