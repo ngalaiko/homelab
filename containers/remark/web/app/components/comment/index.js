@@ -1,26 +1,30 @@
 import 'components/raw-content';
+import withTheme from 'components/with-theme';
+import Comment from './comment';
 
-export { default } from './comment';
+export default withTheme(Comment);
 
 require('./comment.scss');
 
 require('./__action/comment__action.scss');
 require('./__action/_type/_collapse/comment__action_type_collapse.scss');
 require('./__action/_type/_edit/comment__action_type_edit.scss');
+require('./__action/_type/_delete/comment__action_type_delete.scss');
+
+require('./__edit-timer/comment__edit-timer.scss');
 
 require('./__body/comment__body.scss');
+
 require('./__control/comment__control.scss');
 require('./__control/_select/comment__control_select.scss');
 require('./__control/_select-label/comment__control_select-label.scss');
+require('./__control/_view/_inactive/comment__control_view_inactive.scss');
+
 require('./__controls/comment__controls.scss');
 require('./__info/comment__info.scss');
 require('./__input/comment__input.scss');
 require('./__link-to-parent/comment__link-to-parent.scss');
-
 require('./__score/comment__score.scss');
-require('./__score/_view/_negative/comment__score_view_negative.scss');
-require('./__score/_view/_positive/comment__score_view_positive.scss');
-
 require('./__score-value/comment__score-value.scss');
 require('./__status/comment__status.scss');
 require('./__text/comment__text.scss');
@@ -47,3 +51,6 @@ require('./_useless/comment_useless.scss');
 require('./_view/_admin/comment_view_admin.scss');
 require('./_view/_preview/comment_view_preview.scss');
 require('./_view/_user/comment_view_user.scss');
+
+require('./_theme/_dark/comment_theme_dark.scss');
+require('./_theme/_light/comment_theme_light.scss');

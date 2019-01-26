@@ -2,6 +2,7 @@
 import { h, Component } from 'preact';
 import { connect } from 'preact-redux';
 
+import store from 'common/store';
 import api from 'common/api';
 import LastCommentsList from './last-comments-list';
 import Avatar from 'components/avatar-icon';
@@ -22,6 +23,11 @@ class UserInfo extends Component {
       fetchComments(id);
 
       api
+        .getUser()
+        .then(data => store.set('user', data))
+        .catch(() => store.set('user', {}));
+
+      api
         .getUserComments({ user: id, limit: 10 })
         .then(({ comments }) => completeFetchComments(id, comments))
         .catch(() => completeFetchComments(id, []));
@@ -36,7 +42,7 @@ class UserInfo extends Component {
 
   globalOnKeyDown(e) {
     // ESCAPE key pressed
-    if (e.keyCode == 27) {
+    if (e.keyCode === 27) {
       const data = JSON.stringify({ isUserInfoShown: false });
       window.parent.postMessage(data, '*');
     }
@@ -51,11 +57,11 @@ class UserInfo extends Component {
 
     return (
       <div className={b('user-info', props)}>
-        <Avatar className="user-info__avatar" picture={isDefaultPicture ? null : picture} />
+        <Avatar mods={{ theme: 'light' }} mix="user-info__avatar" picture={isDefaultPicture ? null : picture} />
         <p className="user-info__title">Last comments by {name}</p>
         <p className="user-info__id">{id}</p>
 
-        {!!comments && <LastCommentsList isLoading={isLoading} comments={comments} />}
+        {!!comments && <LastCommentsList mods={{ theme: 'light' }} isLoading={isLoading} comments={comments} />}
       </div>
     );
   }

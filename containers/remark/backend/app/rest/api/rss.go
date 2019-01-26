@@ -2,22 +2,22 @@ package api
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
 	"github.com/go-chi/chi"
+	log "github.com/go-pkgz/lgr"
+	"github.com/go-pkgz/rest/cache"
 	"github.com/gorilla/feeds"
 	"github.com/pkg/errors"
 
 	"github.com/umputun/remark/backend/app/rest"
-	"github.com/umputun/remark/backend/app/rest/cache"
 	"github.com/umputun/remark/backend/app/store"
 )
 
 const maxRssItems = 20
 const maxLastCommentsReply = 1000
-const maxReplyDuration = 30 * time.Minute
+const maxReplyDuration = 24 * time.Hour
 
 // ui uses links like <post-url>#remark42__comment-<comment-id>
 const uiNav = "#remark42__comment-"
@@ -35,7 +35,7 @@ func (s *Rest) rssPostCommentsCtrl(w http.ResponseWriter, r *http.Request) {
 	locator := store.Locator{SiteID: r.URL.Query().Get("site"), URL: r.URL.Query().Get("url")}
 	log.Printf("[DEBUG] get rss for post %+v", locator)
 
-	key := cache.NewKey(locator.SiteID).ID(cache.URLKey(r)).Scopes(locator.SiteID, locator.URL)
+	key := cache.NewKey(locator.SiteID).ID(URLKey(r)).Scopes(locator.SiteID, locator.URL)
 	data, err := s.Cache.Get(key, func() ([]byte, error) {
 		comments, e := s.DataService.Find(locator, "-time")
 		if e != nil {
@@ -67,7 +67,7 @@ func (s *Rest) rssSiteCommentsCtrl(w http.ResponseWriter, r *http.Request) {
 	siteID := r.URL.Query().Get("site")
 	log.Printf("[DEBUG] get rss for site %s", siteID)
 
-	key := cache.NewKey(siteID).ID(cache.URLKey(r)).Scopes(siteID, lastCommentsScope)
+	key := cache.NewKey(siteID).ID(URLKey(r)).Scopes(siteID, lastCommentsScope)
 	data, err := s.Cache.Get(key, func() ([]byte, error) {
 		comments, e := s.DataService.Last(siteID, maxRssItems)
 		if e != nil {
@@ -100,7 +100,7 @@ func (s *Rest) rssRepliesCtrl(w http.ResponseWriter, r *http.Request) {
 	siteID := r.URL.Query().Get("site")
 	log.Printf("[DEBUG] get rss replies to user %s for site %s", userID, siteID)
 
-	key := cache.NewKey(siteID).ID(cache.URLKey(r)).Scopes(siteID, lastCommentsScope)
+	key := cache.NewKey(siteID).ID(URLKey(r)).Scopes(siteID, lastCommentsScope)
 	data, err := s.Cache.Get(key, func() (res []byte, e error) {
 		comments, e := s.DataService.Last(siteID, maxLastCommentsReply)
 		if e != nil {
@@ -112,7 +112,7 @@ func (s *Rest) rssRepliesCtrl(w http.ResponseWriter, r *http.Request) {
 			if len(replies) > maxRssItems || c.Timestamp.Add(maxReplyDuration).Before(time.Now()) {
 				break
 			}
-			if c.ParentID != "" && !c.Deleted && c.User.ID != userID { // not interested replies to yourself
+			if c.ParentID != "" && !c.Deleted && c.User.ID != userID { // not interested in replies to yourself
 				var pc store.Comment
 				if pc, e = s.DataService.Get(c.Locator, c.ParentID); e != nil {
 					return nil, errors.Wrap(e, "can't get parent comment")
@@ -164,6 +164,7 @@ func (s *Rest) toRssFeed(url string, comments []store.Comment) (string, error) {
 			Description: c.Text,
 			Created:     c.Timestamp,
 			Author:      &feeds.Author{Name: c.User.Name},
+			Id:          c.ID,
 		}
 		if c.ParentID != "" {
 			// add indication to parent comment
@@ -174,6 +175,10 @@ func (s *Rest) toRssFeed(url string, comments []store.Comment) (string, error) {
 				log.Printf("[WARN] failed to get info about parent comment, %s", err)
 			}
 		}
+		if c.PostTitle != "" {
+			f.Title = f.Title + ", " + c.PostTitle
+		}
+
 		feed.Items = append(feed.Items, &f)
 		if i > maxRssItems {
 			break

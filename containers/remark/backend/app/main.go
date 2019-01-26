@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
+	"os/signal"
+	"runtime"
+	"syscall"
 
-	"github.com/hashicorp/logutils"
-	"github.com/jessevdk/go-flags"
+	log "github.com/go-pkgz/lgr"
+	flags "github.com/jessevdk/go-flags"
 
 	"github.com/umputun/remark/backend/app/cmd"
 )
@@ -18,6 +20,7 @@ type Opts struct {
 	BackupCmd  cmd.BackupCommand  `command:"backup"`
 	RestoreCmd cmd.RestoreCommand `command:"restore"`
 	AvatarCmd  cmd.AvatarCommand  `command:"avatar"`
+	CleanupCmd cmd.CleanupCommand `command:"cleanup"`
 
 	RemarkURL    string `long:"url" env:"REMARK_URL" required:"true" description:"url to remark"`
 	SharedSecret string `long:"secret" env:"SECRET" required:"true" description:"shared secret key"`
@@ -58,17 +61,31 @@ func main() {
 }
 
 func setupLog(dbg bool) {
-	filter := &logutils.LevelFilter{
-		Levels:   []logutils.LogLevel{"DEBUG", "INFO", "WARN", "ERROR"},
-		MinLevel: logutils.LogLevel("INFO"),
-		Writer:   os.Stdout,
-	}
-
-	log.SetFlags(log.Ldate | log.Ltime)
-
 	if dbg {
-		log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds | log.Lshortfile)
-		filter.MinLevel = logutils.LogLevel("DEBUG")
+		log.Setup(log.Debug, log.CallerFile, log.Msec, log.LevelBraces)
+		return
 	}
-	log.SetOutput(filter)
+	log.Setup(log.Msec, log.LevelBraces, log.CallerPkg, log.CallerIgnore("logger"))
+}
+
+// getDump reads runtime stack and returns as a string
+func getDump() string {
+	maxSize := 5 * 1024 * 1024
+	stacktrace := make([]byte, maxSize)
+	length := runtime.Stack(stacktrace, true)
+	if length > maxSize {
+		length = maxSize
+	}
+	return string(stacktrace[:length])
+}
+
+func init() {
+	// catch SIGQUIT and print stack traces
+	sigChan := make(chan os.Signal)
+	go func() {
+		for range sigChan {
+			log.Printf("[INFO] SIGQUIT detected, dump:\n%s", getDump())
+		}
+	}()
+	signal.Notify(sigChan, syscall.SIGQUIT)
 }

@@ -5,7 +5,6 @@ package cmd
 import (
 	"bytes"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -13,6 +12,7 @@ import (
 	"text/template"
 	"time"
 
+	log "github.com/go-pkgz/lgr"
 	"github.com/pkg/errors"
 )
 
@@ -101,28 +101,9 @@ func responseError(resp *http.Response) error {
 
 // mkdir -p for all dirs
 func makeDirs(dirs ...string) error {
-
-	// exists returns whether the given file or directory exists or not
-	exists := func(path string) (bool, error) {
-		_, err := os.Stat(path)
-		if err == nil {
-			return true, nil
-		}
-		if os.IsNotExist(err) {
-			return false, nil
-		}
-		return true, err
-	}
-
 	for _, dir := range dirs {
-		ex, err := exists(dir)
-		if err != nil {
-			return errors.Wrapf(err, "can't check directory status for %s", dir)
-		}
-		if !ex {
-			if e := os.MkdirAll(dir, 0700); e != nil {
-				return errors.Wrapf(err, "can't make directory %s", dir)
-			}
+		if err := os.MkdirAll(dir, 0700); err != nil { // If path is already a directory, MkdirAll does nothing
+			return errors.Wrapf(err, "can't make directory %s", dir)
 		}
 	}
 	return nil

@@ -29,6 +29,9 @@ function init() {
 
   remark_config.url = (remark_config.url || window.location.href).split('#')[0];
 
+  window.REMARK42 = window.REMARK42 || {};
+  window.REMARK42.changeTheme = changeTheme;
+
   const query = Object.keys(remark_config)
     .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(remark_config[key])}`)
     .join('&');
@@ -53,7 +56,11 @@ function init() {
   window.addEventListener('message', receiveMessages);
   window.addEventListener('hashchange', postHashToIframe);
   document.addEventListener('click', postClickOutsideToIframe);
-  setTimeout(postHashToIframe, 1000);
+
+  new MutationObserver(mutations => postTitleToIframe(mutations[0].target.textContent)).observe(
+    document.querySelector('title'),
+    { subtree: true, characterData: true, childList: true }
+  );
 
   const remarkRootId = 'remark-km423lmfdslkm34';
   const userInfo = {
@@ -226,6 +233,11 @@ function init() {
           userInfo.close();
         }
       }
+
+      if (data.inited) {
+        postHashToIframe();
+        postTitleToIframe(document.title);
+      }
     } catch (e) {}
   }
 
@@ -239,9 +251,17 @@ function init() {
     }
   }
 
+  function postTitleToIframe(title) {
+    iframe.contentWindow.postMessage(JSON.stringify({ title }), '*');
+  }
+
   function postClickOutsideToIframe(e) {
     if (!iframe.contains(e.target)) {
       iframe.contentWindow.postMessage(JSON.stringify({ clickOutside: true }), '*');
     }
+  }
+
+  function changeTheme(theme) {
+    iframe.contentWindow.postMessage(JSON.stringify({ theme }), '*');
   }
 }

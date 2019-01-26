@@ -5,5 +5,7 @@ sed -i "s|https://demo.remark42.com|${REMARK_URL}|g" /srv/web/*.js
 # remove devtools attach helper. TODO: move to webpack loader
 sed -i "/REMOVE-START/,/REMOVE-END/d" /srv/web/iframe.html
 
+chown -R app:app /srv/var 2>/dev/null
+
 echo "start remark42 server"
-/srv/remark42 $@
+/sbin/su-exec app /srv/remark42 $@

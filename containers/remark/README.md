@@ -17,8 +17,9 @@ Remark42 is a self-hosted, lightweight, and simple (yet functional) comment engi
 * Self-contained executable can be deployed directly to Linux, Windows and MacOS
 * Clean, lightweight and fully customizable UI
 * Multi-site mode from a single instance
-* Integration with automatic ssl via [nginx-le](https://github.com/umputun/nginx-le)
+* Integration with automatic ssl (direct and via [nginx-le](https://github.com/umputun/nginx-le))
 * [Privacy focused](#privacy)
+
 
 #
 
@@ -76,51 +77,66 @@ _this is the recommended way to run remark42_
 #### Without docker
 
 * download archive for [stable release](https://github.com/umputun/remark/releases) or [development version](https://remark42.com/downloads)
-* unpack with `gunzip` (linux, mac os) or with `zip` (windows) 
+* unpack with `gunzip` (Linux, macOS) or with `zip` (Windows) 
 * run as `remark42.{os}-{arch} server {parameters...}`, i.e. `remark42.linux-amd64 server --secret=12345 --url=http://127.0.0.1:8080`
 * alternatively compile from the sources - `make OS=[linux|darwin|windows] ARCH=[amd64,386,arm64,arm32]`
 
 #### Parameters
 
-| Command line       | Environment        | Default               | Description                                      |
-| ------------------ | ------------------ | --------------------- | ------------------------------------------------ |
-| url                | REMARK_URL         |                       | url to remark42 server, _required_               |
-| secret             | SECRET             |                       | secret key, _required_                           |
-| site               | SITE               | `remark`              | site name(s), _multi_                            |
-| store.type         | STORE_TYPE         | `bolt`                | type of storage, `bolt` or `mongo`               |
-| store.bolt.path    | STORE_BOLT_PATH    | `./var`               | path to data directory                           |
-| store.bolt.timeout | STORE_BOLT_TIMEOUT | `30s`                 | boltdb access timeout                            |
-| mongo.url          | MONGO_URL          |                       | mongo url for all stores using mongodb           |
-| mongo.db           | MONGO_DB           |                       | mongo database                                   |
-| admin.shared.id    | ADMIN_SHARED_ID    |                       | admin names (list of user ids), _multi_          |
-| admin.shared.email | ADMIN_SHARED_EMAIL | `admin@${REMARK_URL}` | admin email                                      |
-| backup             | BACKUP_PATH        | `./var/backup`        | backups location                                 |
-| max-back           | MAX_BACKUP_FILES   | `10`                  | max backup files to keep                         |
-| cache.max.items    | CACHE_MAX_ITEMS    | `1000`                | max number of cached items, `0` - unlimited      |
-| cache.max.value    | CACHE_MAX_VALUE    | `65536`               | max size of cached value, `0` - unlimited        |
-| cache.max.size     | CACHE_MAX_SIZE     | `50000000`            | max size of all cached values, `0` - unlimited   |
-| avatar.type        | AVATAR_TYPE        | `fs`                  | type of avatar storage, `fs`, 'bolt`, or `mongo` |
-| avatar.fs.path     | AVATAR_FS_PATH     | `./var/avatars`       | avatars location for `fs` store                  |
-| avatar.bolt.file   | AVATAR_BOLT_FILE   | `./var/avatars.db`    | file name for  `bolt` store                      |
-| avatar.rsz-lmt     | AVATAR_RSZ_LMT     | 0                     | max image size for resizing avatars on save      |
-| auth.ttl.jwt       | AUTH_TTL_JWT       | 5m                    | jwt TTL                                          |
-| auth.ttl.cookie    | AUTH_TTL_COOKIE    | 200h                  | cookie TTL                                       |
-| auth.google.cid    | AUTH_GOOGLE_CID    |                       | Google OAuth client ID                           |
-| auth.google.csec   | AUTH_GOOGLE_CSEC   |                       | Google OAuth client secret                       |
-| auth.facebook.cid  | AUTH_FACEBOOK_CID  |                       | Facebook OAuth client ID                         |
-| auth.facebook.csec | AUTH_FACEBOOK_CSEC |                       | Facebook OAuth client secret                     |
-| auth.github.cid    | AUTH_GITHUB_CID    |                       | Github OAuth client ID                           |
-| auth.github.csec   | AUTH_GITHUB_CSEC   |                       | Github OAuth client secret                       |
-| auth.yandex.cid    | AUTH_YANDEX_CID    |                       | Yandex OAuth client ID                           |
-| auth.yandex.csec   | AUTH_YANDEX_CSEC   |                       | Yandex OAuth client secret                       |
-| auth.dev           | AUTH_DEV           | false                 | local oauth2 server, development mode only       |
-| max-comment        | MAX_COMMENT_SIZE   | 2048                  | comment's size limit                             |
-| low-score          | LOW_SCORE          | `-5`                  | low score threshold                              |
-| critical-score     | CRITICAL_SCORE     | `-10`                 | critical score threshold                         |
-| edit-time          | EDIT_TIME          | `5m`                  | edit window                                      |
-| img-proxy          | IMG_PROXY          | `false`               | enable http->https proxy for images              |
-| dbg                | DEBUG              | `false`               | debug mode                                       |
-| dev-passwd         | DEV_PASSWD         |                       | password for `dev` user                          |
+| Command line            | Environment             | Default               | Description                                      |
+| ----------------------- | ----------------------- | --------------------- | ------------------------------------------------ |
+| url                     | REMARK_URL              |                       | url to remark42 server, _required_               |
+| secret                  | SECRET                  |                       | secret key, _required_                           |
+| site                    | SITE                    | `remark`              | site name(s), _multi_                            |
+| store.type              | STORE_TYPE              | `bolt`                | type of storage, `bolt` or `mongo`               |
+| store.bolt.path         | STORE_BOLT_PATH         | `./var`               | path to data directory                           |
+| store.bolt.timeout      | STORE_BOLT_TIMEOUT      | `30s`                 | boltdb access timeout                            |
+| mongo.url               | MONGO_URL               |                       | mongo url for all stores using mongodb           |
+| mongo.db                | MONGO_DB                |                       | mongo database                                   |
+| admin.shared.id         | ADMIN_SHARED_ID         |                       | admin names (list of user ids), _multi_          |
+| admin.shared.email      | ADMIN_SHARED_EMAIL      | `admin@${REMARK_URL}` | admin email                                      |
+| backup                  | BACKUP_PATH             | `./var/backup`        | backups location                                 |
+| max-back                | MAX_BACKUP_FILES        | `10`                  | max backup files to keep                         |
+| cache.max.items         | CACHE_MAX_ITEMS         | `1000`                | max number of cached items, `0` - unlimited      |
+| cache.max.value         | CACHE_MAX_VALUE         | `65536`               | max size of cached value, `0` - unlimited        |
+| cache.max.size          | CACHE_MAX_SIZE          | `50000000`            | max size of all cached values, `0` - unlimited   |
+| avatar.type             | AVATAR_TYPE             | `fs`                  | type of avatar storage, `fs`, 'bolt`, or `mongo` |
+| avatar.fs.path          | AVATAR_FS_PATH          | `./var/avatars`       | avatars location for `fs` store                  |
+| avatar.bolt.file        | AVATAR_BOLT_FILE        | `./var/avatars.db`    | file name for  `bolt` store                      |
+| avatar.rsz-lmt          | AVATAR_RSZ_LMT          | 0                     | max image size for resizing avatars on save      |
+| auth.ttl.jwt            | AUTH_TTL_JWT            | 5m                    | jwt TTL                                          |
+| auth.ttl.cookie         | AUTH_TTL_COOKIE         | 200h                  | cookie TTL                                       |
+| auth.google.cid         | AUTH_GOOGLE_CID         |                       | Google OAuth client ID                           |
+| auth.google.csec        | AUTH_GOOGLE_CSEC        |                       | Google OAuth client secret                       |
+| auth.facebook.cid       | AUTH_FACEBOOK_CID       |                       | Facebook OAuth client ID                         |
+| auth.facebook.csec      | AUTH_FACEBOOK_CSEC      |                       | Facebook OAuth client secret                     |
+| auth.github.cid         | AUTH_GITHUB_CID         |                       | Github OAuth client ID                           |
+| auth.github.csec        | AUTH_GITHUB_CSEC        |                       | Github OAuth client secret                       |
+| auth.yandex.cid         | AUTH_YANDEX_CID         |                       | Yandex OAuth client ID                           |
+| auth.yandex.csec        | AUTH_YANDEX_CSEC        |                       | Yandex OAuth client secret                       |
+| auth.dev                | AUTH_DEV                | false                 | local oauth2 server, development mode only       |
+| notify.type             | NOTIFY_TYPE             | none                  | type of notification (none or telegram)          |
+| notify.queue            | NOTIFY_QUEUE            | 100                   | size of notification queue                       |
+| notify.telegram.token   | NOTIFY_TELEGRAM_TOKEN   |                       | telegram token                                   |
+| notify.telegram.chan    | NOTIFY_TELEGRAM_CHAN    |                       | telegram channel                                 |
+| notify.telegram.timeout | NOTIFY_TELEGRAM_TIMEOUT |                       | telegram timeout                                 |
+| ssl.type                | SSL_TYPE                | none                  | `none`-http, `static`-https, `auto`-https + le   |
+| ssl.port                | SSL_PORT                | 8443                  | port for https server                            |
+| ssl.cert                | SSL_CERT                |                       | path to cert.pem file                            |
+| ssl.key                 | SSL_KEY                 |                       | path to key.pem file                             |
+| ssl.acme-location       | SSL_ACME_LOCATION       | `./var/acme`          | dir where obtained le-certs will be stored       |
+| ssl.acme-email          | SSL_ACME_EMAIL          |                       | admin email for receiving notifications from LE  |
+| max-comment             | MAX_COMMENT_SIZE        | 2048                  | comment's size limit                             |
+| max-votes               | MAX_VOTES               | `-1`                  | votes limit per comment, `-1` - unlimited        |
+| low-score               | LOW_SCORE               | `-5`                  | low score threshold                              |
+| critical-score          | CRITICAL_SCORE          | `-10`                 | critical score threshold                         |
+| restricted-words        | RESTRICTED_WORDS        |                       | words banned in comments (can use `*`), _multi_  |
+| edit-time               | EDIT_TIME               | `5m`                  | edit window                                      |
+| read-age                | READONLY_AGE            |                       | read-only age of comments, days                  |
+| img-proxy               | IMG_PROXY               | `false`               | enable http->https proxy for images              |
+| update-limit            | UPDATE_LIMIT            | `0.5`                 | updates/sec limit                                |
+| admin-passwd            | ADMIN_PASSWD            |                       | password for `admin` basic auth                  |
+| dbg                     | DEBUG                   | `false`               | debug mode                                       |
 
 * command line parameters are long form `--<key>=value`, i.e. `--site=https://demo.remark42.com`
 * _multi_ parameters separated by `,` in the environment or repeated with command line key, like `--site=s1 --site=s2 ...`
@@ -250,7 +266,7 @@ Admins/moderators should be defined in `docker-compose.yml` as a list of user ID
 
 ```
     environment:
-        - ADMIN=github_ef0f706a79cc24b17bbbb374cd234a691a034128,github_dae9983158e9e5e127ef2b87a411ef13c891e9e5
+        - ADMIN_SHARED_ID=github_ef0f706a79cc24b17bbbb374cd234a691a034128,github_dae9983158e9e5e127ef2b87a411ef13c891e9e5
 ```
 
 To get user id just login and click on your username or any other user you want to promote to admins. 
@@ -269,7 +285,9 @@ Add this snippet to the bottom of web page:
   var remark_config = {
     site_id: 'YOUR_SITE_ID',
     url: 'PAGE_URL', // optional param; if it isn't defined window.location.href will be used
-    max_shown_comments: 10, // optional param; if it isn't defined default value (15) will be used 
+    max_shown_comments: 10, // optional param; if it isn't defined default value (15) will be used
+    theme: 'dark', // optional param; if it isn't defined default value ('light') will be used
+    page_title: 'Moving to Remark42' // optional param; if it isn't defined `document.title` will be used
   };
 
   (function() {
@@ -287,6 +305,19 @@ And then add this node in the place where you want to see Remark42 widget:
 ``` 
 
 After that widget will be rendered inside this node.
+
+##### Themes
+
+Right now Remark has two themes: light and dark.
+You can pick one using configuration object,
+but there is also a possibility to switch between themes in runtime.
+For this purpose Remark adds to `window` object named `REMARK42`, 
+which contains function `changeTheme`.
+Just call this function and pass a name of the theme that you want to turn on:
+
+```js
+window.REMARK42.changeTheme('light');
+```      
 
 #### Last comments
 
@@ -381,7 +412,6 @@ Frontend docker compose config by default skips running backend related tests an
 
 In order to run backend locally (development mode, without docker) you have to have latest stable `go` toolchain [installed](https://golang.org/doc/install).
 
-
 To run backend - `go run backend/app/main.go --dbg --secret=12345 --dev-passwd=password --site=remark --url=http://127.0.0.1:8080`
 It stars backend service with embedded bolt store on port `8080` with basic auth, allowing to authenticate and run requests directly, like this:
 `HTTP http://dev:password@127.0.0.1:8080/api/v1/find?site=remark&sort=-active&format=tree&url=http://127.0.0.1:8080`
@@ -406,7 +436,7 @@ It used to reformat your frontend code using `prettier` and lint with `eslint` b
 
 For local development mode with Hot Reloading use `npm start` instead of `npm run build`.
 In this case `webpack` will serve files using `webpack-dev-server` on `localhost:9000`.
-By visiting `127.0.0.1:9000/web` you will get a page with main comments widget.
+By visiting `127.0.0.1:9000/web` you will get a page with main comments widget
 communicating with demo server backend running on `https://demo.remark42.com`.
 But you will not be able to login with any oauth providers due to security reasons.
 
@@ -455,6 +485,7 @@ type Comment struct {
     Timestamp time.Time       `json:"time"`    // time stamp, read only
     Pin       bool            `json:"pin"`     // pinned status, read only
     Delete    bool            `json:"delete"`  // delete status, read only
+    PostTitle string          `json:"title"`   // post title
 }
 
 type Locator struct {
@@ -504,6 +535,7 @@ Sort can be `time`, `active` or `score`. Supported sort order with prefix -/+, i
   }{}
   ```
 * `GET /api/v1/count?site=site-id&url=post-url` - get comment's count for `{url}`
+* `POST /api/v1/count?site=siteID` - get number of comments for posts from post body (list of post IDs)
 * `GET /api/v1/list?site=site-id&limit=5&skip=2` - list commented posts, returns array or `PostInfo`, limit=0 will return all posts
   ```go
   type PostInfo struct {
@@ -551,7 +583,9 @@ Sort can be `time`, `active` or `score`. Supported sort order with prefix -/+, i
   }
   ```
 * `GET /api/v1/admin/export?site=side-id&mode=[stream|file]` - export all comments to json stream or gz file.
-* `POST /api/v1/admin/import?site=side-id` - import comments from the backup.
+* `POST /api/v1/admin/import?site=side-id` - import comments from the backup, uses post body.
+* `POST /api/v1/admin/import/form?site=side-id` - import comments from the backup, user post form.
+* `GET /api/v1/admin/import/wait?site=side-id` - wait for import completeion.
 * `PUT /api/v1/admin/pin/{id}?site=site-id&url=post-url&pin=1` - pin or unpin comment.
 * `GET /api/v1/admin/user/{userid}?site=site-id` - get user's info.
 * `DELETE /api/v1/admin/user/{userid}?site=site-id` - delete all user's comments.
@@ -579,16 +613,16 @@ _all admin calls require auth and admin privilege_
 
 * Data stored in [boltdb](https://github.com/coreos/bbolt) (embedded key/value database) files under `STORE_BOLT_PATH`
 * Each site stored in a separate boltbd file.
-* In order to migrate/move remark42 to another host boltbd files as well as avatars directory `AVATAR_FS_PATH` should be transferred.
+* In order to migrate/move remark42 to another host boltbd files as well as avatars directory `AVATAR_FS_PATH` should be transferred. Optionally, boltdb can be used to store avatars as well.
 * Automatic backup process runs every 24h and exports all content in json-like format to `backup-remark-YYYYMMDD.gz`.
-* Authentication implemented with [jwt](https://github.com/dgrijalva/jwt-go) stored in a cookie. It uses HttpOnly, secure cookies.
-* All heavy REST calls cached internally in LRU cache limited by `CACHE_MAX_ITEMS` and `CACHE_MAX_SIZE`.
+* Authentication implemented with [go-pkgz/auth](https://github.com/go-pkgz/auth) stored in a cookie. It uses HttpOnly, secure cookies.
+* All heavy REST calls cached internally in LRU cache limited by `CACHE_MAX_ITEMS` and `CACHE_MAX_SIZE` with [go-pkgz/rest](https://github.com/go-pkgz/rest)
 * User's activity throttled globally (up to 1000 simultaneous requests) and limited locally (per user, usually up to 10 req/sec)
 * Request timeout set to 60sec
-* Development mode (`--dev-password` set) allows to test remark42 without social login and with admin privileges. Adds basic-auth for username: `dev`, password: `${DEV_PASSWD}`. **should not be used in production deployment**
+* Admin authentication (`--admin-password` set) allows to hit remark42 API without social login and with admin privileges. Adds basic-auth for username: `admin`, password: `${ADMIN_PASSWD}`.
 * User can vote for the comment multiple times but only to change the vote. Double-voting not allowed.
 * User can edit comments in 5 mins (configurable) window after creation.
 * User ID hashed and prefixed by oauth provider name to avoid collisions and potential abuse.
-* All avatars resized and cached locally to prevent rate limiters from oauth providers.
+* All avatars resized and cached locally to prevent rate limiters from oauth providers, part of [go-pkgz/auth](https://github.com/go-pkgz/auth) functionality.
 * Images can be proxied (`IMG_PROXY=true`) to prevent mixed http/https.
 * Docker build uses [publicly available](https://github.com/umputun/baseimage) base images.

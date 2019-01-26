@@ -31,10 +31,11 @@ export const putCommentVote = ({ id, url, value }) =>
     withCredentials: true,
   });
 
-export const addComment = ({ text, pid }) =>
+export const addComment = ({ title, text, pid }) =>
   fetcher.post({
     url: '/comment',
     body: {
+      title,
       text,
       locator: {
         site: siteId,
@@ -50,6 +51,15 @@ export const updateComment = ({ text, id }) =>
     url: `/comment/${id}?url=${url}`,
     body: {
       text,
+    },
+    withCredentials: true,
+  });
+
+export const removeMyComment = ({ id }) =>
+  fetcher.put({
+    url: `/comment/${id}?url=${url}`,
+    body: {
+      delete: true,
     },
     withCredentials: true,
   });
@@ -153,6 +163,7 @@ export default {
   putCommentVote,
   addComment,
   updateComment,
+  removeMyComment,
   getUser,
   getPreview,
 

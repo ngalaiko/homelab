@@ -5,19 +5,20 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
-	"github.com/hashicorp/go-multierror"
+	"github.com/go-pkgz/auth/token"
+	log "github.com/go-pkgz/lgr"
+	R "github.com/go-pkgz/rest"
+	"github.com/go-pkgz/rest/cache"
+	multierror "github.com/hashicorp/go-multierror"
 
 	"github.com/umputun/remark/backend/app/rest"
-	"github.com/umputun/remark/backend/app/rest/auth"
-	"github.com/umputun/remark/backend/app/rest/cache"
 	"github.com/umputun/remark/backend/app/store"
 	"github.com/umputun/remark/backend/app/store/service"
 )
@@ -32,7 +33,6 @@ func (s *Rest) createCommentCtrl(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := rest.MustGetUserInfo(r)
-	log.Printf("[DEBUG] create comment %+v", comment)
 
 	comment.PrepareUntrusted() // clean all fields user not supposed to set
 	comment.User = user
@@ -51,14 +51,16 @@ func (s *Rest) createCommentCtrl(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if s.ReadOnlyAge > 0 {
-		if info, e := s.DataService.Info(comment.Locator, s.ReadOnlyAge); e == nil && info.ReadOnly {
-			rest.SendErrorJSON(w, r, http.StatusForbidden, errors.New("rejected"), "old post, read-only")
-			return
-		}
+	if s.isReadOnly(comment.Locator) {
+		rest.SendErrorJSON(w, r, http.StatusForbidden, errors.New("rejected"), "old post, read-only")
+		return
 	}
 
 	id, err := s.DataService.Create(comment)
+	if err == service.ErrRestrictedWordsFound {
+		rest.SendErrorJSON(w, r, http.StatusBadRequest, err, "invalid comment")
+		return
+	}
 	if err != nil {
 		rest.SendErrorJSON(w, r, http.StatusInternalServerError, err, "can't save comment")
 		return
@@ -72,6 +74,12 @@ func (s *Rest) createCommentCtrl(w http.ResponseWriter, r *http.Request) {
 	}
 	s.Cache.Flush(cache.Flusher(comment.Locator.SiteID).
 		Scopes(comment.Locator.URL, lastCommentsScope, comment.User.ID, comment.Locator.SiteID))
+
+	if s.NotifyService != nil {
+		s.NotifyService.Submit(finalComment)
+	}
+
+	log.Printf("[DEBUG] created commend %+v", finalComment)
 
 	render.Status(r, http.StatusCreated)
 	render.JSON(w, r, &finalComment)
@@ -117,12 +125,16 @@ func (s *Rest) updateCommentCtrl(w http.ResponseWriter, r *http.Request) {
 	}
 
 	res, err := s.DataService.EditComment(locator, id, editReq)
+	if err == service.ErrRestrictedWordsFound {
+		rest.SendErrorJSON(w, r, http.StatusBadRequest, err, "invalid comment")
+		return
+	}
 	if err != nil {
 		rest.SendErrorJSON(w, r, http.StatusBadRequest, err, "can't update comment")
 		return
 	}
 
-	s.Cache.Flush(cache.Flusher(locator.SiteID).Scopes(locator.URL, lastCommentsScope, user.ID))
+	s.Cache.Flush(cache.Flusher(locator.SiteID).Scopes(locator.SiteID, locator.URL, lastCommentsScope, user.ID))
 	render.JSON(w, r, res)
 }
 
@@ -145,6 +157,11 @@ func (s *Rest) voteCtrl(w http.ResponseWriter, r *http.Request) {
 
 	vote := r.URL.Query().Get("vote") == "1"
 
+	if s.isReadOnly(locator) {
+		rest.SendErrorJSON(w, r, http.StatusForbidden, errors.New("rejected"), "old post, read-only")
+		return
+	}
+
 	// check if user blocked
 	if s.adminService.checkBlocked(locator.SiteID, user) {
 		rest.SendErrorJSON(w, r, http.StatusForbidden, errors.New("rejected"), "user blocked")
@@ -157,7 +174,7 @@ func (s *Rest) voteCtrl(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.Cache.Flush(cache.Flusher(locator.SiteID).Scopes(locator.URL, comment.User.ID))
-	render.JSON(w, r, JSON{"id": comment.ID, "score": comment.Score})
+	render.JSON(w, r, R.JSON{"id": comment.ID, "score": comment.Score})
 }
 
 // GET /userdata?site=siteID - exports all data about the user as a json with user info and list of all comments
@@ -186,7 +203,6 @@ func (s *Rest) userAllDataCtrl(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var merr error
-
 	merr = multierror.Append(merr, write([]byte(`{"info": `)))     // send user prefix
 	merr = multierror.Append(merr, write(userB))                   // send user info
 	merr = multierror.Append(merr, write([]byte(`, "comments":`))) // send comments prefix
@@ -224,23 +240,38 @@ func (s *Rest) deleteMeCtrl(w http.ResponseWriter, r *http.Request) {
 	user := rest.MustGetUserInfo(r)
 	siteID := r.URL.Query().Get("site")
 
-	claims := auth.CustomClaims{
-		SiteID: siteID,
+	claims := token.Claims{
 		StandardClaims: jwt.StandardClaims{
+			Audience:  siteID,
 			Issuer:    "remark42",
 			ExpiresAt: time.Now().AddDate(0, 3, 0).Unix(),
 			NotBefore: time.Now().Add(-1 * time.Minute).Unix(),
 		},
-		User: &user,
+		User: &token.User{
+			ID:   user.ID,
+			Name: user.Name,
+			Attributes: map[string]interface{}{
+				"delete_me": true, // prevents this token from being used for login
+			},
+		},
 	}
-	claims.Flags.DeleteMe = true // prevent this token from being used for login
 
-	tokenStr, err := s.Authenticator.JWTService.Token(&claims)
+	tokenStr, err := s.Authenticator.TokenService().Token(claims)
 	if err != nil {
 		rest.SendErrorJSON(w, r, http.StatusInternalServerError, err, "can't make token")
 		return
 	}
 
 	link := fmt.Sprintf("%s/web/deleteme.html?token=%s", s.RemarkURL, tokenStr)
-	render.JSON(w, r, JSON{"site": siteID, "user_id": user.ID, "token": tokenStr, "link": link})
+	render.JSON(w, r, R.JSON{"site": siteID, "user_id": user.ID, "token": tokenStr, "link": link})
+}
+
+func (s *Rest) isReadOnly(locator store.Locator) bool {
+	if s.ReadOnlyAge > 0 {
+		// check RO by age
+		if info, e := s.DataService.Info(locator, s.ReadOnlyAge); e == nil && info.ReadOnly {
+			return true
+		}
+	}
+	return s.DataService.IsReadOnly(locator) // ro manually
 }

@@ -2,10 +2,10 @@ package engine
 
 import (
 	"encoding/json"
-	"log"
 	"time"
 
-	"github.com/coreos/bbolt"
+	bolt "github.com/coreos/bbolt"
+	log "github.com/go-pkgz/lgr"
 	"github.com/pkg/errors"
 
 	"github.com/umputun/remark/backend/app/store"
@@ -79,7 +79,7 @@ func (b *BoltDB) DeleteAll(siteID string) error {
 		return nil
 	})
 
-	return errors.Wrapf(err, "failed to delete top level buckets fro site %s", siteID)
+	return errors.Wrapf(err, "failed to delete top level buckets from site %s", siteID)
 }
 
 // DeleteUser removes all comments for given user. Everything will be market as deleted
@@ -319,4 +319,21 @@ func (b *BoltDB) IsVerified(siteID string, userID string) (verified bool) {
 		return nil
 	})
 	return verified
+}
+
+// Verified returns list of verified userIDs
+func (b *BoltDB) Verified(siteID string) (ids []string, err error) {
+	bdb, err := b.db(siteID)
+	if err != nil {
+		return nil, err
+	}
+	err = bdb.View(func(tx *bolt.Tx) error {
+		usersBkt := tx.Bucket([]byte(verifiedBucketName))
+		_ = usersBkt.ForEach(func(k, _ []byte) error {
+			ids = append(ids, string(k))
+			return nil
+		})
+		return nil
+	})
+	return ids, err
 }

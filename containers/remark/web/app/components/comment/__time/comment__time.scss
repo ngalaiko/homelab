@@ -2,8 +2,11 @@
   margin-left: 8px;
   margin-right: 8px;
   vertical-align: middle;
-  color: #999;
   text-decoration: none;
+
+  &:first-child {
+    margin-left: 0;
+  }
 
   &:hover {
     text-decoration: underline;

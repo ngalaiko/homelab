@@ -2,7 +2,7 @@
 import { h, Component } from 'preact';
 
 import { BASE_URL, API_BASE, DEFAULT_MAX_COMMENT_SIZE } from 'common/constants';
-import { siteId, url } from 'common/settings';
+import { siteId, url, pageTitle } from 'common/settings';
 
 import api from 'common/api';
 import store from 'common/store';
@@ -10,6 +10,7 @@ import TextareaAutosize from 'components/input/textarea-autosize';
 
 const RSS_THREAD_URL = `${BASE_URL}${API_BASE}/rss/post?site=${siteId}&url=${url}`;
 const RSS_SITE_URL = `${BASE_URL}${API_BASE}/rss/site?site=${siteId}`;
+const RSS_REPLIES_URL = `${BASE_URL}${API_BASE}/rss/reply?site=${siteId}&user=`;
 
 export default class Input extends Component {
   constructor(props) {
@@ -20,6 +21,7 @@ export default class Input extends Component {
     this.state = {
       preview: null,
       isErrorShown: false,
+      errorMessage: null,
       isDisabled: false,
       maxLength: config.max_comment_size || DEFAULT_MAX_COMMENT_SIZE,
       text: props.value || '',
@@ -40,6 +42,7 @@ export default class Input extends Component {
   shouldComponentUpdate(nextProps, nextState) {
     return (
       nextProps.id !== this.props.id ||
+      nextProps.mods !== this.props.mods ||
       nextProps.pid !== this.props.pid ||
       nextProps.value !== this.props.value ||
       nextProps.errorMessage !== this.props.errorMessage ||
@@ -58,6 +61,7 @@ export default class Input extends Component {
     this.setState({
       preview: null,
       isErrorShown: false,
+      errorMessage: null,
       text: e.target.value,
     });
   }
@@ -70,21 +74,34 @@ export default class Input extends Component {
 
     if (!text || !text.trim()) return;
 
+    if (text === this.props.value) {
+      this.props.onCancel && this.props.onCancel();
+      this.setState({ preview: null, text: '' });
+    }
+
     this.setState({ isDisabled: true, isErrorShown: false });
 
     const request =
-      mods.mode === 'edit' ? api.updateComment({ text, id }) : api.addComment({ text, ...(pid ? { pid } : {}) });
+      mods.mode === 'edit'
+        ? api.updateComment({ text, id })
+        : api.addComment({ title: pageTitle || document.title, text, ...(pid ? { pid } : {}) });
 
     request
       .then(comment => {
-        if (this.props.onSubmit) {
-          this.props.onSubmit(comment);
-        }
-
+        this.props.onSubmit && this.props.onSubmit(comment);
         this.setState({ preview: null, text: '' });
       })
-      .catch(() => {
-        this.setState({ isErrorShown: true });
+      .catch(e => {
+        if (
+          e.response &&
+          e.response.data &&
+          typeof e.response.data.error === 'string' &&
+          e.response.data.error.indexOf("parent comment with reply can't be edited") === 0
+        ) {
+          this.setState({ isErrorShown: true, errorMessage: 'Comment has reply, editing is not possible' });
+          return;
+        }
+        this.setState({ isErrorShown: true, errorMessage: null });
       })
       .finally(() => this.setState({ isDisabled: false }));
   }
@@ -94,19 +111,20 @@ export default class Input extends Component {
 
     if (!text || !text.trim()) return;
 
-    this.setState({ isErrorShown: false });
+    this.setState({ isErrorShown: false, errorMessage: null });
 
     api
       .getPreview({ text })
       .then(preview => this.setState({ preview }))
       .catch(() => {
-        this.setState({ isErrorShown: true });
+        this.setState({ isErrorShown: true, errorMessage: null });
       });
   }
 
-  render(props, { isDisabled, isErrorShown, preview, maxLength, text }) {
+  render(props, { isDisabled, isErrorShown, errorMessage, preview, maxLength, text }) {
     const charactersLeft = maxLength - text.length;
-    const { mods = {}, errorMessage } = props;
+    const { mods = {}, userId } = props;
+    errorMessage = props.errorMessage || errorMessage;
 
     return (
       <form className={b('input', props)} onSubmit={this.send} aria-label="New comment">
@@ -153,13 +171,17 @@ export default class Input extends Component {
                 </a>{' '}
                 is supported
               </div>
-              Subscribe to&nbsp;this{' '}
+              Subscribe to&nbsp;the{' '}
               <a className="input__rss-link" href={RSS_THREAD_URL} target="_blank">
                 Thread
-              </a>{' '}
-              or&nbsp;
+              </a>
+              {', '}
               <a className="input__rss-link" href={RSS_SITE_URL} target="_blank">
                 Site
+              </a>{' '}
+              or&nbsp;
+              <a className="input__rss-link" href={RSS_REPLIES_URL + userId} target="_blank">
+                Replies
               </a>{' '}
               by&nbsp;RSS
             </div>
@@ -171,7 +193,7 @@ export default class Input extends Component {
         !!preview && (
           <div className="input__preview-wrapper">
             <div
-              className={b('input__preview', { mix: 'raw-content' })}
+              className={b('input__preview', { mix: b('raw-content', {}, { theme: mods.theme }) })}
               dangerouslySetInnerHTML={{ __html: preview }}
             />
           </div>

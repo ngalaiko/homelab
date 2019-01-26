@@ -1,10 +1,14 @@
 package service
 
 import (
+	"sort"
 	"sync"
 	"time"
 
+	log "github.com/go-pkgz/lgr"
 	"github.com/google/uuid"
+	multierror "github.com/hashicorp/go-multierror"
+	cache "github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
 
 	"github.com/umputun/remark/backend/app/store"
@@ -15,9 +19,13 @@ import (
 // DataStore wraps store.Interface with additional methods
 type DataStore struct {
 	engine.Interface
-	EditDuration   time.Duration
-	AdminStore     admin.Store
-	MaxCommentSize int
+	EditDuration           time.Duration
+	AdminStore             admin.Store
+	MaxCommentSize         int
+	MaxVotes               int
+	PositiveScore          bool
+	TitleExtractor         *TitleExtractor
+	RestrictedWordsMatcher *RestrictedWordsMatcher
 
 	// granular locks
 	scopedLocks struct {
@@ -25,15 +33,56 @@ type DataStore struct {
 		sync.Once
 		locks map[string]sync.Locker
 	}
+
+	repliesCache struct {
+		*cache.Cache
+		once sync.Once
+	}
+}
+
+// UserMetaData keeps info about user flags
+type UserMetaData struct {
+	ID      string `json:"id"`
+	Blocked struct {
+		Status bool      `json:"status"`
+		Until  time.Time `json:"until"`
+	} `json:"blocked"`
+	Verified bool `json:"verified"`
+}
+
+// PostMetaData keeps info about post flags
+type PostMetaData struct {
+	URL      string `json:"url"`
+	ReadOnly bool   `json:"read_only"`
 }
 
 const defaultCommentMaxSize = 2000
+const maxLastCommentsReply = 1000
+
+// UnlimitedVotes doesn't restrict MaxVotes
+const UnlimitedVotes = -1
+
+// ErrRestrictedWordsFound returned in case comment text contains restricted words
+var ErrRestrictedWordsFound = errors.New("comment contains restricted words")
 
 // Create prepares comment and forward to Interface.Create
 func (s *DataStore) Create(comment store.Comment) (commentID string, err error) {
 
 	if comment, err = s.prepareNewComment(comment); err != nil {
 		return "", errors.Wrap(err, "failed to prepare comment")
+	}
+
+	if s.RestrictedWordsMatcher != nil && s.RestrictedWordsMatcher.Match(comment.Locator.SiteID, comment.Text) {
+		return "", ErrRestrictedWordsFound
+	}
+
+	// keep input title and set to extracted if missing
+	if s.TitleExtractor != nil && comment.PostTitle == "" {
+		if title, err := s.TitleExtractor.Get(comment.Locator.URL); err == nil {
+			comment.PostTitle = title
+		} else {
+			log.Printf("[WARN] failed to set title, %v", err)
+		}
 	}
 
 	return s.Interface.Create(comment)
@@ -54,7 +103,7 @@ func (s *DataStore) prepareNewComment(comment store.Comment) (store.Comment, err
 	}
 	comment.Sanitize() // clear potentially dangerous js from all parts of comment
 
-	secret, err := s.AdminStore.Key(comment.Locator.SiteID)
+	secret, err := s.AdminStore.Key()
 	if err != nil {
 		return store.Comment{}, errors.Wrapf(err, "can't get secret for site %s", comment.Locator.SiteID)
 	}
@@ -97,6 +146,19 @@ func (s *DataStore) Vote(locator store.Locator, commentID string, userID string,
 		return comment, errors.Errorf("user %s already voted for %s", userID, commentID)
 	}
 
+	maxVotes := s.MaxVotes // 0 value allowed and treated as "no comments allowed"
+	if s.MaxVotes < 0 {    // any negative value reset max votes to unlimited
+		maxVotes = UnlimitedVotes
+	}
+
+	if maxVotes >= 0 && len(comment.Votes) >= maxVotes {
+		return comment, errors.Errorf("maximum number of votes exceeded for comment %s", commentID)
+	}
+
+	if s.PositiveScore && comment.Score <= 0 {
+		return comment, errors.Errorf("minimal score reached for comment %s", commentID)
+	}
+
 	// reset vote if user changed to opposite
 	if voted && v != val {
 		delete(comment.Votes, userID)
@@ -137,9 +199,17 @@ func (s *DataStore) EditComment(locator store.Locator, commentID string, req Edi
 		return comment, errors.Errorf("too late to edit %s", commentID)
 	}
 
+	if s.HasReplies(comment) {
+		return comment, errors.Errorf("parent comment with reply can't be edited, %s", commentID)
+	}
+
 	if req.Delete { // delete request
 		comment.Deleted = true
 		return comment, s.Delete(locator, commentID, store.SoftDelete)
+	}
+
+	if s.RestrictedWordsMatcher != nil && s.RestrictedWordsMatcher.Match(comment.Locator.SiteID, req.Text) {
+		return comment, ErrRestrictedWordsFound
 	}
 
 	comment.Text = req.Text
@@ -150,6 +220,58 @@ func (s *DataStore) EditComment(locator store.Locator, commentID string, req Edi
 	}
 
 	comment.Sanitize()
+	err = s.Put(locator, comment)
+	return comment, err
+}
+
+// HasReplies checks if there is any reply to the comments
+// Loads last maxLastCommentsReply comments and compare parent id to the comment's id
+// Comments with replies cached for 5 minutes
+func (s *DataStore) HasReplies(comment store.Comment) bool {
+
+	s.repliesCache.once.Do(func() {
+		//  default expiration time of 5 minutes, purge every 10 minutes
+		s.repliesCache.Cache = cache.New(5*time.Minute, 10*time.Minute)
+	})
+
+	if _, found := s.repliesCache.Get(comment.ID); found {
+		return true
+	}
+
+	comments, err := s.Last(comment.Locator.SiteID, maxLastCommentsReply)
+	if err != nil {
+		log.Printf("[WARN] can't get last comments for reply check, %v", err)
+		return false
+	}
+
+	for _, c := range comments {
+		if c.ParentID != "" && !c.Deleted {
+			if c.ParentID == comment.ID {
+				s.repliesCache.Set(comment.ID, true, cache.DefaultExpiration)
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// SetTitle puts title from the locator.URL page and overwrites any existing title
+func (s *DataStore) SetTitle(locator store.Locator, commentID string) (comment store.Comment, err error) {
+	if s.TitleExtractor == nil {
+		return comment, errors.New("no title extractor")
+	}
+
+	comment, err = s.Get(locator, commentID)
+	if err != nil {
+		return comment, err
+	}
+
+	// set title, overwrite the current one
+	title, e := s.TitleExtractor.Get(comment.Locator.URL)
+	if e != nil {
+		return comment, err
+	}
+	comment.PostTitle = title
 	err = s.Put(locator, comment)
 	return comment, err
 }
@@ -191,6 +313,86 @@ func (s *DataStore) IsAdmin(siteID string, userID string) bool {
 		}
 	}
 	return false
+}
+
+// Metas returns metadata for users and posts
+func (s *DataStore) Metas(siteID string) (umetas []UserMetaData, pmetas []PostMetaData, err error) {
+	umetas = []UserMetaData{}
+	pmetas = []PostMetaData{}
+	// set posts meta
+	posts, err := s.List(siteID, 0, 0)
+	if err != nil {
+		return nil, nil, errors.Wrapf(err, "can't get list of posts for %s", siteID)
+	}
+	for _, p := range posts {
+		if s.IsReadOnly(store.Locator{SiteID: siteID, URL: p.URL}) {
+			pmetas = append(pmetas, PostMetaData{URL: p.URL, ReadOnly: true})
+		}
+
+	}
+
+	// set users meta
+	m := map[string]UserMetaData{}
+
+	// process blocked users
+	blocked, err := s.Blocked(siteID)
+	if err != nil {
+		return nil, nil, errors.Wrapf(err, "can't get list of blocked users for %s", siteID)
+	}
+	for _, b := range blocked {
+		val, ok := m[b.ID]
+		if !ok {
+			val = UserMetaData{ID: b.ID}
+		}
+		val.Blocked.Status = true
+		val.Blocked.Until = b.Until
+		m[b.ID] = val
+	}
+
+	// process verified users
+	verified, err := s.Verified(siteID)
+	if err != nil {
+		return nil, nil, errors.Wrapf(err, "can't get list of verified users for %s", siteID)
+	}
+	for _, v := range verified {
+		val, ok := m[v]
+		if !ok {
+			val = UserMetaData{ID: v}
+		}
+		val.Verified = true
+		m[v] = val
+	}
+
+	for _, u := range m {
+		umetas = append(umetas, u)
+	}
+	sort.Slice(umetas, func(i, j int) bool { return umetas[i].ID < umetas[j].ID })
+
+	return umetas, pmetas, nil
+}
+
+// SetMetas saves metadata for users and posts
+func (s *DataStore) SetMetas(siteID string, umetas []UserMetaData, pmetas []PostMetaData) (err error) {
+	errs := new(multierror.Error)
+
+	// save posts metas
+	for _, pm := range pmetas {
+		if pm.ReadOnly {
+			errs = multierror.Append(errs, s.SetReadOnly(store.Locator{SiteID: siteID, URL: pm.URL}, true))
+		}
+	}
+
+	// save users metas
+	for _, um := range umetas {
+		if um.Blocked.Status {
+			errs = multierror.Append(errs, s.SetBlock(siteID, um.ID, true, time.Until(um.Blocked.Until)))
+		}
+		if um.Verified {
+			errs = multierror.Append(errs, s.SetVerified(siteID, um.ID, true))
+		}
+	}
+
+	return errs.ErrorOrNil()
 }
 
 // getsScopedLocks pull lock from the map if found or create a new one

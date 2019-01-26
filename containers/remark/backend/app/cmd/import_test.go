@@ -3,13 +3,13 @@ package cmd
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
 
+	log "github.com/go-pkgz/lgr"
 	flags "github.com/jessevdk/go-flags"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -33,7 +33,7 @@ func TestImport_Execute(t *testing.T) {
 	cmd.SetCommon(CommonOpts{RemarkURL: ts.URL, SharedSecret: "123456"})
 
 	p := flags.NewParser(&cmd, flags.Default)
-	_, err := p.ParseArgs([]string{"--site=remark", "--file=testdata/import.txt"})
+	_, err := p.ParseArgs([]string{"--site=remark", "--file=testdata/import.txt", "--admin-passwd=secret"})
 	require.Nil(t, err)
 	err = cmd.Execute(nil)
 	assert.NoError(t, err)
@@ -42,7 +42,7 @@ func TestImport_Execute(t *testing.T) {
 	cmd.SetCommon(CommonOpts{RemarkURL: ts.URL, SharedSecret: "123456"})
 
 	p = flags.NewParser(&cmd, flags.Default)
-	_, err = p.ParseArgs([]string{"--site=remark", "--file=testdata/import.txt.gz"})
+	_, err = p.ParseArgs([]string{"--site=remark", "--file=testdata/import.txt.gz", "--admin-passwd=secret"})
 	require.Nil(t, err)
 	err = cmd.Execute(nil)
 	assert.NoError(t, err)
@@ -60,7 +60,7 @@ func TestImport_ExecuteFailed(t *testing.T) {
 	cmd := ImportCommand{}
 	cmd.SetCommon(CommonOpts{RemarkURL: ts.URL, SharedSecret: "123456"})
 	p := flags.NewParser(&cmd, flags.Default)
-	_, err := p.ParseArgs([]string{"--site=remark", "--file=testdata/import-no.txt"})
+	_, err := p.ParseArgs([]string{"--site=remark", "--file=testdata/import-no.txt", "--admin-passwd=secret"})
 	require.Nil(t, err)
 	err = cmd.Execute(nil)
 	t.Log(err)
@@ -70,7 +70,7 @@ func TestImport_ExecuteFailed(t *testing.T) {
 	cmd = ImportCommand{}
 	cmd.SetCommon(CommonOpts{RemarkURL: "http://127.0.0.1:12345", SharedSecret: "123456"})
 	p = flags.NewParser(&cmd, flags.Default)
-	_, err = p.ParseArgs([]string{"--site=remark", "--file=testdata/import.txt"})
+	_, err = p.ParseArgs([]string{"--site=remark", "--file=testdata/import.txt", "--admin-passwd=secret"})
 	require.Nil(t, err)
 	err = cmd.Execute(nil)
 	t.Log(err)
@@ -86,7 +86,7 @@ func TestImport_ExecuteFailed(t *testing.T) {
 	cmd = ImportCommand{}
 	cmd.SetCommon(CommonOpts{RemarkURL: ts2.URL, SharedSecret: "123456"})
 	p = flags.NewParser(&cmd, flags.Default)
-	_, err = p.ParseArgs([]string{"--site=remark", "--file=testdata/import.txt"})
+	_, err = p.ParseArgs([]string{"--site=remark", "--file=testdata/import.txt", "--admin-passwd=secret"})
 	require.Nil(t, err)
 	err = cmd.Execute(nil)
 	t.Log(err)
@@ -111,7 +111,7 @@ func TestImport_ExecuteTimeout(t *testing.T) {
 	cmd.SetCommon(CommonOpts{RemarkURL: ts.URL, SharedSecret: "123456"})
 
 	p := flags.NewParser(&cmd, flags.Default)
-	_, err := p.ParseArgs([]string{"--site=remark", "--file=testdata/import.txt", "--timeout=300ms"})
+	_, err := p.ParseArgs([]string{"--site=remark", "--file=testdata/import.txt", "--timeout=300ms", "--admin-passwd=secret"})
 	require.Nil(t, err)
 	err = cmd.Execute(nil)
 	assert.NotNil(t, err)

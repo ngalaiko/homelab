@@ -3,16 +3,17 @@ package api
 import (
 	"crypto/sha1"
 	"encoding/base64"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
+	log "github.com/go-pkgz/lgr"
+	R "github.com/go-pkgz/rest"
+	"github.com/go-pkgz/rest/cache"
 
 	"github.com/umputun/remark/backend/app/rest"
-	"github.com/umputun/remark/backend/app/rest/cache"
 	"github.com/umputun/remark/backend/app/store"
 )
 
@@ -26,17 +27,20 @@ func (s *Rest) findCommentsCtrl(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Printf("[DEBUG] get comments for %+v, sort %s, format %s", locator, sort, r.URL.Query().Get("format"))
 
-	key := cache.NewKey(locator.SiteID).ID(cache.URLKey(r)).Scopes(locator.SiteID, locator.URL)
+	key := cache.NewKey(locator.SiteID).ID(URLKey(r)).Scopes(locator.SiteID, locator.URL)
 	data, err := s.Cache.Get(key, func() ([]byte, error) {
 		comments, e := s.DataService.Find(locator, sort)
 		if e != nil {
-			return nil, e
+			comments = []store.Comment{} // error should clear comments and continue for post info
 		}
 		maskedComments := s.adminService.alterComments(comments, r)
 		var b []byte
 		switch r.URL.Query().Get("format") {
 		case "tree":
 			tree := rest.MakeTree(maskedComments, sort, s.ReadOnlyAge)
+			if tree.Nodes == nil { // eliminate json nil serialization
+				tree.Nodes = []*rest.Node{}
+			}
 			if s.DataService.IsReadOnly(locator) {
 				tree.Info.ReadOnly = true
 			}
@@ -55,7 +59,10 @@ func (s *Rest) findCommentsCtrl(w http.ResponseWriter, r *http.Request) {
 		rest.SendErrorJSON(w, r, http.StatusBadRequest, err, "can't find comments")
 		return
 	}
-	renderJSONFromBytes(w, r, data)
+
+	if err = R.RenderJSONFromBytes(w, r, data); err != nil {
+		log.Printf("[WARN] can't render comments for post %+v", locator)
+	}
 }
 
 // POST /preview, body is a comment, returns rendered html
@@ -87,7 +94,7 @@ func (s *Rest) previewCommentCtrl(w http.ResponseWriter, r *http.Request) {
 func (s *Rest) infoCtrl(w http.ResponseWriter, r *http.Request) {
 	locator := store.Locator{SiteID: r.URL.Query().Get("site"), URL: r.URL.Query().Get("url")}
 
-	key := cache.NewKey(locator.SiteID).ID(cache.URLKey(r)).Scopes(locator.SiteID, locator.URL)
+	key := cache.NewKey(locator.SiteID).ID(URLKey(r)).Scopes(locator.SiteID, locator.URL)
 	data, err := s.Cache.Get(key, func() ([]byte, error) {
 		info, e := s.DataService.Info(locator, s.ReadOnlyAge)
 		if e != nil {
@@ -101,7 +108,9 @@ func (s *Rest) infoCtrl(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	renderJSONFromBytes(w, r, data)
+	if err = R.RenderJSONFromBytes(w, r, data); err != nil {
+		log.Printf("[WARN] can't render info for post %+v", locator)
+	}
 }
 
 // GET /last/{limit}?site=siteID - last comments for the siteID, across all posts, sorted by time
@@ -114,7 +123,7 @@ func (s *Rest) lastCommentsCtrl(w http.ResponseWriter, r *http.Request) {
 		limit = 0
 	}
 
-	key := cache.NewKey(siteID).ID(cache.URLKey(r)).Scopes(lastCommentsScope)
+	key := cache.NewKey(siteID).ID(URLKey(r)).Scopes(lastCommentsScope)
 	data, err := s.Cache.Get(key, func() ([]byte, error) {
 		comments, e := s.DataService.Last(siteID, limit)
 		if e != nil {
@@ -130,7 +139,10 @@ func (s *Rest) lastCommentsCtrl(w http.ResponseWriter, r *http.Request) {
 		rest.SendErrorJSON(w, r, http.StatusInternalServerError, err, "can't get last comments")
 		return
 	}
-	renderJSONFromBytes(w, r, data)
+
+	if err = R.RenderJSONFromBytes(w, r, data); err != nil {
+		log.Printf("[WARN] can't render last comments for site %s", siteID)
+	}
 }
 
 // GET /id/{id}?site=siteID&url=post-url - gets a comment by id
@@ -149,7 +161,10 @@ func (s *Rest) commentByIDCtrl(w http.ResponseWriter, r *http.Request) {
 	}
 	comment = s.adminService.alterComments([]store.Comment{comment}, r)[0]
 	render.Status(r, http.StatusOK)
-	renderJSONWithHTML(w, r, comment)
+
+	if err = R.RenderJSONWithHTML(w, r, comment); err != nil {
+		log.Printf("[WARN] can't render last comments for url=%s, id=%s", url, id)
+	}
 }
 
 // GET /comments?site=siteID&user=id - returns comments for given userID
@@ -170,7 +185,7 @@ func (s *Rest) findUserCommentsCtrl(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("[DEBUG] get comments for userID %s, %s", userID, siteID)
 
-	key := cache.NewKey(siteID).ID(cache.URLKey(r)).Scopes(userID, siteID)
+	key := cache.NewKey(siteID).ID(URLKey(r)).Scopes(userID, siteID)
 	data, err := s.Cache.Get(key, func() ([]byte, error) {
 		comments, e := s.DataService.User(siteID, userID, limit, 0)
 		if e != nil {
@@ -190,7 +205,10 @@ func (s *Rest) findUserCommentsCtrl(w http.ResponseWriter, r *http.Request) {
 		rest.SendErrorJSON(w, r, http.StatusBadRequest, err, "can't get comment by user id")
 		return
 	}
-	renderJSONFromBytes(w, r, data)
+
+	if err = R.RenderJSONFromBytes(w, r, data); err != nil {
+		log.Printf("[WARN] can't render found comments for user %s", userID)
+	}
 }
 
 // GET /config?site=siteID - returns configuration
@@ -206,6 +224,7 @@ func (s *Rest) configCtrl(w http.ResponseWriter, r *http.Request) {
 		Auth           []string `json:"auth_providers"`
 		LowScore       int      `json:"low_score"`
 		CriticalScore  int      `json:"critical_score"`
+		PositiveScore  bool     `json:"positive_score"`
 		ReadOnlyAge    int      `json:"readonly_age"`
 	}
 
@@ -217,12 +236,13 @@ func (s *Rest) configCtrl(w http.ResponseWriter, r *http.Request) {
 		AdminEmail:     s.DataService.AdminStore.Email(siteID),
 		LowScore:       s.ScoreThresholds.Low,
 		CriticalScore:  s.ScoreThresholds.Critical,
+		PositiveScore:  s.DataService.PositiveScore,
 		ReadOnlyAge:    s.ReadOnlyAge,
 	}
 
 	cnf.Auth = []string{}
-	for _, ap := range s.Authenticator.Providers {
-		cnf.Auth = append(cnf.Auth, ap.Name)
+	for _, ap := range s.Authenticator.Providers() {
+		cnf.Auth = append(cnf.Auth, ap.Name())
 	}
 
 	if cnf.Admins == nil { // prevent json serialization to nil
@@ -240,7 +260,7 @@ func (s *Rest) countCtrl(w http.ResponseWriter, r *http.Request) {
 		rest.SendErrorJSON(w, r, http.StatusBadRequest, err, "can't get count")
 		return
 	}
-	render.JSON(w, r, JSON{"count": count, "locator": locator})
+	render.JSON(w, r, R.JSON{"count": count, "locator": locator})
 }
 
 // POST /count?site=siteID - get number of comments for posts from post body
@@ -253,7 +273,7 @@ func (s *Rest) countMultiCtrl(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// key could be long for multiple posts, make it sha1
-	k := cache.URLKey(r) + strings.Join(posts, ",")
+	k := URLKey(r) + strings.Join(posts, ",")
 	hasher := sha1.New()
 	if _, err := hasher.Write([]byte(k)); err != nil {
 		rest.SendErrorJSON(w, r, http.StatusInternalServerError, err, "can't make sha1 for list of urls")
@@ -273,7 +293,10 @@ func (s *Rest) countMultiCtrl(w http.ResponseWriter, r *http.Request) {
 		rest.SendErrorJSON(w, r, http.StatusBadRequest, err, "can't get counts for "+siteID)
 		return
 	}
-	renderJSONFromBytes(w, r, data)
+
+	if err = R.RenderJSONFromBytes(w, r, data); err != nil {
+		log.Printf("[WARN] can't render comments counters site %s", siteID)
+	}
 }
 
 // GET /list?site=siteID&limit=50&skip=10 - list posts with comments
@@ -289,7 +312,7 @@ func (s *Rest) listCtrl(w http.ResponseWriter, r *http.Request) {
 		skip = v
 	}
 
-	key := cache.NewKey(siteID).ID(cache.URLKey(r)).Scopes(siteID)
+	key := cache.NewKey(siteID).ID(URLKey(r)).Scopes(siteID)
 	data, err := s.Cache.Get(key, func() ([]byte, error) {
 		posts, e := s.DataService.List(siteID, limit, skip)
 		if e != nil {
@@ -302,5 +325,8 @@ func (s *Rest) listCtrl(w http.ResponseWriter, r *http.Request) {
 		rest.SendErrorJSON(w, r, http.StatusBadRequest, err, "can't get list of comments for "+siteID)
 		return
 	}
-	renderJSONFromBytes(w, r, data)
+
+	if err = R.RenderJSONFromBytes(w, r, data); err != nil {
+		log.Printf("[WARN] can't render posts lits for site %s", siteID)
+	}
 }

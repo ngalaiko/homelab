@@ -3,12 +3,12 @@ package engine
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"strings"
 	"time"
 
-	"github.com/coreos/bbolt"
-	"github.com/hashicorp/go-multierror"
+	bolt "github.com/coreos/bbolt"
+	log "github.com/go-pkgz/lgr"
+	multierror "github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
 
 	"github.com/umputun/remark/backend/app/store"
@@ -49,7 +49,7 @@ type BoltSite struct {
 
 // NewBoltDB makes persistent boltdb-based store
 func NewBoltDB(options bolt.Options, sites ...BoltSite) (*BoltDB, error) {
-	log.Printf("[INFO] bolt store for sites %+v", sites)
+	log.Printf("[INFO] bolt store for sites %+v, options %+v", sites, options)
 	result := BoltDB{dbs: make(map[string]*bolt.DB)}
 	for _, site := range sites {
 		db, err := bolt.Open(site.FileName, 0600, &options) // bolt.Options{Timeout: 30 * time.Second}
@@ -63,7 +63,7 @@ func NewBoltDB(options bolt.Options, sites ...BoltSite) (*BoltDB, error) {
 		err = db.Update(func(tx *bolt.Tx) error {
 			for _, bktName := range topBuckets {
 				if _, e := tx.CreateBucketIfNotExists([]byte(bktName)); e != nil {
-					return errors.Wrapf(err, "failed to create top level bucket %s", bktName)
+					return errors.Wrapf(e, "failed to create top level bucket %s", bktName)
 				}
 			}
 			return nil
@@ -127,7 +127,7 @@ func (b *BoltDB) Create(comment store.Comment) (commentID string, err error) {
 			return errors.Wrapf(e, "failed to put user comment %s for %s", comment.ID, comment.User.ID)
 		}
 
-		// set info with countfor post url
+		// set info with the count for post url
 		if _, e = b.setInfo(tx, comment); e != nil {
 			return errors.Wrapf(e, "failed to set info for %s", comment.Locator)
 		}
@@ -169,6 +169,8 @@ func (b *BoltDB) Find(locator store.Locator, sortFld string) (comments []store.C
 
 // Last returns up to max last comments for given siteID
 func (b *BoltDB) Last(siteID string, max int) (comments []store.Comment, err error) {
+
+	comments = []store.Comment{}
 
 	if max > lastLimit || max == 0 {
 		max = lastLimit

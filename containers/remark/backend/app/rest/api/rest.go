@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"path"
 	"strings"
@@ -19,12 +18,16 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
 	"github.com/go-chi/render"
+	"github.com/go-pkgz/auth"
+	log "github.com/go-pkgz/lgr"
+	R "github.com/go-pkgz/rest"
+	"github.com/go-pkgz/rest/cache"
+	"github.com/go-pkgz/rest/logger"
 	"github.com/pkg/errors"
 	"github.com/rakyll/statik/fs"
 
+	"github.com/umputun/remark/backend/app/notify"
 	"github.com/umputun/remark/backend/app/rest"
-	"github.com/umputun/remark/backend/app/rest/auth"
-	"github.com/umputun/remark/backend/app/rest/cache"
 	"github.com/umputun/remark/backend/app/rest/proxy"
 	"github.com/umputun/remark/backend/app/store"
 	"github.com/umputun/remark/backend/app/store/service"
@@ -35,12 +38,12 @@ type Rest struct {
 	Version string
 
 	DataService      *service.DataStore
-	Authenticator    auth.Authenticator
+	Authenticator    *auth.Service
 	Cache            cache.LoadingCache
-	AvatarProxy      *proxy.Avatar
 	ImageProxy       *proxy.Image
 	CommentFormatter *store.CommentFormatter
 	Migrator         *Migrator
+	NotifyService    *notify.Service
 
 	WebRoot         string
 	RemarkURL       string
@@ -50,9 +53,12 @@ type Rest struct {
 		Low      int
 		Critical int
 	}
+	UpdateLimiter float64
 
-	httpServer *http.Server
-	lock       sync.Mutex
+	SSLConfig   SSLConfig
+	httpsServer *http.Server
+	httpServer  *http.Server
+	lock        sync.Mutex
 
 	adminService admin
 }
@@ -68,22 +74,51 @@ type commentsWithInfo struct {
 
 // Run the lister and request's router, activate rest server
 func (s *Rest) Run(port int) {
-	log.Printf("[INFO] activate rest server on port %d", port)
+	switch s.SSLConfig.SSLMode {
+	case None:
+		log.Printf("[INFO] activate http rest server on port %d", port)
 
-	router := s.routes()
+		s.lock.Lock()
+		s.httpServer = s.makeHTTPServer(port, s.routes())
+		s.lock.Unlock()
 
-	s.lock.Lock()
-	s.httpServer = &http.Server{
-		Addr:              fmt.Sprintf(":%d", port),
-		Handler:           router,
-		ReadHeaderTimeout: 5 * time.Second,
-		WriteTimeout:      5 * time.Second,
-		IdleTimeout:       30 * time.Second,
+		err := s.httpServer.ListenAndServe()
+		log.Printf("[WARN] http server terminated, %s", err)
+	case Static:
+		log.Printf("[INFO] activate https server in 'static' mode on port %d", s.SSLConfig.Port)
+
+		s.lock.Lock()
+		s.httpsServer = s.makeHTTPSServer(s.SSLConfig.Port, s.routes())
+		s.httpServer = s.makeHTTPServer(port, s.httpToHTTPSRouter())
+		s.lock.Unlock()
+
+		go func() {
+			log.Printf("[INFO] activate http redirect server on port %d", port)
+			err := s.httpServer.ListenAndServe()
+			log.Printf("[WARN] http redirect server terminated, %s", err)
+		}()
+
+		err := s.httpsServer.ListenAndServeTLS(s.SSLConfig.Cert, s.SSLConfig.Key)
+		log.Printf("[WARN] https server terminated, %s", err)
+	case Auto:
+		log.Printf("[INFO] activate https server in 'auto' mode on port %d", s.SSLConfig.Port)
+
+		m := s.makeAutocertManager()
+		s.lock.Lock()
+		s.httpsServer = s.makeHTTPSAutocertServer(s.SSLConfig.Port, s.routes(), m)
+		s.httpServer = s.makeHTTPServer(port, s.httpChallengeRouter(m))
+		s.lock.Unlock()
+
+		go func() {
+			log.Printf("[INFO] activate http challenge server on port %d", port)
+
+			err := s.httpServer.ListenAndServe()
+			log.Printf("[WARN] http challenge server terminated, %s", err)
+		}()
+
+		err := s.httpsServer.ListenAndServeTLS("", "")
+		log.Printf("[WARN] https server terminated, %s", err)
 	}
-	s.lock.Unlock()
-
-	err := s.httpServer.ListenAndServe()
-	log.Printf("[WARN] http server terminated, %s", err)
 }
 
 // Shutdown rest http server
@@ -94,18 +129,36 @@ func (s *Rest) Shutdown() {
 	s.lock.Lock()
 	if s.httpServer != nil {
 		if err := s.httpServer.Shutdown(ctx); err != nil {
-			log.Printf("[DEBUG] rest shutdown error, %s", err)
+			log.Printf("[DEBUG] http shutdown error, %s", err)
 		}
+		log.Print("[DEBUG] shutdown http server completed")
 	}
-	log.Print("[DEBUG] shutdown rest server completed")
+
+	if s.httpsServer != nil {
+		log.Print("[WARN] shutdown https server")
+		if err := s.httpsServer.Shutdown(ctx); err != nil {
+			log.Printf("[DEBUG] https shutdown error, %s", err)
+		}
+		log.Print("[DEBUG] shutdown https server completed")
+	}
 	s.lock.Unlock()
+}
+
+func (s *Rest) makeHTTPServer(port int, router http.Handler) *http.Server {
+	return &http.Server{
+		Addr:              fmt.Sprintf(":%d", port),
+		Handler:           router,
+		ReadHeaderTimeout: 5 * time.Second,
+		WriteTimeout:      120 * time.Second, // TODO: such a long timeout needed for blocking export (backup) request
+		IdleTimeout:       30 * time.Second,
+	}
 }
 
 func (s *Rest) routes() chi.Router {
 	router := chi.NewRouter()
-	router.Use(middleware.RealIP, Recoverer)
+	router.Use(middleware.RealIP, R.Recoverer(log.Default()))
 	router.Use(middleware.Throttle(1000), middleware.Timeout(60*time.Second))
-	router.Use(AppInfo("remark42", s.Version), Ping)
+	router.Use(R.AppInfo("remark42", "umputun", s.Version), R.Ping)
 
 	s.adminService = admin{
 		dataService:   s.DataService,
@@ -113,7 +166,6 @@ func (s *Rest) routes() chi.Router {
 		cache:         s.Cache,
 		authenticator: s.Authenticator,
 		readOnlyAge:   s.ReadOnlyAge,
-		avatarProxy:   s.AvatarProxy,
 	}
 
 	corsMiddleware := cors.New(cors.Options{
@@ -128,32 +180,35 @@ func (s *Rest) routes() chi.Router {
 
 	ipFn := func(ip string) string { return store.HashValue(ip, s.SharedSecret)[:12] } // logger uses it for anonymization
 
-	// auth routes for all providers
-	router.Route("/auth", func(r chi.Router) {
-		r.Use(Logger(ipFn, LogAll), tollbooth_chi.LimitHandler(tollbooth.NewLimiter(5, nil)))
-		for _, provider := range s.Authenticator.Providers {
-			r.Mount("/"+provider.Name, provider.Routes()) // mount auth providers as /auth/{name}
-		}
-		if len(s.Authenticator.Providers) > 0 {
-			// shortcut, can be any of providers, all logouts do the same - removes cookie
-			r.Get("/logout", s.Authenticator.Providers[0].LogoutHandler)
-		}
+	authHandler, avatarHandler := s.Authenticator.Handlers()
+
+	router.Group(func(r chi.Router) {
+		l := logger.New(logger.Flags(logger.All), logger.Log(log.Default()), logger.IPfn(ipFn), logger.Prefix("[INFO]"))
+		r.Use(l.Handler, tollbooth_chi.LimitHandler(tollbooth.NewLimiter(5, nil)))
+		r.Mount("/auth", authHandler)
 	})
 
-	avatarMiddlewares := []func(http.Handler) http.Handler{
-		Logger(ipFn, LogNone),
-		tollbooth_chi.LimitHandler(tollbooth.NewLimiter(100, nil)),
-	}
-	router.Mount(s.AvatarProxy.Routes(avatarMiddlewares...)) // mount avatars to /api/v1/avatar/{file.img}
+	router.Group(func(r chi.Router) {
+		r.Use(logger.New(logger.Flags(logger.None)).Handler, tollbooth_chi.LimitHandler(tollbooth.NewLimiter(100, nil)))
+		r.Mount("/avatar", avatarHandler)
+	})
+
+	authMiddleware := s.Authenticator.Middleware()
 
 	// api routes
 	router.Route("/api/v1", func(rapi chi.Router) {
-		rapi.Use(tollbooth_chi.LimitHandler(tollbooth.NewLimiter(10, nil)))
+
+		rapi.Group(func(rava chi.Router) {
+			rava.Use(logger.New(logger.Flags(logger.None)).Handler, tollbooth_chi.LimitHandler(tollbooth.NewLimiter(100, nil)))
+			rava.Mount("/avatar", avatarHandler)
+		})
 
 		// open routes
 		rapi.Group(func(ropen chi.Router) {
-			ropen.Use(s.Authenticator.Auth(false))
-			ropen.Use(Logger(ipFn, LogAll))
+			ropen.Use(tollbooth_chi.LimitHandler(tollbooth.NewLimiter(10, nil)))
+			ropen.Use(authMiddleware.Trace)
+			ropen.Use(logger.New(logger.Flags(logger.All), logger.Log(log.Default()),
+				logger.Prefix("[INFO]"), logger.IPfn(ipFn)).Handler)
 			ropen.Get("/find", s.findCommentsCtrl)
 			ropen.Get("/id/{id}", s.commentByIDCtrl)
 			ropen.Get("/comments", s.findUserCommentsCtrl)
@@ -171,21 +226,36 @@ func (s *Rest) routes() chi.Router {
 
 		// protected routes, require auth
 		rapi.Group(func(rauth chi.Router) {
-			rauth.Use(s.Authenticator.Auth(true))
-			rauth.Use(Logger(ipFn, LogAll))
-			rauth.Post("/comment", s.createCommentCtrl)
-			rauth.Put("/comment/{id}", s.updateCommentCtrl)
+			rauth.Use(tollbooth_chi.LimitHandler(tollbooth.NewLimiter(10, nil)))
+			rauth.Use(authMiddleware.Auth)
+			rauth.Use(logger.New(logger.Flags(logger.All), logger.Log(log.Default()),
+				logger.Prefix("[INFO]"), logger.IPfn(ipFn)).Handler)
 			rauth.Get("/user", s.userInfoCtrl)
-			rauth.Put("/vote/{id}", s.voteCtrl)
 			rauth.Get("/userdata", s.userAllDataCtrl)
-			rauth.Post("/deleteme", s.deleteMeCtrl)
 
 			// admin routes, admin users only
-			rauth.Mount("/admin", s.adminService.routes(s.Authenticator.AdminOnly))
+			rauth.Mount("/admin", s.adminService.routes(authMiddleware.AdminOnly))
+		})
+
+		// protected routes, throttled to 10/s by default, controlled by external UpdateLimiter param
+		rapi.Group(func(rauth chi.Router) {
+			lmt := 10.0
+			if s.UpdateLimiter > 0 {
+				lmt = s.UpdateLimiter
+			}
+			rauth.Use(tollbooth_chi.LimitHandler(tollbooth.NewLimiter(lmt, nil)))
+			rauth.Use(authMiddleware.Auth)
+			rauth.Use(logger.New(logger.Flags(logger.All), logger.Log(log.Default()),
+				logger.Prefix("[DEBUG]"), logger.IPfn(ipFn)).Handler)
+
+			rauth.Put("/comment/{id}", s.updateCommentCtrl)
+			rauth.Post("/comment", s.createCommentCtrl)
+			rauth.Put("/vote/{id}", s.voteCtrl)
+			rauth.Post("/deleteme", s.deleteMeCtrl)
 		})
 	})
 
-	// respond to /robots.tx with the list of allowed paths
+	// respond to /robots.txt with the list of allowed paths
 	router.With(tollbooth_chi.LimitHandler(tollbooth.NewLimiter(50, nil))).
 		Get("/robots.txt", func(w http.ResponseWriter, r *http.Request) {
 			allowed := []string{"/find", "/last", "/id", "/count", "/counts", "/list", "/config", "/img", "/avatar"}
@@ -246,16 +316,6 @@ func addFileServer(r chi.Router, path string, root http.FileSystem) {
 		}))
 }
 
-// renderJSONWithHTML allows html tags and forces charset=utf-8
-func renderJSONWithHTML(w http.ResponseWriter, r *http.Request, v interface{}) {
-	data, err := encodeJSONWithHTML(v)
-	if err != nil {
-		rest.SendErrorJSON(w, r, http.StatusInternalServerError, err, "can't render json response")
-		return
-	}
-	renderJSONFromBytes(w, r, data)
-}
-
 func encodeJSONWithHTML(v interface{}) ([]byte, error) {
 	buf := &bytes.Buffer{}
 	enc := json.NewEncoder(buf)
@@ -266,22 +326,23 @@ func encodeJSONWithHTML(v interface{}) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-// renderJSONWithHTML allows html tags and forces charset=utf-8
-func renderJSONFromBytes(w http.ResponseWriter, r *http.Request, data []byte) {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	if status, ok := r.Context().Value(render.StatusCtxKey).(int); ok {
-		w.WriteHeader(status)
-	}
-	if _, err := w.Write(data); err != nil {
-		log.Printf("[WARN] failed to send response to %s, %s", r.RemoteAddr, err)
-	}
-}
-
-func filterComments(comments []store.Comment, fn func(c store.Comment) bool) (filtered []store.Comment) {
+func filterComments(comments []store.Comment, fn func(c store.Comment) bool) []store.Comment {
+	filtered := []store.Comment{}
 	for _, c := range comments {
 		if fn(c) {
 			filtered = append(filtered, c)
 		}
 	}
 	return filtered
+}
+
+// URLKey gets url from request to use it as cache key
+// admins will have different keys in order to prevent leak of admin-only data to regular users
+func URLKey(r *http.Request) string {
+	adminPrefix := "admin!!"
+	key := strings.TrimPrefix(r.URL.String(), adminPrefix)          // prevents attach with fake url to get admin view
+	if user, err := rest.GetUserInfo(r); err == nil && user.Admin { // make separate cache key for admins
+		key = adminPrefix + key
+	}
+	return key
 }

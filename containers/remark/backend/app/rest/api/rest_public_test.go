@@ -9,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	R "github.com/go-pkgz/rest"
+	"github.com/go-pkgz/rest/cache"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -17,9 +19,8 @@ import (
 )
 
 func TestRest_Ping(t *testing.T) {
-	srv, ts := prep(t)
-	require.NotNil(t, srv)
-	defer cleanup(ts, srv)
+	ts, _, teardown := startupT(t)
+	defer teardown()
 
 	res, code := get(t, ts.URL+"/api/v1/ping")
 	assert.Equal(t, "pong", res)
@@ -27,9 +28,8 @@ func TestRest_Ping(t *testing.T) {
 }
 
 func TestRest_Preview(t *testing.T) {
-	srv, ts := prep(t)
-	require.NotNil(t, srv)
-	defer cleanup(ts, srv)
+	ts, _, teardown := startupT(t)
+	defer teardown()
 
 	resp, err := post(t, ts.URL+"/api/v1/preview", `{"text": "test 123", "locator":{"url": "https://radio-t.com/blah1", "site": "radio-t"}}`)
 	assert.Nil(t, err)
@@ -40,9 +40,8 @@ func TestRest_Preview(t *testing.T) {
 }
 
 func TestRest_PreviewWithMD(t *testing.T) {
-	srv, ts := prep(t)
-	require.NotNil(t, srv)
-	defer cleanup(ts, srv)
+	ts, _, teardown := startupT(t)
+	defer teardown()
 
 	text := `
 # h1
@@ -68,12 +67,15 @@ BKT
 }
 
 func TestRest_Find(t *testing.T) {
-	srv, ts := prep(t)
-	assert.NotNil(t, srv)
-	defer cleanup(ts, srv)
+	ts, _, teardown := startupT(t)
+	defer teardown()
 
-	_, code := get(t, ts.URL+"/api/v1/find?site=radio-t&url=https://radio-t.com/blah1")
-	assert.Equal(t, 400, code, "nothing in")
+	res, code := get(t, ts.URL+"/api/v1/find?site=radio-t&url=https://radio-t.com/blah1")
+	assert.Equal(t, 200, code)
+	comments := commentsWithInfo{}
+	err := json.Unmarshal([]byte(res), &comments)
+	assert.Nil(t, err)
+	assert.Equal(t, 0, len(comments.Comments), "should have 0 comments")
 
 	c1 := store.Comment{Text: "test test #1", ParentID: "",
 		Locator: store.Locator{SiteID: "radio-t", URL: "https://radio-t.com/blah1"}}
@@ -86,10 +88,10 @@ func TestRest_Find(t *testing.T) {
 	assert.NotEqual(t, id1, id2)
 
 	// get sorted by +time
-	res, code := get(t, ts.URL+"/api/v1/find?site=radio-t&url=https://radio-t.com/blah1&sort=+time")
+	res, code = get(t, ts.URL+"/api/v1/find?site=radio-t&url=https://radio-t.com/blah1&sort=+time")
 	assert.Equal(t, 200, code)
-	comments := commentsWithInfo{}
-	err := json.Unmarshal([]byte(res), &comments)
+	comments = commentsWithInfo{}
+	err = json.Unmarshal([]byte(res), &comments)
 	assert.Nil(t, err)
 	assert.Equal(t, 2, len(comments.Comments), "should have 2 comments")
 	assert.Equal(t, id1, comments.Comments[0].ID)
@@ -122,9 +124,8 @@ func TestRest_Find(t *testing.T) {
 }
 
 func TestRest_FindAge(t *testing.T) {
-	srv, ts := prep(t)
-	assert.NotNil(t, srv)
-	defer cleanup(ts, srv)
+	ts, srv, teardown := startupT(t)
+	defer teardown()
 
 	c1 := store.Comment{Text: "test test #1", ParentID: "", Timestamp: time.Now().AddDate(0, 0, -5),
 		Locator: store.Locator{SiteID: "radio-t", URL: "https://radio-t.com/blah1"}, User: store.User{ID: "u1"}}
@@ -154,9 +155,8 @@ func TestRest_FindAge(t *testing.T) {
 }
 
 func TestRest_FindReadOnly(t *testing.T) {
-	srv, ts := prep(t)
-	assert.NotNil(t, srv)
-	defer cleanup(ts, srv)
+	ts, srv, teardown := startupT(t)
+	defer teardown()
 
 	c1 := store.Comment{Text: "test test #1", ParentID: "", Timestamp: time.Now().AddDate(0, 0, -1),
 		Locator: store.Locator{SiteID: "radio-t", URL: "https://radio-t.com/blah1"}, User: store.User{ID: "u1"}}
@@ -174,7 +174,7 @@ func TestRest_FindReadOnly(t *testing.T) {
 	req, err := http.NewRequest(http.MethodPut,
 		fmt.Sprintf("%s/api/v1/admin/readonly?site=radio-t&url=https://radio-t.com/blah1&ro=1", ts.URL), nil)
 	assert.Nil(t, err)
-	req.SetBasicAuth("dev", "password")
+	req.SetBasicAuth("admin", "password")
 	_, err = client.Do(req)
 	require.Nil(t, err)
 
@@ -196,9 +196,12 @@ func TestRest_FindReadOnly(t *testing.T) {
 }
 
 func TestRest_Last(t *testing.T) {
-	srv, ts := prep(t)
-	assert.NotNil(t, srv)
-	defer cleanup(ts, srv)
+	ts, srv, teardown := startupT(t)
+	defer teardown()
+
+	res, code := get(t, ts.URL+"/api/v1/last/2?site=radio-t")
+	assert.Equal(t, 200, code)
+	assert.Equal(t, "[]\n", res, "empty last should return empty list")
 
 	c1 := store.Comment{Text: "test test #1", ParentID: "p1",
 		Locator: store.Locator{SiteID: "radio-t", URL: "https://radio-t.com/blah1"}}
@@ -210,7 +213,7 @@ func TestRest_Last(t *testing.T) {
 	id1 := addComment(t, c1, ts)
 	id2 := addComment(t, c2, ts)
 
-	res, code := get(t, ts.URL+"/api/v1/last/2?site=radio-t")
+	res, code = get(t, ts.URL+"/api/v1/last/2?site=radio-t")
 	assert.Equal(t, 200, code)
 	comments := []store.Comment{}
 	err := json.Unmarshal([]byte(res), &comments)
@@ -233,6 +236,7 @@ func TestRest_Last(t *testing.T) {
 
 	err = srv.DataService.Delete(store.Locator{SiteID: "radio-t", URL: "https://radio-t.com/blah1"}, id1, store.SoftDelete)
 	assert.Nil(t, err)
+	srv.Cache.Flush(cache.FlusherRequest{})
 	res, code = get(t, ts.URL+"/api/v1/last/5?site=radio-t")
 	assert.Equal(t, 200, code)
 	err = json.Unmarshal([]byte(res), &comments)
@@ -242,9 +246,8 @@ func TestRest_Last(t *testing.T) {
 }
 
 func TestRest_FindUserComments(t *testing.T) {
-	srv, ts := prep(t)
-	assert.NotNil(t, srv)
-	defer cleanup(ts, srv)
+	ts, srv, teardown := startupT(t)
+	defer teardown()
 
 	c1 := store.Comment{Text: "test test #1",
 		Locator: store.Locator{SiteID: "radio-t", URL: "https://radio-t.com/blah1"}}
@@ -279,23 +282,20 @@ func TestRest_FindUserComments(t *testing.T) {
 }
 
 func TestRest_UserInfo(t *testing.T) {
-	srv, ts := prep(t)
-	assert.NotNil(t, srv)
-	defer cleanup(ts, srv)
+	ts, _, teardown := startupT(t)
+	defer teardown()
 
-	body, code := getWithAuth(t, ts.URL+"/api/v1/user?site=radio-t")
+	body, code := getWithDevAuth(t, ts.URL+"/api/v1/user?site=radio-t")
 	assert.Equal(t, 200, code)
 	user := store.User{}
 	err := json.Unmarshal([]byte(body), &user)
 	assert.Nil(t, err)
-	assert.Equal(t, store.User{Name: "developer one", ID: "dev",
-		Picture: "/api/v1/avatar/remark.image", Admin: true, Blocked: false, IP: ""}, user)
+	assert.Equal(t, store.User{Name: "developer one", ID: "dev", Picture: "http://example.com/pic.png", IP: "127.0.0.1"}, user)
 }
 
 func TestRest_Count(t *testing.T) {
-	srv, ts := prep(t)
-	assert.NotNil(t, srv)
-	defer cleanup(ts, srv)
+	ts, _, teardown := startupT(t)
+	defer teardown()
 
 	c1 := store.Comment{Text: "test test #1",
 		Locator: store.Locator{SiteID: "radio-t", URL: "https://radio-t.com/blah1"}}
@@ -310,7 +310,7 @@ func TestRest_Count(t *testing.T) {
 
 	body, code := get(t, ts.URL+"/api/v1/count?site=radio-t&url=https://radio-t.com/blah1")
 	assert.Equal(t, 200, code)
-	j := JSON{}
+	j := R.JSON{}
 	err := json.Unmarshal([]byte(body), &j)
 	assert.Nil(t, err)
 	assert.Equal(t, 3.0, j["count"])
@@ -323,9 +323,8 @@ func TestRest_Count(t *testing.T) {
 }
 
 func TestRest_Counts(t *testing.T) {
-	srv, ts := prep(t)
-	assert.NotNil(t, srv)
-	defer cleanup(ts, srv)
+	ts, _, teardown := startupT(t)
+	defer teardown()
 
 	c1 := store.Comment{Text: "test test #1",
 		Locator: store.Locator{SiteID: "radio-t", URL: "https://radio-t.com/blah1"}}
@@ -353,9 +352,8 @@ func TestRest_Counts(t *testing.T) {
 }
 
 func TestRest_List(t *testing.T) {
-	srv, ts := prep(t)
-	assert.NotNil(t, srv)
-	defer cleanup(ts, srv)
+	ts, _, teardown := startupT(t)
+	defer teardown()
 
 	c1 := store.Comment{Text: "test test #1",
 		Locator: store.Locator{SiteID: "radio-t", URL: "https://radio-t.com/blah1"}}
@@ -380,13 +378,12 @@ func TestRest_List(t *testing.T) {
 }
 
 func TestRest_Config(t *testing.T) {
-	srv, ts := prep(t)
-	assert.NotNil(t, srv)
-	defer cleanup(ts, srv)
+	ts, _, teardown := startupT(t)
+	defer teardown()
 
 	body, code := get(t, ts.URL+"/api/v1/config?site=radio-t")
 	assert.Equal(t, 200, code)
-	j := JSON{}
+	j := R.JSON{}
 	err := json.Unmarshal([]byte(body), &j)
 	assert.Nil(t, err)
 	assert.Equal(t, 300., j["edit_duration"])
@@ -395,14 +392,14 @@ func TestRest_Config(t *testing.T) {
 	assert.Equal(t, 4000., j["max_comment_size"])
 	assert.Equal(t, -5., j["low_score"])
 	assert.Equal(t, -10., j["critical_score"])
+	assert.False(t, j["positive_score"].(bool))
 	assert.Equal(t, 10., j["readonly_age"])
 	t.Logf("%+v", j)
 }
 
 func TestRest_Info(t *testing.T) {
-	srv, ts := prep(t)
-	assert.NotNil(t, srv)
-	defer cleanup(ts, srv)
+	ts, srv, teardown := startupT(t)
+	defer teardown()
 
 	srv.ReadOnlyAge = 10000000 // make sure we don't hit read-only
 
@@ -438,9 +435,8 @@ func TestRest_Info(t *testing.T) {
 }
 
 func TestRest_Robots(t *testing.T) {
-	srv, ts := prep(t)
-	assert.NotNil(t, srv)
-	defer cleanup(ts, srv)
+	ts, _, teardown := startupT(t)
+	defer teardown()
 
 	body, code := get(t, ts.URL+"/robots.txt")
 	assert.Equal(t, 200, code)

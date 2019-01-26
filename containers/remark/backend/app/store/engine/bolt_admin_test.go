@@ -20,6 +20,10 @@ func TestBoltAdmin_Delete(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, 2, len(res), "initially 2 comments")
 
+	count, err := b.Count(loc)
+	require.NoError(t, err)
+	assert.Equal(t, 2, count, "count=2 initially")
+
 	err = b.Delete(loc, res[0].ID, store.SoftDelete)
 	assert.Nil(t, err)
 
@@ -36,6 +40,10 @@ func TestBoltAdmin_Delete(t *testing.T) {
 	comments, err := b.Last("radio-t", 10)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(comments), "1 in last, 1 removed")
+
+	count, err = b.Count(loc)
+	require.NoError(t, err)
+	assert.Equal(t, 1, count)
 
 	err = b.Delete(loc, "123456", store.SoftDelete)
 	assert.NotNil(t, err)
@@ -214,4 +222,15 @@ func TestBoltAdmin_Verified(t *testing.T) {
 	assert.NoError(t, b.SetVerified("radio-t", "u1xyz", false))
 
 	assert.False(t, b.IsVerified("radio-t-bad", "u1"), "nothing verified on wrong site")
+
+	assert.NoError(t, b.SetVerified("radio-t", "u1", true))
+	assert.NoError(t, b.SetVerified("radio-t", "u2", true))
+	assert.NoError(t, b.SetVerified("radio-t", "u3", false))
+
+	ids, err := b.Verified("radio-t")
+	assert.NoError(t, err)
+	assert.Equal(t, []string{"u1", "u2"}, ids, "verified 2 ids")
+
+	_, err = b.Verified("radio-t-bad")
+	assert.Error(t, err, "site \"radio-t-bad\" not found", "fail on wrong site")
 }

@@ -3,13 +3,16 @@ package service
 import (
 	"fmt"
 	"math/rand"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
-	"github.com/coreos/bbolt"
+	bolt "github.com/coreos/bbolt"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -68,12 +71,93 @@ func TestService_CreateFromPartial(t *testing.T) {
 	assert.Equal(t, "user", res.User.ID)
 	assert.Equal(t, "name", res.User.Name)
 	assert.Equal(t, "23f97cf4d5c29ef788ca2bdd1c9e75656c0e4149", res.User.IP)
+	assert.Equal(t, "", res.PostTitle)
 	assert.Equal(t, comment.Votes, res.Votes)
+}
+
+func TestService_CreateFromPartialWithTitle(t *testing.T) {
+	defer os.Remove(testDb)
+	ks := admin.NewStaticKeyStore("secret 123")
+	b := DataStore{Interface: prepStoreEngine(t), AdminStore: ks,
+		TitleExtractor: NewTitleExtractor(http.Client{Timeout: 5 * time.Second})}
+	comment := store.Comment{
+		Text:      "text",
+		Timestamp: time.Date(2018, 3, 25, 16, 34, 33, 0, time.UTC),
+		Votes:     map[string]bool{"u1": true, "u2": false},
+		User:      store.User{IP: "192.168.1.1", ID: "user", Name: "name"},
+		Locator:   store.Locator{URL: "https://radio-t.com/p/2018/12/29/podcast-630/", SiteID: "radio-t"},
+	}
+	id, err := b.Create(comment)
+	assert.NoError(t, err)
+	assert.True(t, id != "", id)
+
+	res, err := b.Get(store.Locator{URL: "https://radio-t.com/p/2018/12/29/podcast-630/", SiteID: "radio-t"}, id)
+	assert.NoError(t, err)
+	t.Logf("%+v", res)
+	assert.Equal(t, "Радио-Т 630", res.PostTitle)
+
+	comment.PostTitle = "post blah"
+	id, err = b.Create(comment)
+	assert.NoError(t, err)
+	res, err = b.Get(store.Locator{URL: "https://radio-t.com/p/2018/12/29/podcast-630/", SiteID: "radio-t"}, id)
+	assert.NoError(t, err)
+	t.Logf("%+v", res)
+	assert.Equal(t, "post blah", res.PostTitle, "keep comment title")
+}
+
+func TestService_SetTitle(t *testing.T) {
+	defer os.Remove(testDb)
+
+	var titleEnable int32
+	tss := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if atomic.LoadInt32(&titleEnable) == 0 {
+			w.WriteHeader(404)
+		}
+		if r.URL.String() == "/post1" {
+			w.Write([]byte("<html><title>post1 blah 123</title><body> 2222</body></html>"))
+			return
+		}
+		if r.URL.String() == "/post2" {
+			w.Write([]byte("<html><title>post2 blah 123</title><body> 2222</body></html>"))
+			return
+		}
+		w.WriteHeader(404)
+	}))
+	defer tss.Close()
+
+	ks := admin.NewStaticKeyStore("secret 123")
+	b := DataStore{Interface: prepStoreEngine(t), AdminStore: ks,
+		TitleExtractor: NewTitleExtractor(http.Client{Timeout: 5 * time.Second})}
+	comment := store.Comment{
+		Text:      "text",
+		Timestamp: time.Date(2018, 3, 25, 16, 34, 33, 0, time.UTC),
+		Votes:     map[string]bool{"u1": true, "u2": false},
+		User:      store.User{IP: "192.168.1.1", ID: "user", Name: "name"},
+		Locator:   store.Locator{URL: tss.URL + "/post1", SiteID: "radio-t"},
+	}
+
+	id, err := b.Create(comment)
+	assert.NoError(t, err)
+	assert.True(t, id != "", id)
+
+	res, err := b.Get(store.Locator{URL: tss.URL + "/post1", SiteID: "radio-t"}, id)
+	assert.NoError(t, err)
+	t.Logf("%+v", res)
+	assert.Equal(t, "", res.PostTitle)
+
+	atomic.StoreInt32(&titleEnable, 1)
+	c, err := b.SetTitle(store.Locator{URL: tss.URL + "/post1", SiteID: "radio-t"}, id)
+	require.NoError(t, err)
+	assert.Equal(t, "post1 blah 123", c.PostTitle)
+
+	b = DataStore{Interface: prepStoreEngine(t), AdminStore: ks}
+	_, err = b.SetTitle(store.Locator{URL: tss.URL + "/post1", SiteID: "radio-t"}, id)
+	require.EqualError(t, err, "no title extractor")
 }
 
 func TestService_Vote(t *testing.T) {
 	defer os.Remove(testDb)
-	b := DataStore{Interface: prepStoreEngine(t), AdminStore: admin.NewStaticKeyStore("secret 123")}
+	b := DataStore{Interface: prepStoreEngine(t), AdminStore: admin.NewStaticKeyStore("secret 123"), MaxVotes: -1}
 
 	comment := store.Comment{
 		Text:    "text",
@@ -116,9 +200,35 @@ func TestService_Vote(t *testing.T) {
 	assert.Equal(t, map[string]bool{}, res[0].Votes, "vote reset ok")
 }
 
+func TestService_VoteLimit(t *testing.T) {
+	defer os.Remove(testDb)
+	b := DataStore{Interface: prepStoreEngine(t), AdminStore: admin.NewStaticKeyStore("secret 123"), MaxVotes: 2}
+
+	_, err := b.Vote(store.Locator{URL: "https://radio-t.com", SiteID: "radio-t"}, "id-1", "user2", true)
+	assert.Nil(t, err)
+
+	_, err = b.Vote(store.Locator{URL: "https://radio-t.com", SiteID: "radio-t"}, "id-1", "user3", true)
+	assert.Nil(t, err)
+
+	_, err = b.Vote(store.Locator{URL: "https://radio-t.com", SiteID: "radio-t"}, "id-1", "user4", true)
+	assert.NotNil(t, err, "vote limit reached")
+	assert.True(t, strings.HasPrefix(err.Error(), "maximum number of votes exceeded for comment id-1"))
+
+	_, err = b.Vote(store.Locator{URL: "https://radio-t.com", SiteID: "radio-t"}, "id-2", "user4", true)
+	assert.Nil(t, err)
+}
+
+func TestService_VotesDisabled(t *testing.T) {
+	defer os.Remove(testDb)
+	b := DataStore{Interface: prepStoreEngine(t), AdminStore: admin.NewStaticKeyStore("secret 123"), MaxVotes: 0}
+
+	_, err := b.Vote(store.Locator{URL: "https://radio-t.com", SiteID: "radio-t"}, "id-1", "user2", true)
+	assert.EqualError(t, err, "maximum number of votes exceeded for comment id-1")
+}
+
 func TestService_VoteAggressive(t *testing.T) {
 	defer os.Remove(testDb)
-	b := DataStore{Interface: prepStoreEngine(t), AdminStore: admin.NewStaticKeyStore("secret 123")}
+	b := DataStore{Interface: prepStoreEngine(t), AdminStore: admin.NewStaticKeyStore("secret 123"), MaxVotes: -1}
 
 	comment := store.Comment{
 		Text:    "text",
@@ -178,7 +288,7 @@ func TestService_VoteAggressive(t *testing.T) {
 func TestService_VoteConcurrent(t *testing.T) {
 
 	defer os.Remove(testDb)
-	b := DataStore{Interface: prepStoreEngine(t), AdminStore: admin.NewStaticKeyStore("secret 123")}
+	b := DataStore{Interface: prepStoreEngine(t), AdminStore: admin.NewStaticKeyStore("secret 123"), MaxVotes: -1}
 
 	comment := store.Comment{
 		Text:    "text",
@@ -205,6 +315,21 @@ func TestService_VoteConcurrent(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, 100, res[0].Score, "should have 1000 score")
 	assert.Equal(t, 100, len(res[0].Votes), "should have 1000 votes")
+}
+
+func TestService_VotePositive(t *testing.T) {
+	defer os.Remove(testDb)
+	b := DataStore{Interface: prepStoreEngine(t), AdminStore: admin.NewStaticKeyStore("secret 123"),
+		MaxVotes: -1, PositiveScore: true}
+
+	_, err := b.Vote(store.Locator{URL: "https://radio-t.com", SiteID: "radio-t"}, "id-1", "user2", false)
+	assert.EqualError(t, err, "minimal score reached for comment id-1")
+
+	b = DataStore{Interface: prepStoreEngine(t), AdminStore: admin.NewStaticKeyStore("secret 123"),
+		MaxVotes: -1, PositiveScore: false}
+	c, err := b.Vote(store.Locator{URL: "https://radio-t.com", SiteID: "radio-t"}, "id-1", "user2", false)
+	assert.Nil(t, err, "minimal score ignored")
+	assert.Equal(t, -1, c.Score)
 }
 
 func TestService_Pin(t *testing.T) {
@@ -294,6 +419,32 @@ func TestService_EditCommentDurationFailed(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
+func TestService_EditCommentReplyFailed(t *testing.T) {
+	defer os.Remove(testDb)
+	b := DataStore{Interface: prepStoreEngine(t), AdminStore: admin.NewStaticKeyStore("secret 123")}
+
+	res, err := b.Last("radio-t", 0)
+	t.Logf("%+v", res[1])
+	assert.Nil(t, err)
+	assert.Equal(t, 2, len(res))
+	assert.Nil(t, res[1].Edit)
+
+	reply := store.Comment{
+		ID:        "123456",
+		ParentID:  "id-1",
+		Text:      "some text",
+		Timestamp: time.Date(2017, 12, 20, 15, 18, 22, 0, time.Local),
+		Locator:   store.Locator{URL: "https://radio-t.com", SiteID: "radio-t"},
+		User:      store.User{ID: "user2", Name: "user name 2"},
+	}
+	_, err = b.Create(reply)
+	assert.NoError(t, err)
+
+	_, err = b.EditComment(store.Locator{URL: "https://radio-t.com", SiteID: "radio-t"}, res[1].ID,
+		EditRequest{Orig: "yyy", Text: "xxx", Summary: "my edit"})
+	assert.EqualError(t, err, "parent comment with reply can't be edited, id-1")
+}
+
 func TestService_ValidateComment(t *testing.T) {
 
 	b := DataStore{MaxCommentSize: 2000, AdminStore: admin.NewStaticKeyStore("secret 123")}
@@ -346,6 +497,101 @@ func TestService_Counts(t *testing.T) {
 		{URL: "https://radio-t.com/2", Count: 1},
 		{URL: "blah", Count: 0},
 	}, res)
+}
+
+func TestService_GetMetas(t *testing.T) {
+	defer os.Remove(testDb)
+	// two comments for https://radio-t.com
+	b := DataStore{Interface: prepStoreEngine(t), EditDuration: 100 * time.Millisecond,
+		AdminStore: admin.NewStaticKeyStore("secret 123")}
+
+	um, pm, err := b.Metas("radio-t")
+	require.NoError(t, err)
+	assert.Equal(t, 0, len(um))
+	assert.Equal(t, 0, len(pm))
+
+	assert.NoError(t, b.SetVerified("radio-t", "user1", true))
+	assert.NoError(t, b.SetBlock("radio-t", "user1", true, time.Hour))
+	assert.NoError(t, b.SetBlock("radio-t", "user2", true, time.Hour))
+	assert.NoError(t, b.SetReadOnly(store.Locator{URL: "https://radio-t.com", SiteID: "radio-t"}, true))
+
+	um, pm, err = b.Metas("radio-t")
+	require.NoError(t, err)
+
+	assert.Equal(t, 2, len(um))
+	assert.Equal(t, "user1", um[0].ID)
+	assert.Equal(t, true, um[0].Verified)
+	assert.Equal(t, true, um[0].Blocked.Status)
+	assert.Equal(t, false, um[1].Verified)
+	assert.Equal(t, true, um[1].Blocked.Status)
+
+	assert.Equal(t, 1, len(pm))
+	assert.Equal(t, "https://radio-t.com", pm[0].URL)
+	assert.Equal(t, true, pm[0].ReadOnly)
+}
+
+func TestService_SetMetas(t *testing.T) {
+	defer os.Remove(testDb)
+	// two comments for https://radio-t.com
+	b := DataStore{Interface: prepStoreEngine(t), EditDuration: 100 * time.Millisecond,
+		AdminStore: admin.NewStaticKeyStore("secret 123")}
+	umetas := []UserMetaData{}
+	pmetas := []PostMetaData{}
+	err := b.SetMetas("radio-t", umetas, pmetas)
+	assert.NoError(t, err, "empty metas")
+
+	um1 := UserMetaData{ID: "user1", Verified: true}
+	um2 := UserMetaData{ID: "user2"}
+	um2.Blocked.Status = true
+	um2.Blocked.Until = time.Now().AddDate(0, 1, 1)
+
+	pmetas = []PostMetaData{{URL: "https://radio-t.com", ReadOnly: true}}
+	err = b.SetMetas("radio-t", []UserMetaData{um1, um2}, pmetas)
+	assert.NoError(t, err)
+
+	assert.True(t, b.IsReadOnly(store.Locator{SiteID: "radio-t", URL: "https://radio-t.com"}))
+	assert.True(t, b.IsVerified("radio-t", "user1"))
+	assert.True(t, b.IsBlocked("radio-t", "user2"))
+}
+
+func TestService_IsAdmin(t *testing.T) {
+	defer os.Remove(testDb)
+	// two comments for https://radio-t.com
+	b := DataStore{Interface: prepStoreEngine(t), EditDuration: 100 * time.Millisecond,
+		AdminStore: admin.NewStaticStore("secret 123", []string{"user2"}, "user@email.com")}
+
+	assert.False(t, b.IsAdmin("radio-t", "user1"))
+	assert.True(t, b.IsAdmin("radio-t", "user2"))
+}
+
+func TestService_HasReplies(t *testing.T) {
+	defer os.Remove(testDb)
+
+	// two comments for https://radio-t.com, no reply
+	b := DataStore{Interface: prepStoreEngine(t), EditDuration: 100 * time.Millisecond,
+		AdminStore: admin.NewStaticStore("secret 123", []string{"user2"}, "user@email.com")}
+
+	comment := store.Comment{
+		ID:        "id-1",
+		Text:      `some text, <a href="http://radio-t.com">link</a>`,
+		Timestamp: time.Date(2017, 12, 20, 15, 18, 22, 0, time.Local),
+		Locator:   store.Locator{URL: "https://radio-t.com", SiteID: "radio-t"},
+		User:      store.User{ID: "user1", Name: "user name"},
+	}
+
+	assert.False(t, b.HasReplies(comment))
+
+	reply := store.Comment{
+		ID:        "123456",
+		ParentID:  "id-1",
+		Text:      "some text",
+		Timestamp: time.Date(2017, 12, 20, 15, 18, 22, 0, time.Local),
+		Locator:   store.Locator{URL: "https://radio-t.com", SiteID: "radio-t"},
+		User:      store.User{ID: "user2", Name: "user name 2"},
+	}
+	_, err := b.Create(reply)
+	assert.NoError(t, err)
+	assert.True(t, b.HasReplies(comment))
 }
 
 // makes new boltdb, put two records
