@@ -24,7 +24,7 @@ services:
         environment:
             - REMARK_URL=https://remark.${HOST}
             - SECRET=${REMARK_SECRET}
-            - ADMIN_EMAIL=ngalayko@gmail.com
+            - ADMIN_EMAIL=${EMAIL}
             - ADMIN=github_0ff4f879002bc6feb694a37ae894e279f0d0af4e
             - AUTH_GITHUB_CID=${GITHUB_CID}
             - AUTH_GITHUB_CSEC=${GITHUB_CSEC}

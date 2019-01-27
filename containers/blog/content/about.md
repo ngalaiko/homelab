@@ -29,4 +29,4 @@ Experienced with (ordered lists):
 
 Originally from Russia, now living in Sweden.
 
-You can contact me by email: [ngalayko@gmail.com](mailto:ngalayko@gmail.com)
+You can contact me by email: [nikita@galaiko.rocks](mailto:nikita@galaiko.rocks)

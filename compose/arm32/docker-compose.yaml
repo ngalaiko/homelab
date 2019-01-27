@@ -20,7 +20,7 @@ services:
             - "--acme.entryPoint=https"
             - "--acme.OnHostRule=true"
             - "--acme.acmeLogging=true"
-            - "--acme.email=ngalayko@gmail.com"
+            - "--acme.email=${EMAIL}"
             - "--docker"
             - "--docker.domain=${HOST}"
             - "--docker.watch=true"
