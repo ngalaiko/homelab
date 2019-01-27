@@ -40,7 +40,7 @@ copyright = "(c) 2018. Powered by Hugo, Docker Swarm and Raspberry Pi (for some 
 
   [[params.social]]
     name = "email"
-    url = "mailto:ngalayko@gmail.com"
+    url = "mailto:nikita@galaiko.rocks"
 
 [menu]
 
