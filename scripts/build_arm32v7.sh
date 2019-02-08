@@ -8,7 +8,6 @@ echo "Building images..."
 BUILD_IMAGES=(
     "./containers/remark:ngalayko/remark"
     "./containers/home-assistant:ngalayko/home-assistant"
-    "./containers/redirect:ngalayko/redirect"
     "./containers/dyn-dns:ngalayko/dyn-dns"
     "./containers/pihole:ngalayko/pihole"
     "./containers/grafana:ngalayko/grafana"
