@@ -28,4 +28,4 @@ services:
                 - "traefik.frontend.rule=Host:rss.${HOST}"
                 - "traefik.backend.loadbalancer.sticky=true"
             restart_policy:
-                condition: on-failure
+                condition: any

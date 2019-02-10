@@ -17,6 +17,8 @@ services:
             - FATHOM_SECRET=${FATHOM_SECRET}
         deploy:
             replicas: 1
+            restart_policy:
+                condition: any
             labels:
                 - "traefik.port=8080"
                 - "traefik.docker.network=server_traefik"

@@ -33,6 +33,8 @@ services:
             - SITE=nikitag-remark
             - USER=0
         deploy:
+            restart_policy:
+                condition: any
             replicas: 1
             labels:
                 - "traefik.port=8080"
