@@ -70,7 +70,7 @@ services:
                 max_attempts: 20
                 window: 380s
 
-    faas-nats:
+    nats:
         image: nats-streaming:0.11.2
         command: "--store memory --cluster_id faas-cluster"
         networks:
