@@ -1,0 +1,119 @@
+version: '3.4'
+
+networks:
+    faas:
+        driver: overlay
+        attachable: true
+        labels:
+            - "openfaas=true"
+
+secrets:
+    basic-auth-user:
+        external: true
+    basic-auth-password:
+        external: true
+
+services:
+    gateway:
+        image: openfaas/gateway:0.11.0-armhf
+        networks:
+            - faas
+            - traefik
+        environment:
+            functions_provider_url: "https://faas.${HOST}/"
+            read_timeout:  "5m5s"
+            write_timeout: "5m5s"
+            upstream_timeout: "5m"
+            dnsrr: "true"
+            faas_nats_address: "nats"
+            faas_nats_port: 4222
+            direct_functions: "true"
+            direct_functions_suffix: ""
+            basic_auth: "${BASIC_AUTH:-true}"
+            secret_mount_path: "/run/secrets/"
+            scale_from_zero: "true"
+            max_idle_conns: 1024
+            max_idle_conns_per_host: 1024
+        deploy:
+            replicas: 1
+            labels:
+                - "traefik.port=8080"
+                - "traefik.docker.network=server_traefik"
+                - "traefik.frontend.rule=Host:faas.${HOST}"
+            resources:
+                limits:
+                    memory: 200M
+                reservations:
+                    memory: 100M
+            restart_policy:
+                condition: on-failure
+                delay: 5s
+                max_attempts: 20
+                window: 380s
+
+    # Docker Swarm provider
+    faas-swarm:
+        image:  openfaas/faas-swarm:0.6.1-armhf
+        volumes:
+            - "/var/run/docker.sock:/var/run/docker.sock"
+        networks:
+            - faas
+        environment:
+            read_timeout:  "5m5s"
+            write_timeout: "5m5s"
+            DOCKER_API_VERSION: "1.30"
+            basic_auth: "${BASIC_AUTH:-true}"
+            secret_mount_path: "/run/secrets/"
+        deploy:
+            placement:
+                constraints:
+                    - 'node.role == manager'
+            resources:
+                limits:
+                    memory: 100M
+                reservations:
+                    memory: 100M
+            restart_policy:
+                condition: on-failure
+                delay: 5s
+                max_attempts: 20
+                window: 380s
+        secrets:
+            - basic-auth-user
+            - basic-auth-password
+
+    nats:
+        image: nats-streaming:0.11.2
+        command: "--store memory --cluster_id faas-cluster"
+        networks:
+            - faas
+        deploy:
+            resources:
+                limits:
+                    memory: 125M
+                reservations:
+                    memory: 50M
+
+    queue-worker:
+        image: openfaas/queue-worker:0.6.0-armhf
+        networks:
+            - faas
+        environment:
+            max_inflight: "1"
+            ack_wait: "5m5s"    # Max duration of any async task / request
+            basic_auth: "${BASIC_AUTH:-true}"
+            secret_mount_path: "/run/secrets/"
+        deploy:
+            resources:
+                limits:
+                    memory: 50M
+                reservations:
+                    memory: 20M
+            restart_policy:
+                condition: on-failure
+                delay: 5s
+                max_attempts: 20
+                window: 380s
+        secrets:
+            - basic-auth-user
+            - basic-auth-password
