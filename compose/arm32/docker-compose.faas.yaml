@@ -8,7 +8,7 @@ networks:
             - "openfaas=true"
 
 services:
-    gateway:
+    faas-gateway:
         image: openfaas/gateway:0.11.0-armhf
         networks:
             - faas
@@ -24,7 +24,6 @@ services:
             direct_functions: "true"
             direct_functions_suffix: ""
             basic_auth: "false"
-            secret_mount_path: "/run/secrets/"
             scale_from_zero: "true"
             max_idle_conns: 1024
             max_idle_conns_per_host: 1024
@@ -45,7 +44,6 @@ services:
                 max_attempts: 20
                 window: 380s
 
-    # Docker Swarm provider
     faas-swarm:
         image:  openfaas/faas-swarm:0.6.1-armhf
         volumes:
@@ -57,7 +55,6 @@ services:
             write_timeout: "5m5s"
             DOCKER_API_VERSION: "1.30"
             basic_auth: "false"
-            secret_mount_path: "/run/secrets/"
         deploy:
             placement:
                 constraints:
@@ -73,7 +70,7 @@ services:
                 max_attempts: 20
                 window: 380s
 
-    nats:
+    faas-nats:
         image: nats-streaming:0.11.2
         command: "--store memory --cluster_id faas-cluster"
         networks:
@@ -85,7 +82,7 @@ services:
                 reservations:
                     memory: 50M
 
-    queue-worker:
+    faas-queue-worker:
         image: openfaas/queue-worker:0.6.0-armhf
         networks:
             - faas
@@ -93,7 +90,6 @@ services:
             max_inflight: "1"
             ack_wait: "5m5s"    # Max duration of any async task / request
             basic_auth: "false"
-            secret_mount_path: "/run/secrets/"
         deploy:
             resources:
                 limits:
