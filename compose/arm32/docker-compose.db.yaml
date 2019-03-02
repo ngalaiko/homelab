@@ -3,6 +3,10 @@ version: '3.4'
 volumes:
     postgres_data:
 
+networks:
+    rss:
+        driver: overlay
+
 services:
     postgres:
         image: ngalayko/postgres:arm32v7
