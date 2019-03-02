@@ -14,7 +14,7 @@ services:
             - faas
             - traefik
         environment:
-            functions_provider_url: "https://faas.${HOST}/"
+            functions_provider_url: "http://faas-swarm:8080/"
             read_timeout:  "5m5s"
             write_timeout: "5m5s"
             upstream_timeout: "5m"
