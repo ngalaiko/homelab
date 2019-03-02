@@ -7,12 +7,6 @@ networks:
         labels:
             - "openfaas=true"
 
-secrets:
-    basic-auth-user:
-        external: true
-    basic-auth-password:
-        external: true
-
 services:
     gateway:
         image: openfaas/gateway:0.11.0-armhf
@@ -78,9 +72,6 @@ services:
                 delay: 5s
                 max_attempts: 20
                 window: 380s
-        secrets:
-            - basic-auth-user
-            - basic-auth-password
 
     nats:
         image: nats-streaming:0.11.2
@@ -114,6 +105,3 @@ services:
                 delay: 5s
                 max_attempts: 20
                 window: 380s
-        secrets:
-            - basic-auth-user
-            - basic-auth-password
