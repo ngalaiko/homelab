@@ -7,7 +7,7 @@ networks:
 services:
     p2p-dispatcher:
         image: ngalayko/dispatcher
-        command: --port=20000 --jwt_secret=secret --network_name=server_p2p --image_name=docker.io/ngalayko/peer
+        command: --port=20000 --jwt_secret=secret --network_name=zk65o0bkwie5 --image_name=docker.io/ngalayko/peer
         networks:
             - traefik
             - p2p
