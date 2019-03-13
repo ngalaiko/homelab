@@ -26,3 +26,4 @@ services:
             labels:
                 - "traefik.port=8500"
                 - "traefik.frontend.rule=Host:consul-ui.${HOST}"
+                - "traefik.frontend.auth.basic=ngalayko:${CONSUL_AUTH}"
