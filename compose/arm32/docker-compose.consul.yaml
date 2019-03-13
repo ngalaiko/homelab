@@ -23,3 +23,6 @@ services:
                     - "node.labels.consul==true"
             restart_policy:
                 condition: on-failure
+            labels:
+                - "traefik.port=8500"
+                - "traefik.frontend.rule=Host:consul-ui.${HOST}"
