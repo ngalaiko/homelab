@@ -21,6 +21,8 @@ services:
             - "--acme.OnHostRule=true"
             - "--acme.acmeLogging=true"
             - "--acme.email=${EMAIL}"
+            - "--acme.domains.sans=p2p.${HOST}"
+            - "--acme.domains.main=*.p2p.${HOST}"
             - "--docker"
             - "--docker.domain=${HOST}"
             - "--docker.watch=true"
