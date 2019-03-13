@@ -37,7 +37,7 @@ services:
             - "--consul.endpoint=consul:8500"
             - "--consul.prefix=traefik"
             - "--consulCatalog.endpoint=consul:8500"
-            - "--consulCatalog.domain=localhost"
+            - "--consulCatalog.domain=${HOST}"
             - "--consulCatalog.frontendRule=Host:{{.ServiceName}}.{{.Domain}}"
         depends_on:
             - consul
