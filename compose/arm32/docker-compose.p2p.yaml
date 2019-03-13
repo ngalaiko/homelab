@@ -1,0 +1,33 @@
+version: '3.4'
+
+networks:
+    p2p:
+        driver: overlay
+
+services:
+    p2p-peer:
+        image: ngalayko/peer
+        command: 
+            - "--udp4_multicast=" 
+            - "--udp6_multicast="
+            - "--consul=consul:8500"
+        networks: 
+            - p2p
+
+    p2p-dispatcher: 
+        image: ngalayko/dispatcher
+        command:
+            - "--jwt_secret=${P2P_JWT_SECRET}"
+            - "--peer_service=server_p2p-peer"
+            - "--log_level=info"
+            - "--buffer=3"
+            - "--consul=consul:8500"
+        networks:
+            - p2p
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        deploy:
+            replicas: 1
+            labels:
+                - "traefik.port=20000"
+                - "traefik.frontend.rule=Host:p2p.${HOST}"

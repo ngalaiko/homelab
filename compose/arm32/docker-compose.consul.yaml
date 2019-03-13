@@ -15,6 +15,7 @@ services:
             - CONSUL_CLIENT_INTERFACE=eth0
         networks:
             - traefik
+            - p2p
         deploy:
             replicas: 1
             placement:

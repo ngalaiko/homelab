@@ -35,6 +35,9 @@ services:
             - "--consul.watch=true"
             - "--consul.endpoint=consul:8500"
             - "--consul.prefix=traefik"
+            - "--consulCatalog.endpoint=consul:8500"
+            - "--consulCatalog.domain=localhost"
+            - "--consulCatalog.frontendRule=Host:{{.ServiceName}}.{{.Domain}}"
         depends_on:
             - consul
         ports:
@@ -49,6 +52,7 @@ services:
         networks:
             - traefik
             - monitoring
+            - p2p
         deploy:
             mode: global
             placement:
