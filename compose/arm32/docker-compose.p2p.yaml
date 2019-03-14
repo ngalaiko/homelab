@@ -13,13 +13,15 @@ services:
             - "--consul=consul:8500"
         networks: 
             - p2p
+        deploy:
+            replicas: 0
 
     p2p-dispatcher: 
         image: ngalayko/dispatcher
         command:
             - "--jwt_secret=${P2P_JWT_SECRET}"
             - "--peer_service=server_p2p-peer"
-            - "--log_level=info"
+            - "--log_level=debug"
             - "--buffer=3"
             - "--consul=consul:8500"
         networks:
