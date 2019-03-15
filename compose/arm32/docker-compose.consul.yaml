@@ -3,6 +3,10 @@ version: '3.4'
 volumes:
   consul-data:
 
+networks:
+    p2p:
+        driver: overlay
+
 services:
     consul:
         image: arm32v6/consul:1.4.3

@@ -1,9 +1,5 @@
 version: '3.4'
 
-networks:
-    p2p:
-        driver: overlay
-
 services:
     p2p-peer:
         image: ngalayko/peer
