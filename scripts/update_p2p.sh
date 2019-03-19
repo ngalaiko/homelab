@@ -4,7 +4,7 @@ set -e
 
 echo "Deploying..."
 
-docker stack deploy \
+HOST=galaiko.rocks docker stack deploy \
     --resolve-image never \
     -c ./compose/arm32/docker-compose.p2p.yaml.skip \
     server
