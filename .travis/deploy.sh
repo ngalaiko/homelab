@@ -3,8 +3,8 @@
 set -e
 
 eval "$(ssh-agent -s)" # Start ssh-agent cache
-chmod 600 .travis/id_rsa # Allow read access to the private key
-ssh-add .travis/id_rsa # Add the private key to SSH
+chmod 600 .travis/deploy_rsa # Allow read access to the private key
+ssh-add .travis/deploy_rsa # Add the private key to SSH
 
 # move ENV_* variables to the remote server
 # NOTE: they are moved without ENV_ prefix
@@ -15,7 +15,7 @@ for v in $(env); do
     fi
 done
 
-ssh $USER@$IP <<EOF
+ssh -i .travis/deploy_rsa $USER@$IP <<EOF
     ${VARS}
     cd ${DEPLOY_DIR}
 
