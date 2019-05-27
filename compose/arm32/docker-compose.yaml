@@ -52,8 +52,6 @@ services:
             - /var/run/docker.sock:/var/run/docker.sock
         networks:
             - traefik
-            - monitoring
-            - p2p
         deploy:
             mode: global
             placement:
