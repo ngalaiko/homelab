@@ -2,6 +2,10 @@ version: '3.4'
 
 volumes:
     remark_data:
+        driver: "ngalayko/sshfs:arm32v7"
+        driver_opts:
+            allow_other: ""
+            sshcmd: "pirate@node-white:/home/pirate/data/comments"
 
 services:
     comments:
@@ -29,6 +33,3 @@ services:
                 - "traefik.port=8080"
                 - "traefik.docker.network=server_traefik"
                 - "traefik.frontend.rule=Host:remark.${HOST}"
-            placement:
-                constraints:
-                    - "node.labels.remark==true"
