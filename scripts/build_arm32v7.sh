@@ -6,10 +6,10 @@ echo "Building images..."
 
 # NOTE: ./server is the root
 BUILD_IMAGES=(
+    "./containers/pihole:ngalayko/pihole"
     "./containers/remark:ngalayko/remark"
     "./containers/home-assistant:ngalayko/home-assistant"
     "./containers/dyn-dns:ngalayko/dyn-dns"
-    "./containers/pihole:ngalayko/pihole"
     "./containers/grafana:ngalayko/grafana"
     "./containers/prometheus:ngalayko/prometheus"
     "./containers/docker-ap:ngalayko/docker-ap"
