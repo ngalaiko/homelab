@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-dashboard
+  namespace: kube-system
+spec:
+  selector:
+    k8s-app: traefik-ingress-lb
+  ports:
+  - name: dashboard
+    port: 80
+    targetPort: 8080
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: traefik-dashboard
+  namespace: kube-system
+spec:
+  rules:
+  - host: traefik.galaiko.rocks
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: traefik-dashboard
+          servicePort: dashboard
