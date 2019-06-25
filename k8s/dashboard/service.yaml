@@ -7,7 +7,24 @@ metadata:
   namespace: kube-system
 spec:
   ports:
-    - port: 443
+    - name: https
+      port: 443
       targetPort: 8443
   selector:
     k8s-app: kubernetes-dashboard
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: kubernetes-dashboard
+  namespace: kube-system
+spec:
+  rules:
+  - host: kubernetes.galaiko.rocks
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: kubernetes-dashboard
+          servicePort: https
