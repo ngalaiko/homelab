@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
-set -xe
+set -e
 
-find ./k8s/ \
-    -name '*.yaml' \
-    -exec kubectl apply -f {} \;
+files=""
+for file in $(find ./k8s -name '*.yaml'); do
+    files="${files} -f ${file} "
+done
+
+kubectl apply --prune --all ${files}
