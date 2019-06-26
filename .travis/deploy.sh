@@ -21,7 +21,8 @@ ssh -i .travis/deploy_rsa $USER@$IP <<EOF
 
     echo ${VARS}
 
-    git pull --force
+    git fetch origin
+    git reset origin/master --hard
 
     ./scripts/k8s/apply.sh
 EOF
