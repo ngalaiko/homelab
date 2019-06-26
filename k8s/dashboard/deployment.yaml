@@ -37,6 +37,7 @@ spec:
           protocol: TCP
         args:
           - --insecure-bind-address=0.0.0.0
+          - --enable-insecure-login=true
         volumeMounts:
         - mountPath: /tmp
           name: tmp-volume
