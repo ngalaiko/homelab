@@ -15,6 +15,7 @@ for v in $(env); do
     fi
 done
 
+RESULT=0
 ssh -i .travis/deploy_rsa $USER@$IP <<EOF
     ${VARS}
     cd ${DEPLOY_DIR}
@@ -25,4 +26,8 @@ ssh -i .travis/deploy_rsa $USER@$IP <<EOF
     git reset origin/master --hard
 
     ./scripts/k8s/apply.sh
+
+    RESULT=$?
 EOF
+
+exit $RESULT
