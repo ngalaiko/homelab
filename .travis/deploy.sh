@@ -7,11 +7,11 @@ chmod 600 .travis/deploy_rsa # Allow read access to the private key
 ssh-add .travis/deploy_rsa # Add the private key to SSH
 
 # move ENV_* variables to the remote server
-# NOTE: they are moved without ENV_ prefix
+# NOTE: they are moved with ENV_ prefix
 VARS="echo env variables updated"
 for v in $(env); do
     if [[ "${v}" =~ ^ENV_* ]]; then
-        VARS="${VARS} && export ${v/ENV_/}"
+        VARS="${VARS} && export ${v}"
     fi
 done
 
@@ -23,5 +23,5 @@ ssh -i .travis/deploy_rsa $USER@$IP <<EOF
 
     git pull --force
 
-    ./scripts/deploy_arm32v7.sh
+    ./scripts/k8s/apply.sh
 EOF
