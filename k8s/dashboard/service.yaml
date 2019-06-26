@@ -7,9 +7,12 @@ metadata:
   namespace: kube-system
 spec:
   ports:
+    - name: http
+      port: 80
+      targetPort: http
     - name: https
       port: 443
-      targetPort: 8443
+      targetPort: https
   selector:
     k8s-app: kubernetes-dashboard
 
@@ -27,4 +30,4 @@ spec:
       - path: /
         backend:
           serviceName: kubernetes-dashboard
-          servicePort: https
+          servicePort: http
