@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: consul
+data:
+    config.json: |
+        {
+            "bind_addr": "0.0.0.0",
+            "client_addr": "0.0.0.0",
+            "disable_host_node_id": true,
+            "data_dir": "/consul/data",
+            "datacenter": "dc1",
+            "domain": "cluster.local",
+            "ports": {
+                "https": 8443
+            },
+            "retry_join": [
+                "provider=k8s label_selector=\"app=consul,component=server\""
+            ],
+            "server": true,
+            "telemetry": {
+                "prometheus_retention_time": "5m"
+            },
+            "verify_incoming": true,
+            "verify_outgoing": true,
+            "verify_server_hostname": true,
+            "ui": true
+        }

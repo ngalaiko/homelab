@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: consul
+spec:
+  selector:
+    matchLabels:
+      app: consul
+      component: server
+  serviceName: consul
+  podManagementPolicy: "Parallel"
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: consul
+        component: server
+      annotations:
+        "consul.hashicorp.com/connect-inject": "false"
+    spec:
+      serviceAccountName: consul
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - consul
+              topologyKey: kubernetes.io/hostname
+      terminationGracePeriodSeconds: 10
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: consul
+          image: "arm32v6/consul:1.5.2"
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          args:
+            - "agent"
+            - "-advertise=$(POD_IP)"
+            - "-bootstrap-expect=3"
+            - "-config-file=/etc/consul/config/server.json"
+          volumeMounts:
+            - name: data
+              mountPath: /consul/data
+            - name: config
+              mountPath: /etc/consul/config
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                - /bin/sh
+                - -c
+                - consul leave
+          ports:
+            - containerPort: 8500
+              name: ui-port
+            - containerPort: 8400
+              name: alt-port
+            - containerPort: 53
+              name: udp-port
+            - containerPort: 8443
+              name: https-port
+            - containerPort: 8080
+              name: http-port
+            - containerPort: 8301
+              name: serflan
+            - containerPort: 8302
+              name: serfwan
+            - containerPort: 8600
+              name: consuldns
+            - containerPort: 8300
+              name: server
+      volumes:
+        - name: config
+          configMap:
+            name: consul
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
