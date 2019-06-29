@@ -4,8 +4,10 @@ set -e
 
 for v in $(env); do
     if [[ "${v}" =~ ^ENV_* ]]; then
-        VARS="${VARS} && export ${v}"
-        echo $v
+        name="${v%=*}"
+        value="${v#*=}"
+
+        echo "${value}" > "./secrets/${name/ENV_/}"
     fi
 done
 
