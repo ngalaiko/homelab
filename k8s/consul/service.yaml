@@ -40,3 +40,18 @@ spec:
       targetPort: 8600
   selector:
     app: consul
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: consul-ui
+spec:
+  rules:
+  - host: consul.galaiko.rocks
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: consul
+          servicePort: http
