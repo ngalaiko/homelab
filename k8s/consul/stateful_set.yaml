@@ -34,7 +34,7 @@ spec:
         fsGroup: 1000
       containers:
         - name: consul
-          image: "arm32v6/consul:1.5.2"
+          image: "arm32v6/consul:1.4.5"
           env:
             - name: POD_IP
               valueFrom:
