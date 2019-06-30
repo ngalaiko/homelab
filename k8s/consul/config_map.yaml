@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: consul
 data:
-    config.json: |
+    server.json: |
         {
             "bind_addr": "0.0.0.0",
             "client_addr": "0.0.0.0",
