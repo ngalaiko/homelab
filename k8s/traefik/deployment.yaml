@@ -2,14 +2,14 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: traefik-ingress-controller
-  namespace: kube-system
+  namespace: default
 
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: traefik-ingress-controller
-  namespace: kube-system
+  namespace: default
   labels:
     k8s-app: traefik-ingress-lb
 spec:
@@ -39,6 +39,29 @@ spec:
         - --api
         - --kubernetes
         - --defaultentrypoints=http,https
-        - --entrypoints=Name:https Address::443 TLS
+        - --entrypoints=Name:https Address::443 TLS Compress:true TLS.MinVersion:VersionTLS13 TLS.CipherSuites:TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
         - --entrypoints=Name:http Address::80
         - --logLevel=INFO
+        - --acme
+        - --acme.storage=traefik/acme/account
+        - --acme.dnsChallenge.provider=cloudflare
+        - --acme.dnsChallenge.delayBeforeCheck=0
+        - --acme.entryPoint=https
+        - --acme.OnHostRule=true
+        - --acme.acmeLogging=true
+        - --acme.email=nikita+letsencrypt@galaiko.rocks
+        - --consul
+        - --consul.watch=true
+        - --consul.endpoint=consul:8500
+        - --consul.prefix=traefik
+        env:
+        - name: CF_API_EMAIL
+          valueFrom:
+            secretKeyRef:
+              name: cloudflare-email
+              key: CLOUDFLARE_EMAIL
+        - name: CF_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: cloudflare-token
+              key: CLOUDFLARE_TOKEN
