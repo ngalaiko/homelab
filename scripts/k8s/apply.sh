@@ -26,14 +26,21 @@ for secret_file in $(find "${SECRETS_DIR}" -type f); do
         kubectl create secret generic \
             "${secret_name}" \
             --from-file="${secret_file}"
-    else
-        # update secret
-        kubectl get secret "${secret_name}" -o json \
-            | jq \
-            --arg value "$(echo -n $(cat "${secret_file}") | base64)" \
-            ".data[\"${file_name}\"]=\$value" \
-            | kubectl apply -f -
+        continue
     fi
+
+    # if secret is the same, do nothing
+    secret_value=$(kubectl get secret ${secret_name} -o json | jq -r ".data[\"${file_name}\"]" | base64 --decode)
+    if [ "${secret_value}" == "$(cat ${secret_file})" ]; then
+        continue
+    fi
+
+    # update secret
+    kubectl get secret "${secret_name}" -o json \
+        | jq \
+        --arg value "$(echo -n $(cat "${secret_file}") | base64)" \
+        ".data[\"${file_name}\"]=\$value" \
+        | kubectl apply -f -
 done
 
 files=""
