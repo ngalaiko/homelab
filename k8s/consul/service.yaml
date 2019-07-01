@@ -46,6 +46,9 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: consul-ui
+  annotations:
+      ingress.kubernetes.io/auth-type: basic
+      ingress.kubernetes.io/auth-secret: consul-auth
 spec:
   rules:
   - host: consul.galaiko.rocks
