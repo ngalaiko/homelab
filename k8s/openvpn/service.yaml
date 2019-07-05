@@ -13,3 +13,18 @@ spec:
   selector:
     app: openvpn
   type: LoadBalancer
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: openvpn
+spec:
+  rules:
+  - host: vpn.galaiko.rocks
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: openvpn
+          servicePort: vpn
