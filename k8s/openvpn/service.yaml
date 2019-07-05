@@ -6,13 +6,12 @@ metadata:
     app: openvpn
 spec:
   ports:
-    - name: openvpn
-      port: 443
-      targetPort: 443
+    - name: tcp
+      port: 8443
+      targetPort: tcp
       protocol: TCP
   selector:
     app: openvpn
-  type: LoadBalancer
 
 ---
 apiVersion: extensions/v1beta1
@@ -27,4 +26,4 @@ spec:
       - path: /
         backend:
           serviceName: openvpn
-          servicePort: vpn
+          servicePort: tcp
