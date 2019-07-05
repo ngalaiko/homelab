@@ -1,0 +1,49 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: openvpn
+  labels:
+    app: openvpn
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openvpn
+  template:
+    metadata:
+      labels:
+        app: openvpn
+    spec:
+      containers:
+      - name: openvpn
+        image: ngalayko/openvpn:arm32v7
+        command: ["/etc/openvpn/setup/configure.sh"]
+        ports:
+        - containerPort: 443
+          name: openvpn
+        securityContext:
+          capabilities:
+            add:
+              - NET_ADMIN
+        resources:
+          requests:
+            cpu: 300m
+            memory: 128Mi
+          limits:
+            cpu: 300m
+            memory: 128Mi
+        volumeMounts:
+          - mountPath: /etc/openvpn/setup
+            name: openvpn
+            readOnly: false
+          - mountPath: /etc/openvpn/certs
+            name: certs
+            readOnly: false
+      volumes:
+      - name: openvpn
+        configMap:
+          name: openvpn
+          defaultMode: 0775
+      - name: certs
+        persistentVolumeClaim:
+          claimName: openvpn

@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: openvpn
+  labels:
+    app: openvpn
+spec:
+  ports:
+    - name: openvpn
+      port: 443
+      targetPort: 443
+      protocol: TCP
+  selector:
+    app: openvpn
+  type: LoadBalancer
