@@ -20,7 +20,7 @@ metadata:
   name: openvpn
 spec:
   rules:
-  - host: vpn.galaiko.rocks
+  - host: connect.vpn.galaiko.rocks
     http:
       paths:
       - path: /
