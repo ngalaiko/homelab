@@ -1,0 +1,53 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: pihole
+  labels:
+    app: pihole
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pihole
+  template:
+    metadata:
+      labels:
+        app: pihole
+    spec:
+      containers:
+      - name: pihole
+        image: ngalayko/pihole:arm32v7
+        ports:
+        - containerPort: 80
+          name: http
+        resources:
+          requests:
+            cpu: 300m
+            memory: 128Mi
+          limits:
+            cpu: 300m
+            memory: 128Mi
+        volumeMounts:
+          - mountPath: /etc/pihole
+            name: pihole
+            readOnly: false
+          - mountPath: /etc/dnsmasq.d
+            name: dnsmasq
+            readOnly: false
+        env:
+          - name: TZ
+            value: Europe/Stockholm
+          - name: VIRTUAL_HOST
+            value: dns.galaiko.rocks
+          - name: WEBPASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: dns-password
+                key: DNS_PASSWORD
+      volumes:
+      - name: pihole
+        persistentVolumeClaim:
+          claimName: pihole
+      - name: dnsmasq
+        persistentVolumeClaim:
+          claimName: dnsmasq
