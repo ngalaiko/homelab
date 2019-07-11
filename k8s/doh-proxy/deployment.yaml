@@ -1,0 +1,27 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: doh-proxy
+  labels:
+    app: doh-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: doh-proxy
+  template:
+    metadata:
+      labels:
+        app: doh-proxy
+    spec:
+      containers:
+      - name: doh-proxy
+        image: ngalayko/doh-proxy:arm32v7
+        args:
+        - --upstream-resolver=pihole
+        - --port=3000
+        - --listen-address=0.0.0.0
+        - --trusted
+        ports:
+        - containerPort: 3000
+          name: http
