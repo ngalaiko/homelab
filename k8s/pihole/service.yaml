@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: pihole
+  name: pihole-ui
 spec:
   selector:
     app: pihole
@@ -9,6 +9,20 @@ spec:
     - name: http
       port: 80
       targetPort: http
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pihole-dns
+spec:
+  selector:
+    app: pihole
+  ports:
+    - name: dns
+      port: 53
+      targetPort: dns
+      protocol: UDP
 
 ---
 apiVersion: extensions/v1beta1
@@ -22,5 +36,5 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: pihole
+          serviceName: pihole-ui
           servicePort: http

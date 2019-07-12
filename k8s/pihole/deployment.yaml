@@ -20,6 +20,9 @@ spec:
         ports:
         - containerPort: 80
           name: http
+        - containerPort: 53
+          name: dns
+          protocol: UDP
         resources:
           requests:
             cpu: 300m
