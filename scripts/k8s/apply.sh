@@ -11,7 +11,7 @@ for v in $(env); do
         name="${v%=*}"
         value="${v#*=}"
 
-        echo "${value}" > "${SECRETS_DIR}/${name/ENV_/}"
+        echo -n "${value}" > "${SECRETS_DIR}/${name/ENV_/}"
     fi
 done
 

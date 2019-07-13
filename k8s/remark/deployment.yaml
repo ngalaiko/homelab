@@ -37,7 +37,7 @@ spec:
         - name: ADMIN_EMAIL
           value: nikita+remark@galaiko.rocks
         - name: ADMIN
-          value: github_0ff4f879002bc6feb694a37ae894e279f0d0af4e
+          value: github_8eb2bf7120d8b97c88c96bdd6d37cd74b015f2a0
         - name: AUTH_GITHUB_CID
           valueFrom:
             secretKeyRef:
