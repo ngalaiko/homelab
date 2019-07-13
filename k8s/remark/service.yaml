@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: remark
+  labels:
+    app: remark
+spec:
+  selector:
+    app: remark
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: remark
+  labels:
+    app: remark
+spec:
+  rules:
+  - host: remark.galaiko.rocks
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: remark
+          servicePort: http

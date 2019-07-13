@@ -1,0 +1,69 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: remark
+  labels:
+    app: remark
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: remark
+  template:
+    metadata:
+      labels:
+        app: remark
+    spec:
+      containers:
+      - name: remark
+        image: ngalayko/remark:arm32v7
+        ports:
+        - containerPort: 8080
+          name: http
+        volumeMounts:
+          - mountPath: /srv/var
+            name: remark-data
+            readOnly: false
+        env:
+        - name: REMARK_PORT
+          value: "8080"
+        - name: REMARK_URL
+          value: https://remark.galaiko.rocks
+        - name: SECRET
+          valueFrom:
+            secretKeyRef:
+              name: remark-secret
+              key: REMARK_SECRET
+        - name: ADMIN_EMAIL
+          value: nikita+remark@galaiko.rocks
+        - name: ADMIN
+          value: github_0ff4f879002bc6feb694a37ae894e279f0d0af4e
+        - name: AUTH_GITHUB_CID
+          valueFrom:
+            secretKeyRef:
+              name: github-cid
+              key: GITHUB_CID
+        - name: AUTH_GITHUB_CSEC
+          valueFrom:
+            secretKeyRef:
+              name: github-csec
+              key: GITHUB_CSEC
+        - name: AUTH_GOOGLE_CID
+          valueFrom:
+            secretKeyRef:
+              name: google-cid
+              key: GOOGLE_CID
+        - name: AUTH_GOOGLE_CSEC
+          valueFrom:
+            secretKeyRef:
+              name: google-csec
+              key: GOOGLE_CSEC
+        - name: SITE
+          value: nikitag-remark
+        - name: USER
+          value: "0"
+
+      volumes:
+      - name: remark-data
+        persistentVolumeClaim:
+          claimName: remark-data
