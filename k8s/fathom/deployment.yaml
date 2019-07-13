@@ -1,0 +1,47 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: fathom
+  labels:
+    app: fathom
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fathom
+  template:
+    metadata:
+      labels:
+        app: fathom
+    spec:
+      containers:
+      - name: fathom
+        image: ngalayko/fathom:arm32v7
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+          - name: FATHOM_SERVER_ADDR
+            value: ":8080"
+          - name: FATHOM_DEBUG
+            value: "true"
+          - name: FATHOM_DATABASE_DRIVER
+            value: postgres
+          - name: FATHOM_DATABASE_NAME
+            value: fathom
+          - name: FATHOM_DATABASE_USER
+            value: postgres
+          - name: FATHOM_DATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-pass
+                key: POSTGRES_PASS
+          - name: FATHOM_DATABASE_HOST
+            value: postgres
+          - name: FATHOM_DATABASE_SSLMODE
+            value: disable
+          - name: FATHOM_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: fathom-secret
+                key: FATHOM_SECRET
