@@ -1,0 +1,14 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: postgres-data
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "managed-nfs-storage"
+  labels:
+    app: postgres
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
