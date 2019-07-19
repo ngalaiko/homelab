@@ -1,0 +1,13 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nginx-config
+  namespace: nginx-ingress
+data:
+  lb-method: "round_robin"
+  max-fails: "3"
+  fail-timeout: "33s"
+  proxy-connect-timeout: "44s"
+  proxy-read-timeout: "22s"
+  proxy-send-timeout: "55s"
+  keepalive: "1024"
