@@ -48,4 +48,4 @@ for file in $(find ./k8s -name '*.yaml'); do
     files="${files} -f ${file} "
 done
 
-kubectl apply ${files}
+kubectl apply --prune --prune-whitelist=core/v1/Secret --all ${files} 
