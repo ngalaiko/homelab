@@ -11,10 +11,10 @@ spec:
   ports:
     - name: http
       port: 80
-      nodePort: 31290
+      nodePort: 31292
       targetPort: http
     - name: https
       port: 443
-      nodePort: 31291
+      nodePort: 31293
       targetPort: https
   type: LoadBalancer
