@@ -17,3 +17,4 @@ spec:
       port: 443
       nodePort: 31291
       targetPort: https
+  type: LoadBalancer
