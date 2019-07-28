@@ -2,6 +2,8 @@ kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   name: nginx-ingress
+  labels:
+    app: nginx-ingress
 rules:
 - apiGroups:
   - ""
@@ -71,6 +73,8 @@ kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   name: nginx-ingress
+  labels:
+    app: nginx-ingress
 subjects:
 - kind: ServiceAccount
   name: nginx-ingress
