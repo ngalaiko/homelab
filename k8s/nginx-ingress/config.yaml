@@ -6,3 +6,4 @@ metadata:
   labels:
     app: nginx-ingress
 data:
+    server-names-hash-bucket-size: "1024"
