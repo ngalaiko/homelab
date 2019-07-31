@@ -22,7 +22,14 @@ kind: Ingress
 metadata:
   name: kubernetes-dashboard
   namespace: kube-system
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    certmanager.k8s.io/cluster-issuer: "letsencrypt"
 spec:
+  tls:
+  - hosts:
+    - kubernetes.galaiko.rocks
+    secretName: kubernetes-dashboard-tls
   rules:
   - host: kubernetes.galaiko.rocks
     http:
