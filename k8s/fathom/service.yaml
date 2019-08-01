@@ -19,7 +19,15 @@ metadata:
   name: fathom
   labels:
     app: fathom
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    certmanager.k8s.io/cluster-issuer: "letsencrypt"
 spec:
+spec:
+  tls:
+  - hosts:
+    - analytics.galaiko.rocks
+    secretName: fathom-tls
   rules:
   - host: analytics.galaiko.rocks
     http:

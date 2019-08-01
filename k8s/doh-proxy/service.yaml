@@ -15,7 +15,14 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: doh-proxy
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    certmanager.k8s.io/cluster-issuer: "letsencrypt"
 spec:
+  tls:
+  - hosts:
+    - connect.dns.galaiko.rocks
+    secretName: doh-proxy-tls
   rules:
   - host: connect.dns.galaiko.rocks
     http:

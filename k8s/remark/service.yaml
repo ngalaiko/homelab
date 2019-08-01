@@ -19,7 +19,14 @@ metadata:
   name: remark
   labels:
     app: remark
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    certmanager.k8s.io/cluster-issuer: "letsencrypt"
 spec:
+  tls:
+  - hosts:
+    - remark.galaiko.rocks
+    secretName: remark-tls
   rules:
   - host: remark.galaiko.rocks
     http:
