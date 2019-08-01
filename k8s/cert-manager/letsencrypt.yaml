@@ -14,5 +14,5 @@ spec:
        cloudflare:
          email: nikita+cloudflare@galaiko.rocks
          apiKeySecretRef:
-           name: cloudflare-api-key-secret
+           name: cloudflare-token
            key: CLOUDFLARE_TOKEN
