@@ -23,6 +23,8 @@ spec:
           containerPort: 80
         - name: https
           containerPort: 443
+        - name: openvpn
+          containerPort: 1194
         env:
         - name: POD_NAMESPACE
           valueFrom:

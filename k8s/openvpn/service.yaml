@@ -17,12 +17,14 @@ spec:
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: nginx-config
+  name: openvpn-proxy-config
   namespace: nginx-ingress
+  labels:
+    app: openvpn
 data:
     stream-snippets: |
       upstream openvpn-udp {
-          server connect.dns.galaiko.rocks:1194;
+          server openvpn.default.svc.cluster.local:1194;
       }
       server {
           listen 1194 udp;
