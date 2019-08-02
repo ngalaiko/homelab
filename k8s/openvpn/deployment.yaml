@@ -19,8 +19,8 @@ spec:
         image: ngalayko/openvpn:arm32v7
         command: ["/etc/openvpn/setup/configure.sh"]
         ports:
-        - containerPort: 8443
-          name: tcp
+        - containerPort: 1194
+          name: openvpn-udp
         securityContext:
           capabilities:
             add:

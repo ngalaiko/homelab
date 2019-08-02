@@ -6,24 +6,26 @@ metadata:
     app: openvpn
 spec:
   ports:
-    - name: tcp
-      port: 8443
-      targetPort: tcp
-      protocol: TCP
+    - name: openvpn-udp
+      port: 1194
+      targetPort: openvpn-udp
+      protocol: UDP
   selector:
     app: openvpn
 
 ---
-apiVersion: extensions/v1beta1
-kind: Ingress
+kind: ConfigMap
+apiVersion: v1
 metadata:
-  name: openvpn
-spec:
-  rules:
-  - host: connect.vpn.galaiko.rocks
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: openvpn
-          servicePort: tcp
+  name: nginx-config
+  namespace: nginx-ingress
+data:
+    stream-snippets: |
+      upstream openvpn-udp {
+          server connect.dns.galaiko.rocks:1194;
+      }
+      server {
+          listen 1194 udp;
+          proxy_pass openvpn-udp;
+          proxy_responses 1;
+      }
