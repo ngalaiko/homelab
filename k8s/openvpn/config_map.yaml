@@ -32,7 +32,7 @@ data:
       client
       nobind
       dev tun
-      remote ${MY_IP_ADDR} 1194 udp
+      remote ${MY_IP_ADDR} 1194 tcp
       redirect-gateway def1
       <key>
       `cat ${EASY_RSA_LOC}/pki/private/$1.key`
@@ -131,7 +131,7 @@ data:
       persist-key
       persist-tun
 
-      proto udp
+      proto tcp
       port  1194
       dev tun0
       status /tmp/openvpn-status.log

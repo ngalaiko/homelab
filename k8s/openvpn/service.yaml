@@ -6,28 +6,31 @@ metadata:
     app: openvpn
 spec:
   ports:
-    - name: openvpn-udp
+    - name: tcp
       port: 1194
-      targetPort: openvpn-udp
-      protocol: UDP
+      targetPort: tcp
+      protocol: TCP
   selector:
     app: openvpn
 
 ---
-kind: ConfigMap
-apiVersion: v1
+apiVersion: extensions/v1beta1
+kind: Ingress
 metadata:
-  name: openvpn-proxy-config
-  namespace: nginx-ingress
-  labels:
-    app: openvpn
-data:
-    stream-snippets: |
-      upstream openvpn-udp {
-          server openvpn.default.svc.cluster.local:1194;
-      }
-      server {
-          listen 1194 udp;
-          proxy_pass openvpn-udp;
-          proxy_responses 1;
-      }
+  name: openvpn
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    certmanager.k8s.io/cluster-issuer: "letsencrypt"
+spec:
+  tls:
+  - hosts:
+    - connect.vpn.galaiko.rocks
+    secretName: openvpn-tls
+  rules:
+  - host: connect.vpn.galaiko.rocks
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: openvpn
+          servicePort: tcp

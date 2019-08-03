@@ -20,12 +20,19 @@ spec:
         command: ["/etc/openvpn/setup/configure.sh"]
         ports:
         - containerPort: 1194
-          name: openvpn-udp
-          protocol: UDP
+          name: tcp
+          protocol: TCP
         securityContext:
           capabilities:
             add:
               - NET_ADMIN
+        livenessProbe:
+          tcpSocket:
+            port: tcp
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          failureThreshold: 5
+          timeoutSeconds: 1
         resources:
           requests:
             cpu: 300m
