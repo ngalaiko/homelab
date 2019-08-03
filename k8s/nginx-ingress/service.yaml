@@ -17,8 +17,28 @@ spec:
       port: 443
       nodePort: 31293
       targetPort: https
-    - name: openvpn
+  type: LoadBalancer
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: nginx-openvpn-ingress
+  namespace: nginx-ingress
+  labels:
+    app: nginx-ingress
+spec:
+  selector:
+    app: nginx-ingress
+  ports:
+    - name: openvpn-tcp
       port: 1194
       nodePort: 31294
-      targetPort: openvpn
-  type: LoadBalancer
+      targetPort: openvpn-tcp
+      protocol: TCP
+    - name: openvpn-udp
+      port: 1194
+      nodePort: 31294
+      targetPort: openvpn-udp
+      protocol: UDP
+  type: NodePort
