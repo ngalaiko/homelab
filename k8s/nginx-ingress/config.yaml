@@ -7,3 +7,11 @@ metadata:
     app: nginx-ingress
 data:
     server-names-hash-bucket-size: "1024"
+    stream-snippets: |
+      upstream openvpn-tcp {
+          server openvpn.default.svc.cluster.local:1194;
+      }
+      server {
+          listen 1194;
+          proxy_pass openvpn-tcp;
+      } 

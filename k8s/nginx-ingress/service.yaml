@@ -17,4 +17,8 @@ spec:
       port: 443
       nodePort: 31293
       targetPort: https
+    - name: openvpn
+      port: 1194
+      nodePort: 31294
+      targetPort: openvpn
   type: LoadBalancer

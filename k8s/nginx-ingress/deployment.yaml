@@ -25,7 +25,7 @@ spec:
           containerPort: 443
         - name: openvpn
           containerPort: 1194
-          protocol: UDP
+          protocol: TCP
         env:
         - name: POD_NAMESPACE
           valueFrom:
