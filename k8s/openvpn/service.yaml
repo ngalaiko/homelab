@@ -6,9 +6,9 @@ metadata:
     app: openvpn
 spec:
   ports:
-    - name: tcp
-      port: 1194
-      targetPort: tcp
-      protocol: TCP
+  - name: udp
+    port: 1194
+    targetPort: udp
+    protocol: UDP
   selector:
     app: openvpn

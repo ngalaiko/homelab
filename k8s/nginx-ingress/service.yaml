@@ -31,14 +31,9 @@ spec:
   selector:
     app: nginx-ingress
   ports:
-    - name: openvpn-tcp
+    - name: openvpn
       port: 1194
       nodePort: 31294
-      targetPort: openvpn-tcp
-      protocol: TCP
-    - name: openvpn-udp
-      port: 1194
-      nodePort: 31294
-      targetPort: openvpn-udp
+      targetPort: openvpn
       protocol: UDP
-  type: NodePort
+  type: LoadBalancer

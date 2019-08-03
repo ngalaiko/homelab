@@ -8,10 +8,10 @@ metadata:
 data:
     server-names-hash-bucket-size: "1024"
     stream-snippets: |
-      upstream openvpn-tcp {
+      upstream openvpn-udp {
           server openvpn.default.svc.cluster.local:1194;
       }
       server {
-          listen 1194;
-          proxy_pass openvpn-tcp;
+          listen 1194 udp;
+          proxy_pass openvpn-udp;
       } 
