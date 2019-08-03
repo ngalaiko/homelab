@@ -21,6 +21,7 @@ spec:
         ports:
         - containerPort: 1194
           name: openvpn-udp
+          protocol: UDP
         securityContext:
           capabilities:
             add:
