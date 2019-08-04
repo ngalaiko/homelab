@@ -105,7 +105,10 @@ data:
 
       NETWORK="$(cidr2net $cidr)"
       NETMASK="$(cidr2mask ${cidr#*/})"
-      DNS=$(cat /etc/resolv.conf | grep -v '^#' | grep nameserver | awk '{print $2}')
+      DNS=$(nslookup pihole-dns.default 2>/dev/null | grep Address | awk '{ print $3 }')
+
+      echo "Using dns: $DNS"
+
       SEARCH=$(cat /etc/resolv.conf | grep -v '^#' | grep search | awk '{$1=""; print $0}')
       FORMATTED_SEARCH=""
       for DOMAIN in $SEARCH; do
@@ -139,8 +142,10 @@ data:
       user nobody
       group nogroup
 
+      duplicate-cn
+      client-to-client
+
       push "route NETWORK NETMASK"
       push "route 10.0.0.0 255.0.0.0"
 
-      OVPN_K8S_SEARCH
       push "dhcp-option DNS OVPN_K8S_DNS"
