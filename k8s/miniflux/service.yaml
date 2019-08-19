@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: miniflux
+  labels:
+    app: miniflux
+spec:
+  selector:
+    app: miniflux
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: miniflux
+  labels:
+    app: miniflux
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    certmanager.k8s.io/cluster-issuer: "letsencrypt"
+spec:
+spec:
+  tls:
+  - hosts:
+    - rss.galaiko.rocks
+    secretName: rss-tls
+  rules:
+  - host: rss.galaiko.rocks
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: miniflux
+          servicePort: http
