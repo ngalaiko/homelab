@@ -44,7 +44,7 @@ spec:
                 name: rss-password
                 key: RSS_PASSWORD
           - name: POLLING_FREQUENCY
-            value: "1"
+            value: "5"
           - name: WORKER_POOL_SIZE
             value: "50"
           - name: BATCH_SIZE
