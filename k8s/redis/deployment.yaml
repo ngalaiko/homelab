@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: redis
+
+---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: redis
+  namespace: redis
+  labels:
+    app: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      namespace: redis
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:5.0.6
+        args:
+        - /etc/redis/redis.conf
+        ports:
+        - containerPort: 6379
+          name: redis
+        resources:
+          requests:
+            memory: 128Mi
+          limits:
+            memory: 128Mi
+        volumeMounts:
+          - mountPath: /etc/redis
+            name: redis-config
+            readOnly: true
+          - mountPath: /data
+            name: redis-data
+            readOnly: false
+      volumes:
+      - name: redis-config
+        configMap:
+          name: redis-config
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: redis-data

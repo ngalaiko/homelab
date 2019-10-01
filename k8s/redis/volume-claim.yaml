@@ -1,0 +1,15 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: redis-data
+  namespace: redis
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "managed-nfs-storage"
+  labels:
+    app: redis
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
