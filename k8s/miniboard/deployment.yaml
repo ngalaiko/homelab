@@ -1,0 +1,48 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: miniboard
+  labels:
+    app: miniboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: miniboard
+  template:
+    metadata:
+      labels:
+        app: miniboard
+    spec:
+      imagePullSecrets:
+      - name: github
+      containers:
+      - name: miniflux
+        image: docker.pkg.github.com/ngalaiko/miniboard/app:5f46d01777f1286d4f0f45d88ddec4d562234e2e
+        ports:
+        - containerPort: 8080
+          name: http
+        livenessProbe:
+          tcpSocket:
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          failureThreshold: 5
+          timeoutSeconds: 1
+        args:
+          - --redis-uri=redis.redis:6379
+          - --smtp-sender=auth@miniboard.app
+          - --smtp-port=587
+          - --smtp-host=smtp.fastmail.com
+          - --domain=https://miniboard.galaiko.rocks
+        env:
+          - name: SMTP_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: smtp-username
+                key: SMTP_USERNAME
+          - name: SMTP_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: smtp-password
+                key: SMTP_PASSWORD
