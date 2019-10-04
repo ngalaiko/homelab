@@ -11,8 +11,8 @@ BUILD_IMAGES=(
     "./containers/miniflux:ngalayko/miniflux"
     "./containers/openvpn:ngalayko/openvpn"
     "./containers/pihole:ngalayko/pihole"
-    "./containers/postgres:ngalayko/postgres"
     "./containers/remark:ngalayko/remark"
+    "./containers/postgres:ngalayko/postgres"
 )
 
 docker login -u "${DOCKER_HUB_LOGIN}" -p "${DOCKER_HUB_PASSWORD}"
