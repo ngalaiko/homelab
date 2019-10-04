@@ -1,0 +1,21 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+    
+    - name: Apply charts
+      uses: JimCronqvist/action-ssh@master
+      with:
+        hosts: 'pirate@selfhosted.galaiko.rocks'
+        privateKey: ${{ secrets.PRIVATE_KEY }}
+        command: |
+          cd server
+          git fetch origin
+          got reset --hard origin/master
+          ./scripts/k8s/apply.sh
