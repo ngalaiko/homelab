@@ -1,8 +1,0 @@
--- +migrate Up
-CREATE TABLE hostnames(
-   id INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
-   name VARCHAR(255) NOT NULL
-) CHARACTER SET=utf8;
-
--- +migrate Down
-DROP TABLE IF EXISTS hostnames;
