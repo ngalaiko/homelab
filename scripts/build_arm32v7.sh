@@ -6,22 +6,13 @@ echo "Building images..."
 
 # NOTE: ./server is the root
 BUILD_IMAGES=(
+    "./containers/doh-proxy:ngalayko/doh-proxy"
+    "./containers/fathom:ngalayko/fathom"
+    "./containers/miniflux:ngalayko/miniflux"
     "./containers/openvpn:ngalayko/openvpn"
     "./containers/pihole:ngalayko/pihole"
-    "./containers/remark:ngalayko/remark"
-    "./containers/home-assistant:ngalayko/home-assistant"
-    "./containers/dyn-dns:ngalayko/dyn-dns"
-    "./containers/grafana:ngalayko/grafana"
-    "./containers/prometheus:ngalayko/prometheus"
-    "./containers/docker-ap:ngalayko/docker-ap"
-    "./containers/miniflux:ngalayko/miniflux"
-    "./containers/traefik:ngalayko/proxy"
-    "./containers/fathom:ngalayko/fathom"
     "./containers/postgres:ngalayko/postgres"
-    "./containers/review-slots:ngalayko/review-slots"
-    "./containers/doh-proxy:ngalayko/doh-proxy"
-    "./containers/node-exporter:ngalayko/node-exporter"
-    "./containers/nginx:ngalayko/nginx"
+    "./containers/remark:ngalayko/remark"
 )
 
 docker login -u "${DOCKER_HUB_LOGIN}" -p "${DOCKER_HUB_PASSWORD}"

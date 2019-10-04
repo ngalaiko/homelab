@@ -1,1 +1,0 @@
-FROM arm32v7/nginx:1.15.3
