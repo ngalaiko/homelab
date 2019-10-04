@@ -18,7 +18,7 @@ spec:
       - name: github
       containers:
       - name: miniflux
-        image: docker.pkg.github.com/ngalaiko/miniboard/app:5f46d01777f1286d4f0f45d88ddec4d562234e2e
+        image: docker.pkg.github.com/ngalaiko/miniboard/app:9ac5f1844934d756e5356e7c3032daecc2058c66
         ports:
         - containerPort: 8080
           name: http
