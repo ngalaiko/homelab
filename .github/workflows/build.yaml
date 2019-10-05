@@ -36,10 +36,13 @@ jobs:
 
     - name: Build
       run: |
+        changed_files=$(git diff --name-only HEAD^1)
+        if [[ -z $(echo $changed_files | grep "images/${{ matrix.image }}") ]]; then 
+            echo 'files not changed, skipping'
+            exit 0
+        fi
+
         docker build \
             -t docker.pkg.github.com/ngalaiko/server/${{ matrix.image }} \
             ./images/${{ matrix.image }}
-
-    - name: Push
-      run: |
         docker push docker.pkg.github.com/ngalaiko/server/${{ matrix.image }}
