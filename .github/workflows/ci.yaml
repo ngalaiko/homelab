@@ -3,19 +3,32 @@ name: CI
 on: [push]
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        chart:
+        - cert-manager
+        - doh-proxy
+        - fathom
+        - kube-dashboard
+        - miniboard
+        - miniflux
+        - nfs-client
+        - nginx-ingress
+        - openvpn
+        - pihole
+        - postgres
+        - redis
+        - remark
+        - weave
     
     steps:
     - uses: actions/checkout@v1
-    
+
     - name: Apply charts
-      uses: JimCronqvist/action-ssh@master
+      uses: exelban/kubectl@master
+      env:
+        KUBE_CONFIG: ${{ secrets.KUBE_CONFIG_DATA }}
       with:
-        hosts: 'pirate@selfhosted.galaiko.rocks'
-        privateKey: ${{ secrets.PRIVATE_KEY }}
-        command: |
-          cd server
-          git fetch origin
-          got reset --hard origin/master
-          ./scripts/k8s/apply.sh
+        args: apply -f /github/workspace/k8s/${{ matrix.chart }}
