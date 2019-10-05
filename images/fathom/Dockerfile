@@ -27,6 +27,6 @@ RUN go get -u github.com/gobuffalo/packr/... \
     && GOOS=linux GOARCH=arm GOARM=7 ${GOPATH}/bin/packr build -v -ldflags '-w' -o fathom ./main.go
 
 
-FROM docker.pkg.github.com/ngalaiko/server/base-alpine:latest
+FROM hypriot/rpi-alpine:3.6
 COPY --from=binarybuilder /go/src/github.com/usefathom/fathom/fathom .
 CMD ["./fathom", "server"]

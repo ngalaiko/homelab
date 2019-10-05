@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: miniflux
-        image: ngalayko/miniflux:arm32v7
+        image: miniflux/miniflux:arm32v6-2.0.13
         ports:
         - containerPort: 8080
           name: http
