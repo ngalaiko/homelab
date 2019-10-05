@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: postgres
-        image: arm32v7/postgres:12.0-alpine
+        image: arm32v7/postgres:11.5
         ports:
         - containerPort: 5432
           name: postgres
@@ -30,8 +30,6 @@ spec:
             name: postgres-data
             readOnly: false
         env:
-          - name: POSTGRES_MULTIPLE_DATABASES
-            value: miniflux2,fathom,home_assistant
           - name: POSTGRES_USER
             value: postgres
           - name: POSTGRES_PASSWORD
