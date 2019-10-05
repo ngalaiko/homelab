@@ -14,9 +14,12 @@ spec:
       labels:
         app: remark
     spec:
+      imagePullSecrets:
+      - name: github
       containers:
       - name: remark
-        image: ngalayko/remark:arm32v7
+        image: docker.pkg.github.com/ngalaiko/server/remark
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
           name: http
