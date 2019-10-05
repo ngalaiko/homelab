@@ -14,9 +14,12 @@ spec:
       labels:
         app: fathom
     spec:
+      imagePullSecrets:
+      - name: github
       containers:
       - name: fathom
-        image: ngalayko/fathom:arm32v7
+        image: docker.pkg.github.com/ngalaiko/server/fathom
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
           name: http
