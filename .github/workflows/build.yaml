@@ -1,0 +1,45 @@
+name: Build
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        image:
+        - base-alpine
+        - base-debian
+        - doh-proxy
+        - fathom
+        - miniflux
+        - openvpn
+        - postgres
+        - remark
+    
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Login to registry
+      env:
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        DOCKER_HOME: /home/runner/work/_temp/_github_home
+      run: |
+        # this will create /home/runner/.docker/config.json with credentials
+        docker login \
+            docker.pkg.github.com \
+            -u ngalaiko \
+            -p ${DOCKER_PASSWORD}
+        mkdir -p ${DOCKER_HOME}/.docker
+        cp /home/runner/.docker/config.json ${DOCKER_HOME}/.docker/config.json
+
+    - name: Build
+      run: |
+        docker build \
+            -t docker.pkg.github.com/ngalaiko/server/${{ matrix.image }} \
+            ./images/${{ matrix.image }}
+
+    - name: Push
+      run: |
+        docker push docker.pkg.github.com/ngalaiko/server/${{ matrix.image }}

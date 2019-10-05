@@ -1,6 +1,6 @@
 # source: https://raw.githubusercontent.com/docker-library/postgres/040949af1595f49f2242f6d1f9c42fb042b3eaed/11/Dockerfile
 
-FROM hypriot/rpi-alpine:3.6
+FROM docker.pkg.github.com/ngalaiko/server/base-alpine
 
 # make the "en_US.UTF-8" locale so postgres will be utf-8 enabled by default
 # alpine doesn't require explicit locale-file generation

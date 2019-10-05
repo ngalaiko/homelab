@@ -1,4 +1,4 @@
-FROM hypriot/rpi-alpine:3.6
+FROM docker.pkg.github.com/ngalaiko/server/base-alpine
 
 RUN apk add --update \
         openssl \

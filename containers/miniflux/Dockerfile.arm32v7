@@ -1,9 +1,0 @@
-FROM miniflux/miniflux:arm32v6-2.0.13
-
-USER root
-
-RUN apk add --update curl
-
-USER nobody
-
-HEALTHCHECK --interval=30s --timeout=3s CMD curl --fail http://localhost:8080/|| exit 1
