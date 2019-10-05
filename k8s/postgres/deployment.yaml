@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: postgres
-        image: ngalayko/postgres:arm32v7
+        image: arm32v7/postgres:12.0-alpine
         ports:
         - containerPort: 5432
           name: postgres
