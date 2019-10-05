@@ -8,7 +8,8 @@ RUN curl -OL "https://github.com/umputun/remark/archive/v${REMARK_VERSION}.tar.g
     && sha256sum v${REMARK_VERSION}.tar.gz \
     && echo "${REMARK_SHA256SUM}  v${REMARK_VERSION}.tar.gz" | sha256sum -c - \
     && tar -xvzf v${REMARK_VERSION}.tar.gz \
-    && mv remark-${REMARK_VERSION} remark
+    && mv remark-${REMARK_VERSION} remark \
+    && chmod +x /remark/entrypoint.sh
 
 FROM umputun/baseimage:buildgo-latest as build-backend
 COPY --from=downloader /remark/backend /build/backend
@@ -34,6 +35,7 @@ RUN cd /srv/frontend && \
 
 FROM hypriot/rpi-alpine:3.6
 WORKDIR /srv
+COPY --from=downloader /remark/entrypoint.sh /entrypoint.sh
 COPY --from=downloader /remark/backend/scripts/backup.sh /usr/local/bin/backup
 COPY --from=downloader /remark/backend/scripts/restore.sh /usr/local/bin/restore
 COPY --from=downloader /remark/backend/scripts/import.sh /usr/local/bin/import
