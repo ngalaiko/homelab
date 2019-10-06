@@ -1,17 +1,27 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: nginx-config
+  name: nginx-configuration
+  namespace: nginx-ingress
+  labels:
+    app: nginx-ingress
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: tcp-services
+  namespace: nginx-ingress
+  labels:
+    app: nginx-ingress
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: udp-services
   namespace: nginx-ingress
   labels:
     app: nginx-ingress
 data:
-    server-names-hash-bucket-size: "1024"
-    stream-snippets: |
-      upstream openvpn-udp {
-          server openvpn.default.svc.cluster.local:1194;
-      }
-      server {
-          listen 1194 udp;
-          proxy_pass openvpn-udp;
-      } 
+  1194: "default/openvpn:1194"
