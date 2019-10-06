@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: pihole
-        image: ngalayko/pihole:arm32v7
+        image: pihole/pihole:4.3.2-1_armhf
         ports:
         - containerPort: 80
           name: http
