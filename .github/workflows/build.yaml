@@ -11,6 +11,7 @@ jobs:
     strategy:
       matrix:
         image:
+        - base-alpine
         - base-debian
         - doh-proxy
         - fathom
