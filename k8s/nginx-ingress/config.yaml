@@ -5,6 +5,8 @@ metadata:
   namespace: nginx-ingress
   labels:
     app: nginx-ingress
+data:
+  proxy-stream-responses: "100"
 
 ---
 kind: ConfigMap
