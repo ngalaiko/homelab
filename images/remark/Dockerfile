@@ -33,7 +33,7 @@ RUN cd /srv/frontend && \
     rm -rf ./node_modules
 
 
-FROM hypriot/rpi-alpine:3.6
+FROM docker.pkg.github.com/ngalaiko/server/base-alpine
 WORKDIR /srv
 COPY --from=downloader /remark/entrypoint.sh /entrypoint.sh
 COPY --from=downloader /remark/backend/scripts/backup.sh /usr/local/bin/backup

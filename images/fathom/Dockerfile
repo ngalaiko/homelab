@@ -1,4 +1,3 @@
-
 FROM alpine as downloader
 ENV FATHOM_VERSION=1.2.1
 ENV FATHOM_SHA256SUM=d63bf114928e0bed8b3ec08393f6a8c7c7ae62220e8c5140f7cfae1908f52668
@@ -27,6 +26,6 @@ RUN go get -u github.com/gobuffalo/packr/... \
     && GOOS=linux GOARCH=arm GOARM=7 ${GOPATH}/bin/packr build -v -ldflags '-w' -o fathom ./main.go
 
 
-FROM hypriot/rpi-alpine:3.6
+FROM docker.pkg.github.com/ngalaiko/server/base-alpine
 COPY --from=binarybuilder /go/src/github.com/usefathom/fathom/fathom .
 CMD ["./fathom", "server"]
