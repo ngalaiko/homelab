@@ -14,9 +14,11 @@ spec:
       labels:
         app: doh-proxy
     spec:
+      imagePullSecrets:
+      - name: github
       containers:
       - name: doh-proxy
-        image: ngalayko/doh-proxy:arm32v7
+        image: docker.pkg.github.com/ngalaiko/server/doh-proxy
         args:
         - --upstream-resolver=pihole-dns
         - --port=3000
