@@ -6,7 +6,7 @@ metadata:
   labels:
     app: nginx-ingress
 spec:
-  type: NodePort
+  type: LoadBalancer
   ports:
     - name: http
       port: 80
@@ -28,7 +28,7 @@ metadata:
   labels:
     app: nginx-ingress
 spec:
-  type: NodePort
+  type: LoadBalancer
   ports:
     - name: openvpn
       port: 1194
