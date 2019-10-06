@@ -11,6 +11,8 @@ jobs:
     strategy:
       matrix:
         image:
+        - base-debian
+        - doh-proxy
         - fathom
         - openvpn
         - remark
@@ -39,6 +41,7 @@ jobs:
             exit 0
         fi
 
+        docker run --rm --privileged multiarch/qemu-user-static:register --reset
         docker build \
             -t docker.pkg.github.com/ngalaiko/server/${{ matrix.image }} \
             ./images/${{ matrix.image }}
