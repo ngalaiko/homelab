@@ -20,6 +20,8 @@ spec:
       - name: remark
         image: docker.pkg.github.com/ngalaiko/server/remark
         imagePullPolicy: Always
+        args:
+        - server
         ports:
         - containerPort: 8080
           name: http

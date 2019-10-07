@@ -25,22 +25,29 @@ RUN cd /srv/frontend && CI=true npm ci
 
 
 FROM node:10.11-alpine as build-frontend
+ARG NODE_ENV=production
 COPY --from=build-frontend-deps /srv/frontend/node_modules /srv/frontend/node_modules
 COPY --from=downloader /remark/frontend /srv/frontend
 RUN cd /srv/frontend && \
-    if [ -z "$SKIP_FRONTEND_TEST" ] ; then npx run-p lint test build ; \
-    else echo "skip frontend tests and lint" ; npm run build ; fi && \
+    npm run build && \
     rm -rf ./node_modules
 
 
 FROM docker.pkg.github.com/ngalaiko/server/base-alpine
+
 WORKDIR /srv
-COPY --from=downloader /remark/entrypoint.sh /entrypoint.sh
+
+COPY entrypoint.sh /entrypoint.sh
 COPY --from=downloader /remark/backend/scripts/backup.sh /usr/local/bin/backup
 COPY --from=downloader /remark/backend/scripts/restore.sh /usr/local/bin/restore
 COPY --from=downloader /remark/backend/scripts/import.sh /usr/local/bin/import
+RUN chmod +x /entrypoint.sh /usr/local/bin/backup /usr/local/bin/restore /usr/local/bin/import
+
 COPY --from=build-backend /build/backend/remark42 /srv/remark42
 COPY --from=build-frontend /srv/frontend/public/ /srv/web
-EXPOSE 8080
+
+RUN ln -s /srv/remark42 /usr/bin/remark42
+
 HEALTHCHECK --interval=30s --timeout=3s CMD curl --fail http://localhost:8080/ping || exit 1
-CMD ["/srv/remark42", "server"]
+
+ENTRYPOINT ["/entrypoint.sh"]
