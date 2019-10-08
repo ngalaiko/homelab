@@ -6,7 +6,7 @@ metadata:
   labels:
     app: nginx-ingress
 data:
-  proxy-stream-responses: "100"
+  proxy-stream-responses: "10"
 
 ---
 kind: ConfigMap
