@@ -36,6 +36,7 @@ spec:
             - --udp-services-configmap=$(POD_NAMESPACE)/udp-services
             - --publish-service=$(POD_NAMESPACE)/nginx-ingress
             - --annotations-prefix=nginx.ingress.kubernetes.io
+            - --v=10
           securityContext:
             allowPrivilegeEscalation: true
             capabilities:
