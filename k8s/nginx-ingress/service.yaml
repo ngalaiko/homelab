@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: nginx-ingress
+  name: nginx-ingress-tcp
   namespace: nginx-ingress
   labels:
     app: nginx-ingress
@@ -10,10 +10,12 @@ spec:
   ports:
     - name: http
       port: 80
+      nodePort: 31360
       targetPort: 80
       protocol: TCP
     - name: https
       port: 443
+      nodePort: 31259
       targetPort: 443
       protocol: TCP
   selector:
@@ -23,7 +25,7 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: nginx-openvpn-ingress
+  name: nginx-ingress-udp
   namespace: nginx-ingress
   labels:
     app: nginx-ingress
