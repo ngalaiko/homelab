@@ -27,13 +27,13 @@ spec:
             - name: PROVISIONER_NAME
               value: fuseim.pri/ifs
             - name: NFS_SERVER
-              value: 192.168.0.9
+              value: 192.168.0.13
             - name: NFS_PATH
               value: /mnt/nfsserver
       volumes:
         - name: nfs-client-root
           nfs:
-            # this is node-blue
+            # this is node-rp4-1
             # todo: do not hardcode it
-            server: 192.168.0.9
+            server: 192.168.0.13
             path: /mnt/nfsserver
