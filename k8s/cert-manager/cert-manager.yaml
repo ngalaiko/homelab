@@ -2069,7 +2069,7 @@ spec:
       serviceAccountName: cert-manager-cainjector
       containers:
         - name: cainjector
-          image: "quay.io/jetstack/cert-manager-cainjector-arm:v0.9.0"
+          image: "quay.io/jetstack/cert-manager-cainjector-arm:v0.11.0"
           imagePullPolicy: IfNotPresent
           args:
           - --v=2
@@ -2117,7 +2117,7 @@ spec:
       serviceAccountName: cert-manager-webhook
       containers:
         - name: webhook
-          image: "quay.io/jetstack/cert-manager-webhook-arm:v0.9.0"
+          image: "quay.io/jetstack/cert-manager-webhook-arm:v0.11.0"
           imagePullPolicy: IfNotPresent
           args:
           - --v=2
@@ -2177,7 +2177,7 @@ spec:
       serviceAccountName: cert-manager
       containers:
         - name: cert-manager
-          image: "quay.io/jetstack/cert-manager-controller-arm:v0.9.0"
+          image: "quay.io/jetstack/cert-manager-controller-arm:v0.11.0"
           imagePullPolicy: IfNotPresent
           args:
           - --v=2
