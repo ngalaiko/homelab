@@ -15,7 +15,7 @@ spec:
   selector:
     matchLabels:
       app: vault
-  replicas: 3
+  replicas: 1
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -44,14 +44,14 @@ spec:
             scheme: HTTP
           initialDelaySeconds: 30
           periodSeconds: 10
-        readinessProbe:
-          # Ready depends on preference
-          httpGet:
-            path: /v1/sys/health?standbycode=204&uninitcode=204&
-            port: 8200
-            scheme: HTTP
-          initialDelaySeconds: 10
-          periodSeconds: 10
+        #readinessProbe:
+          ## Ready depends on preference
+          #httpGet:
+            #path: /v1/sys/health?standbycode=204&uninitcode=204&
+            #port: 8200
+            #scheme: HTTP
+          #initialDelaySeconds: 10
+          #periodSeconds: 10
         securityContext:
           readOnlyRootFilesystem: true
           capabilities:

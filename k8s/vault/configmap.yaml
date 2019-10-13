@@ -8,7 +8,7 @@ metadata:
 data:
   config.json: |
     {
-        "backendPolicy":null,
+        "ui": true,
         "listener":{
             "tcp":{
                 "address":"[::]:8200",
@@ -20,9 +20,7 @@ data:
         },
         "storage": {
             "consul": {
-                "address": "consul.consul:8500",
-                "path": "vault",
-                "scheme": "http"
+                "address": "consul.consul:8500"
             }
         }
     }

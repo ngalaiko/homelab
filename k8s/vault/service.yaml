@@ -9,10 +9,29 @@ spec:
   type: ClusterIP
   ports:
   - port: 8200
-    protocol: TCP
-    targetPort: 8200
     name: api
   selector:
     app: vault
-    release: vault
 
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: vault-ui
+  namespace: vault
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+  - hosts:
+    - vlt.galaiko.rocks
+    secretName: vault-tls
+  rules:
+  - host: vlt.galaiko.rocks
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: vault
+          servicePort: api
