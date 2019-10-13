@@ -1,0 +1,12 @@
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: "consul-pdb"
+  namespace: consul
+  labels:
+    component: "consul-consul"
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      component: "consul-consul"

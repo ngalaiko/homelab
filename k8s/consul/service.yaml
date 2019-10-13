@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: "consul"
+  namespace: "consul"
+  labels:
+    component: "consul-consul"
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+spec:
+  ports:
+  - name: http
+    port: 8500
+  - name: rpc
+    port: 8400
+  - name: serflan-tcp
+    protocol: "TCP"
+    port: 8301
+  - name: serflan-udp
+    protocol: "UDP"
+    port: 8301
+  - name: serfwan-tcp
+    protocol: "TCP"
+    port: 8302
+  - name: serfwan-udp
+    protocol: "UDP"
+    port: 8302
+  - name: server
+    port: 8300
+  - name: consuldns-tcp
+    port: 8600
+  - name: consuldns-udp
+    protocol: "UDP"
+    port: 8600
+  clusterIP: None
+  selector:
+    component: "consul-consul"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "consul-ui"
+  namespace: "consul"
+  labels:
+    component: "consul-consul"
+spec:
+  ports:
+  - name: http
+    port: 8500
+  selector:
+    component: "consul-consul"
+  type: "NodePort"
