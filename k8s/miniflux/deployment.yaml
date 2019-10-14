@@ -1,7 +1,14 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: miniflux
+
+---
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
   name: miniflux
+  namespace: miniflux
   labels:
     app: miniflux
 spec:
@@ -11,6 +18,7 @@ spec:
       app: miniflux
   template:
     metadata:
+      namespace: miniflux
       labels:
         app: miniflux
     spec:
