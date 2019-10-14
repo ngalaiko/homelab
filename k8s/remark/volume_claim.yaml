@@ -2,6 +2,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: remark-data
+  namespace: remark
   annotations:
     volume.beta.kubernetes.io/storage-class: "managed-nfs-storage"
   labels:
