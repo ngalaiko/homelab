@@ -2,6 +2,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: pihole
+  namespace: pihole
   annotations:
     volume.beta.kubernetes.io/storage-class: "managed-nfs-storage"
   labels:
@@ -18,6 +19,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: dnsmasq
+  namespace: pihole
   annotations:
     volume.beta.kubernetes.io/storage-class: "managed-nfs-storage"
   labels:
