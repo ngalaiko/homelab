@@ -106,7 +106,7 @@ data:
 
       NETWORK="$(cidr2net $cidr)"
       NETMASK="$(cidr2mask ${cidr#*/})"
-      DNS=$(nslookup pihole-dns.default 2>/dev/null | grep Address | awk '{ print $3 }')
+      DNS=$(nslookup pihole-dns.pihole 2>/dev/null | grep Address | awk '{ print $3 }')
 
       echo "Using dns: $DNS"
 
