@@ -10,4 +10,7 @@ RUN apk add --update --no-cache \
 
 FROM hypriot/rpi-alpine:3.6
 
+RUN apk add --update --no-cache \
+    ca-certificates
+
 COPY --from=downloader /usr/bin/qemu-arm-static /usr/bin/qemu-arm-static
