@@ -2,6 +2,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: openvpn
+  namespace: openvpn
   labels:
     app: openvpn
 spec:

@@ -1,7 +1,14 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openvpn
+
+---
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
   name: openvpn
+  namespace: openvpn
   labels:
     app: openvpn
 spec:
@@ -11,6 +18,7 @@ spec:
       app: openvpn
   template:
     metadata:
+      namespace: openvpn
       labels:
         app: openvpn
     spec:

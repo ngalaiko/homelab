@@ -2,6 +2,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: openvpn
+  namespace: openvpn
   annotations:
     volume.beta.kubernetes.io/storage-class: "managed-nfs-storage"
   labels:
