@@ -2,6 +2,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: postgres-data
+  namespace: postgres
   annotations:
     volume.beta.kubernetes.io/storage-class: "managed-nfs-storage"
   labels:

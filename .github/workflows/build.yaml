@@ -16,6 +16,7 @@ jobs:
         - doh-proxy
         - fathom
         - openvpn
+        - postgres
         - remark
     
     steps:
