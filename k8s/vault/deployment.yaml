@@ -41,7 +41,7 @@ spec:
           httpGet:
             path: /v1/sys/health?standbyok=true&uninitcode=204&sealedcode=204&
             port: 8200
-            scheme: HTTP
+            scheme: HTTPS
           initialDelaySeconds: 30
           periodSeconds: 10
         #readinessProbe:
@@ -76,6 +76,8 @@ spec:
           mountPath: /vault/config/
         - name: vault-root
           mountPath: /root/
+        - name: certificate
+          mountPath: /tls/
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -94,5 +96,8 @@ spec:
             name: "vault-config"
         - name: vault-root
           emptyDir: {}
+        - name: certificate
+          secret:
+            secretName: certificate
 
 
