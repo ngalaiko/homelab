@@ -90,3 +90,38 @@ spec:
           persistentVolumeClaim:
             claimName: prometheus-server
 
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: prometheus-kube-state-metrics
+  namespace: prometheus
+  labels:
+    component: "kube-state-metrics"
+    app: prometheus
+spec:
+  selector:
+    matchLabels:
+      component: "kube-state-metrics"
+      app: prometheus
+  replicas: 1
+  template:
+    metadata:
+      namespace: prometheus
+      labels:
+        component: "kube-state-metrics"
+        app: prometheus
+    spec:
+      serviceAccountName: prometheus-kube-state-metrics
+      containers:
+        - name: prometheus-kube-state-metrics
+          image: "k8s.gcr.io/kube-state-metrics-arm:v1.7.2"
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - name: metrics
+              containerPort: 8080
+          resources:
+            {}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534

@@ -25,6 +25,30 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  name: prometheus-kube-state-metrics
+  namespace: prometheus
+  annotations:
+    prometheus.io/scrape: "true"
+  labels:
+    component: "kube-state-metrics"
+    app: prometheus
+spec:
+  clusterIP: None
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    component: "kube-state-metrics"
+    app: prometheus
+    release: prometheus
+  type: "ClusterIP"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
   name: prometheus-server
   namespace: prometheus
   labels:

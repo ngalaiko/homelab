@@ -8,6 +8,9 @@ metadata:
 data:
   alerts: |
     {}
+
+  rules: |
+    {}
     
   prometheus.yml: |
     global:
@@ -179,7 +182,3 @@ data:
         source_labels:
         - __meta_kubernetes_pod_name
         target_label: kubernetes_pod_name
-    
-  rules: |
-    {}
- 

@@ -1,6 +1,16 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
+  name: prometheus-kube-state-metrics
+  namespace: prometheus
+  labels:
+    component: "kube-state-metrics"
+    app: prometheus
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
   name: prometheus-node-exporter
   namespace: prometheus
   labels:
