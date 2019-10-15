@@ -21,6 +21,16 @@ metadata:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
+  name: prometheus-arm-exporter
+  namespace: prometheus
+  labels:
+    component: "arm-exporter"
+    app: prometheus
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
   name: prometheus-server
   namespace: prometheus
   labels:
