@@ -9,9 +9,9 @@ spec:
   selector:
     app: remark
   ports:
-    - name: http
-      port: 8080
-      targetPort: http
+    - name: https
+      port: 8443
+      targetPort: https
 
 ---
 apiVersion: extensions/v1beta1
@@ -23,6 +23,7 @@ metadata:
     app: remark
   annotations:
     kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
   tls:
@@ -36,4 +37,4 @@ spec:
       - path: /
         backend:
           serviceName: remark
-          servicePort: http
+          servicePort: https

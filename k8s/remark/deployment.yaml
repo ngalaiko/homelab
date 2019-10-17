@@ -31,13 +31,26 @@ spec:
         args:
         - server
         ports:
-        - containerPort: 8080
-          name: http
+        - containerPort: 8443
+          name: https
         volumeMounts:
           - mountPath: /srv/var
             name: remark-data
             readOnly: false
+          - mountPath: /tls
+            name: tls-certificate
+            readOnly: true
         env:
+        - name: SSL_PORT
+          value: "8443"
+        - name: SSL_CERT
+          value: "/tls/tls.crt"
+        - name: SSL_KEY
+          value: "/tls/tls.key"
+        - name: EMOJI
+          value: "true"
+        - name: SSL_TYPE
+          value: "static"
         - name: REMARK_PORT
           value: "8080"
         - name: REMARK_URL
@@ -80,3 +93,6 @@ spec:
       - name: remark-data
         persistentVolumeClaim:
           claimName: remark-data
+      - name: tls-certificate
+        secret:
+          secretName: tls-certificate
