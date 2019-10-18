@@ -26,8 +26,8 @@ spec:
       - name: miniflux
         image: miniflux/miniflux:arm32v6-2.0.13
         ports:
-        - containerPort: 8080
-          name: http
+        - containerPort: 8443
+          name: https
         livenessProbe:
           tcpSocket:
             port: http
@@ -36,8 +36,14 @@ spec:
           failureThreshold: 5
           timeoutSeconds: 1
         env:
+          - name: HTTPS
+            value: "true"
+          - name: CERT_FILE
+            value: "/tls/tls.crt"
+          - name: KEY_FILE
+            value: "/tls/tls.key"
           - name: PORT
-            value: "8080"
+            value: "8443"
           - name: BASE_URL
             value: "https://rss.galaiko.rocks"
           - name: RUN_MIGRATIONS
@@ -62,3 +68,11 @@ spec:
               secretKeyRef:
                 name: miniflux-database-url
                 key: MINIFLUX_DATABASE_URL
+        volumeMounts:
+        - name: tls-certificate
+          mountPath: /tls
+
+      volumes:
+      - name: tls-certificate
+        secret:
+          secretName: tls-certificate

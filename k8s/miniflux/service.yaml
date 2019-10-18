@@ -9,9 +9,9 @@ spec:
   selector:
     app: miniflux
   ports:
-    - name: http
-      port: 8080
-      targetPort: http
+    - name: https
+      port: 8443
+      targetPort: https
 
 ---
 apiVersion: extensions/v1beta1
@@ -23,6 +23,7 @@ metadata:
     app: miniflux
   annotations:
     kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
 spec:
@@ -37,4 +38,4 @@ spec:
       - path: /
         backend:
           serviceName: miniflux
-          servicePort: http
+          servicePort: https
