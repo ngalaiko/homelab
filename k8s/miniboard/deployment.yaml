@@ -28,21 +28,26 @@ spec:
       - name: miniflux
         image: ngalayko/miniboard
         ports:
-        - containerPort: 8080
-          name: http
+        - containerPort: 8443
+          name: https
         livenessProbe:
-          tcpSocket:
-            port: http
+          httpGet:
+            scheme: HTTPS
+            path: /
+            port: https
           initialDelaySeconds: 30
           periodSeconds: 10
           failureThreshold: 5
           timeoutSeconds: 1
         args:
+          - --addr=:8443
           - --redis-uri=redis.redis:6379
           - --smtp-sender=auth@miniboard.app
           - --smtp-port=587
           - --smtp-host=smtp.fastmail.com
           - --domain=https://miniboard.galaiko.rocks
+          - --ssl-cert=/tls/tls.crt
+          - --ssl-key=/tls/tls.key
         env:
           - name: SMTP_USERNAME
             valueFrom:
@@ -54,3 +59,11 @@ spec:
               secretKeyRef:
                 name: smtp-password
                 key: SMTP_PASSWORD
+        volumeMounts:
+        - name: tls-certificate
+          mountPath: /tls
+
+      volumes:
+      - name: tls-certificate
+        secret:
+          secretName: tls-certificate

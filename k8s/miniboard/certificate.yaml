@@ -1,0 +1,11 @@
+apiVersion: cert-manager.io/v1alpha2		
+kind: Certificate		
+metadata:		
+  name: tls-certificate		
+  namespace: miniboard		
+spec:		
+  secretName: tls-certificate		
+  issuerRef:		
+    name: ca-issuer		
+    kind: ClusterIssuer		
+  commonName: miniboard.miniboard		
