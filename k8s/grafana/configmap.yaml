@@ -7,6 +7,11 @@ metadata:
     app: grafana
 data:
   grafana.ini: |
+    [server]
+    protocol = https
+    enable_gzip = true
+    cert_file = /tls/tls.crt
+    cert_key = /tls/tls.key
     [analytics]
     reporting_enabled = false
     check_for_updates = true

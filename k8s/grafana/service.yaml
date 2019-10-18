@@ -8,7 +8,7 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-    - name: http
+    - name: https
       port: 80
       protocol: TCP
       targetPort: 3000
@@ -25,6 +25,7 @@ metadata:
     app: grafana
   annotations:
     kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
   tls:
@@ -38,4 +39,4 @@ spec:
       - path: /
         backend:
           serviceName: grafana
-          servicePort: http
+          servicePort: https

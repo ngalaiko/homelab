@@ -49,6 +49,8 @@ spec:
               subPath: grafana.ini
             - name: storage
               mountPath: "/var/lib/grafana"
+            - name: tls-certificate
+              mountPath: /tls
           ports:
             - name: service
               containerPort: 80
@@ -70,6 +72,7 @@ spec:
           livenessProbe:
             failureThreshold: 10
             httpGet:
+              scheme: HTTPS
               path: /api/health
               port: 3000
             initialDelaySeconds: 60
@@ -77,6 +80,7 @@ spec:
             
           readinessProbe:
             httpGet:
+              scheme: HTTPS
               path: /api/health
               port: 3000
             
@@ -87,3 +91,6 @@ spec:
         - name: storage
           persistentVolumeClaim:
             claimName: grafana-data
+        - name: tls-certificate
+          secret:
+              secretName: tls-certificate
