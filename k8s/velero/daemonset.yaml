@@ -60,4 +60,4 @@ spec:
             - name: AWS_SHARED_CREDENTIALS_FILE
               value: /credentials/cloud
           securityContext:
-            privileged: false
+            privileged: true
