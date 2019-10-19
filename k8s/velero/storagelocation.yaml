@@ -1,0 +1,11 @@
+apiVersion: velero.io/v1
+kind: BackupStorageLocation
+metadata:
+  name: default
+  namespace: velero
+  labels:
+    app: velero
+spec:
+  provider: aws
+  objectStorage:
+    bucket: cluster.backup

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: velero
+  namespace: velero
+  labels:
+    app: velero
+spec:
+  type: ClusterIP
+  ports:
+    - name: monitoring
+      port: 8085
+      targetPort: monitoring
+  selector:
+    app: velero

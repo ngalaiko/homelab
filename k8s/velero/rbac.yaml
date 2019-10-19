@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: velero-server
+  namespace: velero
+  labels:
+    app: velero
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: velero-server
+  namespace: velero
+  labels:
+    component: server
+    app: velero
+subjects:
+  - kind: ServiceAccount
+    namespace: velero
+    name: velero-server
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
