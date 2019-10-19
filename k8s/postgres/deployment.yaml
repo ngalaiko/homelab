@@ -18,6 +18,8 @@ spec:
       app: postgres
   template:
     metadata:
+      annotations:
+        backup.velero.io/backup-volumes: "postgres-data"
       namespace: postgres
       labels:
         app: postgres

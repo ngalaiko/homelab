@@ -19,6 +19,8 @@ spec:
   template:
     metadata:
       namespace: remark
+      annotations:
+        backup.velero.io/backup-volumes: "remark-data"
       labels:
         app: remark
     spec:

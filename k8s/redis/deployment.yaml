@@ -19,6 +19,8 @@ spec:
   template:
     metadata:
       namespace: redis
+      annotations:
+        backup.velero.io/backup-volumes: "redis-data"
       labels:
         app: redis
     spec:

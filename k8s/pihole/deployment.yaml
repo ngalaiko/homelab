@@ -19,6 +19,8 @@ spec:
   template:
     metadata:
       namespace: pihole
+      annotations:
+        backup.velero.io/backup-volumes: "pihole,dnsmasq"
       labels:
         app: pihole
     spec:

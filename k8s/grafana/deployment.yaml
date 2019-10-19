@@ -30,6 +30,8 @@ spec:
   template:
     metadata:
       namespace: grafana
+      annotations:
+        backup.velero.io/backup-volumes: "storage"
       labels:
         app: grafana
     spec:

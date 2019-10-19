@@ -18,6 +18,8 @@ spec:
       app: openvpn
   template:
     metadata:
+      annotations:
+        backup.velero.io/backup-volumes: "openvpn"
       namespace: openvpn
       labels:
         app: openvpn
