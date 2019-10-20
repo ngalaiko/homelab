@@ -27,6 +27,7 @@ spec:
       containers:
       - name: miniflux
         image: ngalayko/miniboard
+        imagePullPolicy: Always
         ports:
         - containerPort: 8443
           name: https
