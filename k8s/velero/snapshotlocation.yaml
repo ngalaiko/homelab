@@ -1,0 +1,11 @@
+apiVersion: velero.io/v1
+kind: VolumeSnapshotLocation
+metadata:
+  name: backup
+  namespace: velero
+  labels:
+    app: velero
+spec:
+  provider: aws
+  config:
+    region: eu-north-1
