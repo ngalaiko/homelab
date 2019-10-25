@@ -16,7 +16,7 @@ jobs:
         - fathom
         - grafana
         - kube-dashboard
-        - miniboard
+        #- miniboard
         - miniflux
         - nfs-client
         - nginx-ingress
