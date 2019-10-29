@@ -20,6 +20,9 @@ spec:
       app: nginx-ingress
   template:
     metadata:
+      annotations:
+        prometheus.io/port: "10254"
+        prometheus.io/scrape: "true"
       labels:
         app: nginx-ingress
     spec:
