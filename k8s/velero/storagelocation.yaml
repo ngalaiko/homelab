@@ -9,3 +9,5 @@ spec:
   provider: aws
   objectStorage:
     bucket: cluster.backup
+  config:
+    region: eu-north-1
