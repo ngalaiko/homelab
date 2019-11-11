@@ -13,4 +13,4 @@ spec:
     - "*"
     includedNamespaces:
     - "*"
-    ttl: 72h
+    ttl: 48h
