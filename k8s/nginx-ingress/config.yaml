@@ -6,7 +6,10 @@ metadata:
   labels:
     app: nginx-ingress
 data:
-  proxy-stream-responses: "10"
+  ssl-protocols: "TLSv1.2 TLSv1.3"
+  ssl-early-data: "true"
+  keepalive-timeout: "10m"
+  use-http2: "true"
 
 ---
 kind: ConfigMap
