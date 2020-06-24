@@ -1,0 +1,12 @@
+hostname: ""
+ssh_authorized_keys:
+- "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC97qxwy0hF5xiq+fLSm7cgoP7fKx1SgRu63qg/bqa9Ol5TEVStIQhoCvZU7A2EAcAGd5oIBpeWS5ULNMP84yg/5rc7FUS6MymedoKsOonKU4Guh0uB6r5oBx5UU6mYKtAZdyjaWzestLPzjAcPnFCCxknoBX9rRv1g0wljseliKt+65xPA08ztbofMnnSwqJTEJ5qK65ckyX1wg/hzk6E5JgenUVL18Ed7oqNBuYQQ9I6WN3h90hrU+lpWOp+mnljrAlElM7rpqqbQyMm3ld8pZWWShevpEgTs414A5malXrrzRJSPYaxaj9X3NXWHOVxUNwrsMVPkqZ6Ju9lAfcTX"
+k3os:
+  ntp_servers:
+  - 0.us.pool.ntp.org
+  - 1.us.pool.ntp.org
+  k3s_args:
+  - server
+  - "--server=https://127.0.0.1:6443"
+  - "--disable=traefik"
+  token: ""
