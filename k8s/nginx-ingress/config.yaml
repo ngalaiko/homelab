@@ -29,4 +29,3 @@ metadata:
   labels:
     app: nginx-ingress
 data:
-  1194: "openvpn/openvpn:1194"
