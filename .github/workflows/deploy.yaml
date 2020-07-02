@@ -22,7 +22,7 @@ jobs:
         - nginx-ingress
         #- openvpn
         #- pihole
-        #- postgres
+        - postgres
         #- prometheus
         #- redis
         #- remark
