@@ -12,21 +12,21 @@ jobs:
       matrix:
         chart:
         - cert-manager
-        - doh-proxy
-        - fathom
-        - grafana
+        #- doh-proxy
+        #- fathom
+        #- grafana
         - kube-dashboard
         #- miniboard
-        - miniflux
-        - nfs-client
+        #- miniflux
+        #- nfs-client
         - nginx-ingress
-        - openvpn
-        - pihole
-        - postgres
-        - prometheus
-        - redis
-        - remark
-        - velero
+        #- openvpn
+        #- pihole
+        #- postgres
+        #- prometheus
+        #- redis
+        #- remark
+        #- velero
     
     steps:
     - uses: actions/checkout@v1
