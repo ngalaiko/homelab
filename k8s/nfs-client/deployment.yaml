@@ -16,7 +16,7 @@ metadata:
 
 ---
 kind: Deployment
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 metadata:
   name: nfs-client-provisioner
   namespace: nfs-client-provisioner
@@ -26,6 +26,9 @@ spec:
   replicas: 1
   strategy:
     type: Recreate
+  selector:
+    matchLabels:
+      app: nfs-client-provisioner
   template:
     metadata:
       namespace: nfs-client-provisioner
@@ -43,13 +46,11 @@ spec:
             - name: PROVISIONER_NAME
               value: fuseim.pri/ifs
             - name: NFS_SERVER
-              value: 192.168.0.13
+              value: 192.168.1.108
             - name: NFS_PATH
-              value: /mnt/nfsserver
+              value: /home/pirate/nfs
       volumes:
         - name: nfs-client-root
           nfs:
-            # this is node-rp4-1
-            # todo: do not hardcode it
-            server: 192.168.0.13
-            path: /mnt/nfsserver
+            server: 192.168.1.108
+            path: /home/pirate/nfs
