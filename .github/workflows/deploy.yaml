@@ -17,7 +17,7 @@ jobs:
         #- grafana
         - kube-dashboard
         #- miniboard
-        #- miniflux
+        - miniflux
         - nfs-client
         - nginx-ingress
         #- openvpn

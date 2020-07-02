@@ -4,7 +4,7 @@ metadata:
   name: miniflux
 
 ---
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: miniflux
@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
       - name: miniflux
-        image: miniflux/miniflux:arm32v6-2.0.13
+        image: miniflux/miniflux:arm32v6-2.0.22
         ports:
         - containerPort: 8443
           name: https
