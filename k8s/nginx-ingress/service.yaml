@@ -20,22 +20,3 @@ spec:
       protocol: TCP
   selector:
     app: nginx-ingress
-
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: nginx-ingress-udp
-  namespace: nginx-ingress
-  labels:
-    app: nginx-ingress
-spec:
-  type: LoadBalancer
-  ports:
-    - name: openvpn
-      port: 1194
-      nodePort: 31294
-      targetPort: openvpn
-      protocol: UDP
-  selector:
-    app: nginx-ingress
